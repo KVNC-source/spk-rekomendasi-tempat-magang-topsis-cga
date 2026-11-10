@@ -1,13 +1,207 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// Data Layer — PostgreSQL via Prisma ORM.
+// Table and column names follow proposal Gambar 3.8 exactly. Anything marked
+// [ADDED] is NOT in Gambar 3.8 and was approved individually (gaps 1–5).
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider            = "prisma-client"
+  output              = "../generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "ts"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model Role {
+  role_id   Int    @id @default(autoincrement())
+  nama_role String @db.VarChar(100)
+
+  users User[]
+
+  @@map("role")
+}
+
+model User {
+  user_id  Int    @id @default(autoincrement())
+  role_id  Int
+  username String @db.VarChar(100)
+  password String @db.VarChar(255)
+  email    String @db.VarChar(255)
+  status   String @db.VarChar(50)
+
+  role      Role       @relation(fields: [role_id], references: [role_id])
+  mahasiswa Mahasiswa?
+
+  @@map("users")
+}
+
+model Mahasiswa {
+  mahasiswa_id Int     @id @default(autoincrement())
+  user_id      Int     @unique
+  nim          String  @db.VarChar(50)
+  nama         String  @db.VarChar(255)
+  angkatan     Int
+  ipk          Decimal @db.Decimal(3, 2) // [C3]
+  minat_bidang String  @db.VarChar(100) // [C2, student side]
+
+  // [ADDED, gap 2] domisili coordinates for C4 (Haversine). Nullable: a
+  // mahasiswa without coordinates cannot be ranked (rekomendasi returns 422).
+  domisili_latitude  Decimal? @db.Decimal(8, 6)
+  domisili_longitude Decimal? @db.Decimal(9, 6)
+
+  user                 User                  @relation(fields: [user_id], references: [user_id])
+  kompetensi_mahasiswa KompetensiMahasiswa[]
+  hasil_cga            HasilCga[]
+  pengajuan            Pengajuan[]
+
+  @@map("mahasiswa")
+}
+
+model Kompetensi {
+  kompetensi_id   Int     @id @default(autoincrement())
+  nama_kompetensi String  @db.VarChar(255)
+  kategori        String  @db.VarChar(100)
+  deskripsi       String? @db.Text
+  skala_maksimum  Int
+
+  kompetensi_mahasiswa KompetensiMahasiswa[]
+  kebutuhan_kompetensi KebutuhanKompetensi[]
+  hasil_cga_detail     HasilCgaDetail[]
+
+  @@map("kompetensi")
+}
+
+model KompetensiMahasiswa {
+  km_id            Int @id @default(autoincrement())
+  mahasiswa_id     Int
+  kompetensi_id    Int
+  level_penguasaan Int
+
+  mahasiswa  Mahasiswa  @relation(fields: [mahasiswa_id], references: [mahasiswa_id])
+  kompetensi Kompetensi @relation(fields: [kompetensi_id], references: [kompetensi_id])
+
+  // Constraint (not a column): one level per mahasiswa per kompetensi.
+  @@unique([mahasiswa_id, kompetensi_id])
+  @@map("kompetensi_mahasiswa")
+}
+
+model TempatMagang {
+  tempat_id         Int     @id @default(autoincrement())
+  nama_perusahaan   String  @db.VarChar(255)
+  bidang_industri   String  @db.VarChar(100) // [C2]
+  lokasi            String  @db.VarChar(255) // [C4] display label only
+  benefit_finansial Decimal @db.Decimal(8, 2) // [C5] juta Rp / bulan
+  reputasi          Int // [C6] 1-5
+  deskripsi         String? @db.Text
+
+  // [ADDED, gap 2] tempat magang coordinates for C4 (Haversine).
+  latitude  Decimal? @db.Decimal(8, 6)
+  longitude Decimal? @db.Decimal(9, 6)
+
+  kebutuhan_kompetensi KebutuhanKompetensi[]
+  hasil_cga            HasilCga[]
+  pengajuan            Pengajuan[]
+
+  @@map("tempat_magang")
+}
+
+model KebutuhanKompetensi {
+  kebutuhan_id  Int     @id @default(autoincrement())
+  tempat_id     Int
+  kompetensi_id Int
+  level_minimum Int
+  // [ADDED, gap 1] true = wajib (Core Factor), false = opsional (Secondary Factor).
+  is_mandatory  Boolean
+
+  tempat_magang TempatMagang @relation(fields: [tempat_id], references: [tempat_id])
+  kompetensi    Kompetensi   @relation(fields: [kompetensi_id], references: [kompetensi_id])
+
+  // Constraint (not a column): one requirement row per kompetensi per tempat.
+  @@unique([tempat_id, kompetensi_id])
+  @@map("kebutuhan_kompetensi")
+}
+
+model HasilCga {
+  cga_id              Int      @id @default(autoincrement())
+  mahasiswa_id        Int
+  tempat_id           Int
+  compatibility_score Decimal  @db.Decimal(7, 4) // [C1] 0-100
+  tanggal_hitung      DateTime @default(now())
+
+  mahasiswa     Mahasiswa        @relation(fields: [mahasiswa_id], references: [mahasiswa_id])
+  tempat_magang TempatMagang     @relation(fields: [tempat_id], references: [tempat_id])
+  detail        HasilCgaDetail[]
+  hasil_topsis  HasilTopsis[]
+
+  @@map("hasil_cga")
+}
+
+// [ADDED, gap 5] per-element CGA detail, written in the same transaction as
+// hasil_cga; backs the Detail Compatibility Score page.
+model HasilCgaDetail {
+  detail_id       Int      @id @default(autoincrement())
+  cga_id          Int
+  kompetensi_id   Int
+  level_mahasiswa Int? // null = unassessed optional element (excluded from average)
+  level_minimum   Int
+  gap             Int? // capped at +1
+  nilai_bobot     Decimal? @db.Decimal(3, 1) // Tabel 2.3 weight score
+  is_mandatory    Boolean
+
+  hasil_cga  HasilCga   @relation(fields: [cga_id], references: [cga_id])
+  kompetensi Kompetensi @relation(fields: [kompetensi_id], references: [kompetensi_id])
+
+  @@map("hasil_cga_detail")
+}
+
+model HasilTopsis {
+  topsis_id        Int      @id @default(autoincrement())
+  cga_id           Int
+  nilai_preferensi Decimal  @db.Decimal(10, 8)
+  ranking          Int
+  tanggal_hitung   DateTime @default(now())
+
+  hasil_cga HasilCga    @relation(fields: [cga_id], references: [cga_id])
+  pengajuan Pengajuan[]
+
+  @@map("hasil_topsis")
+}
+
+model KriteriaTopsis {
+  kriteria_id   Int     @id @default(autoincrement())
+  kode_kriteria String  @unique @db.VarChar(10) // unique: the engine keys criteria by code
+  nama_kriteria String  @db.VarChar(255)
+  bobot         Decimal @db.Decimal(5, 4) // editable by Administrator; PROVISIONAL until Koorprodi validation
+  tipe          String  @db.VarChar(10) // 'benefit' | 'cost'
+
+  @@map("kriteria_topsis")
+}
+
+// [ADDED, gap 4] C2 partial-match mapping (serumpun), managed by Administrator.
+// Identical minat/bidang scores 100 without needing a row; no row = 0.
+model PemetaanBidang {
+  pemetaan_id      Int     @id @default(autoincrement())
+  minat_bidang     String  @db.VarChar(100)
+  bidang_industri  String  @db.VarChar(100)
+  nilai_kesesuaian Decimal @db.Decimal(5, 2) // 0-100
+
+  @@unique([minat_bidang, bidang_industri])
+  @@map("pemetaan_bidang")
+}
+
+model Pengajuan {
+  pengajuan_id        Int      @id @default(autoincrement())
+  mahasiswa_id        Int
+  tempat_id           Int
+  topsis_id           Int
+  tanggal_pengajuan   DateTime @db.Date
+  status              String   @db.VarChar(50) // dalam_proses | disetujui | ditolak
+  catatan_koordinator String?  @db.Text
+
+  mahasiswa     Mahasiswa    @relation(fields: [mahasiswa_id], references: [mahasiswa_id])
+  tempat_magang TempatMagang @relation(fields: [tempat_id], references: [tempat_id])
+  hasil_topsis  HasilTopsis  @relation(fields: [topsis_id], references: [topsis_id])
+
+  @@map("pengajuan")
 }

@@ -1,22 +1,314 @@
-@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
+/*
+ * SPK Magang — design tokens.
+ *
+ * Identity: deep sea teal (Bunaken) as primary, warm coral used sparingly for
+ * the main action and highlights, warm "sand" ground, near-black ink.
+ * Contrast (WCAG): ink/muted on sand >= 6:1, white on sea-700 9:1, white on
+ * coral-600 4.9:1, coral-700 on coral-50 6:1.
+ *
+ * Type scale (Tailwind defaults, nothing off-scale): xs 12 · sm 14 · base 16 ·
+ * lg 18 · xl 20 · 2xl 24 · 3xl 30 · 4xl 36.
+ * Spacing: multiples of 4px. Radii: three sizes only — tile 8, ctl 12, card 20.
+ */
 @theme {
-  --color-ink: #0b0d14;
-  --color-canvas: #f2f2f7;
-  --color-surface: #ffffff;
-  --color-line: #e4e4ec;
-  --color-accent: #4f3df5;
-  --color-signal: #ffb020;
-  --color-muted: #6b6f79;
+  /* Sea (primary) */
+  --color-sea-50: #eaf4f2;
+  --color-sea-100: #d3e8e5;
+  --color-sea-200: #a9d2ce;
+  --color-sea-300: #78b5b0;
+  --color-sea-400: #3f9690;
+  --color-sea-500: #1f7a77;
+  --color-sea-600: #0f6468;
+  --color-sea-700: #0b5057;
+  --color-sea-800: #083e45;
+  --color-sea-900: #062f35;
+  --color-sea-950: #041f24;
 
-  --font-display: "Bricolage Grotesque", sans-serif;
+  /* Sand (ground) */
+  --color-sand-50: #fffdf9;
+  --color-sand-100: #f6f0e4;
+  --color-sand-200: #ebe2d0;
+  --color-sand-300: #ddd3bd;
+  --color-sand-400: #b8a98a;
+
+  /* Coral (accent — main action + highlights only) */
+  --color-coral-50: #fef0ea;
+  --color-coral-100: #fcdccf;
+  --color-coral-300: #f6a284;
+  --color-coral-400: #f2814f;
+  --color-coral-500: #e4572e;
+  --color-coral-600: #c8431f;
+  --color-coral-700: #a33518;
+
+  /* Semantic */
+  --color-ink: #0f1f21;
+  --color-muted: #4a5857;
+  --color-canvas: #f6f0e4;
+  --color-surface: #fffdf9;
+  --color-line: #ddd3bd;
+  --color-line-strong: #7c7664;
+  --color-primary: #0b5057;
+  --color-accent: #c8431f;
+  /* Kept for the existing Landing page (previously an amber highlight). */
+  --color-signal: #f2814f;
+
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /* Radii: small tiles, controls, cards. Nothing else. */
+  --radius-tile: 0.5rem;
+  --radius-ctl: 0.75rem;
+  --radius-card: 1.25rem;
+
+  /* Easing: ease-out for things entering, ease-in for things leaving. */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-soft: cubic-bezier(0.4, 0, 1, 1);
 }
 
-body {
-  margin: 0;
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+:root {
+  --tabbar-h: 4rem;
+
+  /* Motion tokens. 150–200ms feedback, 250–350ms entering/moving. */
+  --duration-fast: 160ms;
+  --duration-base: 300ms;
+  --duration-exit: 200ms;
+}
+
+/* Utilities that bind the motion tokens to Tailwind. */
+@utility duration-fast {
+  transition-duration: var(--duration-fast);
+}
+
+@utility duration-base {
+  transition-duration: var(--duration-base);
+}
+
+/* Real press feedback: phones do not hover. */
+@utility press {
+  transition-property: transform, background-color, border-color, color;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--ease-out-soft);
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+}
+
+/* Something arrived: fade up a few pixels. `--i` staggers siblings (40ms apart). */
+@utility motion-rise {
+  animation: rise var(--duration-base) var(--ease-out-soft) backwards;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+
+/* A state changed: a quick settle. */
+@utility motion-pop {
+  animation: pop var(--duration-fast) var(--ease-out-soft) backwards;
+}
+
+/* A meter was filled: grow from the left. */
+@utility motion-grow {
+  transform-origin: left;
+  animation: grow var(--duration-base) var(--ease-out-soft) backwards;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+}
+
+@keyframes grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes sheet-down {
+  from {
+    transform: translateY(var(--drag, 0px));
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes sheet-side-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes sheet-side-out {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Typographic care. */
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  .font-mono {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Taps respond immediately and never zoom. */
+  button,
+  a,
+  label,
+  select,
+  input {
+    touch-action: manipulation;
+  }
+
+  /* Focus ring: teal, offset so it never hugs the element, follows its shape. */
+  :focus-visible {
+    outline: 3px solid var(--color-sea-700);
+    outline-offset: 3px;
+  }
+
+  .on-dark :focus-visible {
+    outline-color: var(--color-sand-100);
+  }
+}
+
+@layer components {
+  /* Bottom sheet (mobile) / side panel (>= 1024px). Enter with ease-out, leave with ease-in. */
+  dialog.sheet[open] .sheet-panel {
+    animation: sheet-up var(--duration-base) var(--ease-out-soft) backwards;
+  }
+
+  dialog.sheet[open]::backdrop {
+    animation: fade-in var(--duration-base) var(--ease-out-soft) backwards;
+  }
+
+  dialog.sheet[data-closing] .sheet-panel {
+    animation: sheet-down var(--duration-exit) var(--ease-in-soft) forwards;
+  }
+
+  dialog.sheet[data-closing]::backdrop {
+    animation: fade-out var(--duration-exit) var(--ease-in-soft) forwards;
+  }
+
+  @media (min-width: 1024px) {
+    dialog.sheet[open] .sheet-panel {
+      animation-name: sheet-side-in;
+    }
+
+    dialog.sheet[data-closing] .sheet-panel {
+      animation-name: sheet-side-out;
+    }
+  }
+
+  /* Level ladder: each step has a fill layer that scales up from its base. */
+  .ladder-fill {
+    transform-origin: bottom;
+    transform: scaleY(0);
+    opacity: 0;
+    transition:
+      transform var(--duration-base) var(--ease-out-soft),
+      opacity var(--duration-fast) var(--ease-out-soft);
+  }
+
+  .ladder-fill[data-on="true"] {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+
+  .ladder-check {
+    opacity: 0;
+    transform: scale(0.5);
+    transition:
+      transform var(--duration-fast) var(--ease-out-soft),
+      opacity var(--duration-fast) var(--ease-out-soft);
+  }
+
+  .ladder-check[data-on="true"] {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Reduced motion: swap movement for simple opacity changes. */
+@media (prefers-reduced-motion: reduce) {
+  .motion-rise,
+  .motion-pop,
+  .motion-grow {
+    animation-name: fade-in;
+  }
+
+  dialog.sheet[open] .sheet-panel {
+    animation-name: fade-in;
+  }
+
+  dialog.sheet[data-closing] .sheet-panel {
+    animation-name: fade-out;
+  }
+
+  .press:active:not(:disabled) {
+    transform: none;
+  }
+
+  .ladder-fill,
+  .ladder-check {
+    transform: none;
+    transition-delay: 0ms !important;
+  }
+
+  .animate-pulse {
+    animation: none;
+    opacity: 0.7;
+  }
 }
