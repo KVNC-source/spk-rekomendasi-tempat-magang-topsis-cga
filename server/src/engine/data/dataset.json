@@ -1,0 +1,915 @@
+{
+  "meta": {
+    "sumber": "Dataset_Tempat_Magang_revisi.xlsx",
+    "dibuat": "2026-11-16",
+    "catatan": "Dihasilkan oleh tools/xlsx_to_json.py; jangan diedit manual."
+  },
+  "tempat": [
+    {
+      "tempatId": "T01",
+      "namaPerusahaan": "PT Wesclic Indonesia Neotech",
+      "posisi": "Web Developer Intern",
+      "bidang": "Web Development",
+      "lokasi": "Kota Yogyakarta (Cebongan, Ngestiharjo)",
+      "modeKerja": "Tidak dinyatakan",
+      "lat": -7.7956,
+      "lon": 110.3695,
+      "benefitFinansial": null,
+      "reputasi": null,
+      "statusAlternatif": "Dipakai",
+      "alasanDikeluarkan": null,
+      "sumberUrl": "https://career.amikom.ac.id/detail/lowongan/wesclic-indonesia-neotechpt-web-developer-intern-lowongan-magang-mahasiswa-6e6nwj",
+      "tanggalAkses": "2026-11-05"
+    },
+    {
+      "tempatId": "T02",
+      "namaPerusahaan": "Rakamin",
+      "posisi": "Backend Developer Internship (Remote)",
+      "bidang": "Web Development",
+      "lokasi": "Remote (lokasi perusahaan: Jakarta)",
+      "modeKerja": "Remote/WFH",
+      "lat": null,
+      "lon": null,
+      "benefitFinansial": 1.5,
+      "reputasi": null,
+      "statusAlternatif": "Dikeluarkan",
+      "alasanDikeluarkan": "Remote (Batasan 3): tidak memiliki lokasi fisik untuk C4",
+      "sumberUrl": "https://glints.com/id/en/opportunities/jobs/backend-developer-internship-remote/5966954f-6629-48d7-bb93-f809127efe98",
+      "tanggalAkses": "2026-11-05"
+    },
+    {
+      "tempatId": "T03",
+      "namaPerusahaan": "PT Dibimbing Digital Indonesia",
+      "posisi": "Data Analyst Intern",
+      "bidang": "Data Science",
+      "lokasi": "Jakarta Selatan",
+      "modeKerja": "Hybrid",
+      "lat": -6.2615,
+      "lon": 106.8106,
+      "benefitFinansial": null,
+      "reputasi": null,
+      "statusAlternatif": "Dipakai",
+      "alasanDikeluarkan": null,
+      "sumberUrl": "https://prima-ptki.kemenag.go.id/vacancy/site/view/0197a158-ee63-72cc-ac8b-1fb8fbee6e33/Data-Analyst-Intern",
+      "tanggalAkses": "2026-11-05"
+    },
+    {
+      "tempatId": "T04",
+      "namaPerusahaan": "PT Qtera Mandiri",
+      "posisi": "Internship Back End Golang Programmer",
+      "bidang": "Web Development",
+      "lokasi": "Jakarta Utara (Kelapa Gading)",
+      "modeKerja": "On-site",
+      "lat": -6.1588,
+      "lon": 106.9056,
+      "benefitFinansial": null,
+      "reputasi": null,
+      "statusAlternatif": "Dipakai",
+      "alasanDikeluarkan": null,
+      "sumberUrl": "https://dealls.com/loker/internship-back-end-golang-programmer~pt-qtera-mandiri",
+      "tanggalAkses": "2026-11-05"
+    },
+    {
+      "tempatId": "T05",
+      "namaPerusahaan": "PT Qtera Mandiri",
+      "posisi": "Internship Front End Developer",
+      "bidang": "Web Development",
+      "lokasi": "Jakarta Utara",
+      "modeKerja": "On-site",
+      "lat": -6.1588,
+      "lon": 106.9056,
+      "benefitFinansial": null,
+      "reputasi": null,
+      "statusAlternatif": "Dipakai",
+      "alasanDikeluarkan": null,
+      "sumberUrl": "https://dealls.com/en/loker/internship-front-end-programmer-vuejs~pt-qtera-mandiri",
+      "tanggalAkses": "2026-11-05"
+    },
+    {
+      "tempatId": "T06",
+      "namaPerusahaan": "Kode Aplikasi Indonesia",
+      "posisi": "Internship Front-end Developer (React Native)",
+      "bidang": "Mobile Development",
+      "lokasi": "Jakarta Selatan",
+      "modeKerja": "Tidak dinyatakan",
+      "lat": -6.2615,
+      "lon": 106.8106,
+      "benefitFinansial": 0.0,
+      "reputasi": null,
+      "statusAlternatif": "Dipakai",
+      "alasanDikeluarkan": null,
+      "sumberUrl": "https://jobs.dicoding.com/kode-aplikasi-indonesia/internship-front-end-developer-73689ffbb9/8918",
+      "tanggalAkses": "2026-11-05"
+    },
+    {
+      "tempatId": "T07",
+      "namaPerusahaan": "You Express International",
+      "posisi": "Software Engineer (Intern)",
+      "bidang": "Web Development",
+      "lokasi": "Jakarta Utara",
+      "modeKerja": "Tidak dinyatakan",
+      "lat": -6.1384,
+      "lon": 106.863,
+      "benefitFinansial": null,
+      "reputasi": null,
+      "statusAlternatif": "Dipakai",
+      "alasanDikeluarkan": null,
+      "sumberUrl": "https://www.kalibrr.id/c/you-express/jobs/94544/software-engineer-intern",
+      "tanggalAkses": "2026-11-05"
+    },
+    {
+      "tempatId": "T08",
+      "namaPerusahaan": "BLP Beauty",
+      "posisi": "Backend Developer Intern",
+      "bidang": "Web Development",
+      "lokasi": "Jakarta",
+      "modeKerja": "Tidak dinyatakan",
+      "lat": -6.2088,
+      "lon": 106.8456,
+      "benefitFinansial": null,
+      "reputasi": null,
+      "statusAlternatif": "Dipakai",
+      "alasanDikeluarkan": null,
+      "sumberUrl": "https://career.cakap.com/peluang/lowongan/blp-beauty/backend-developer-intern/67bfad7a-3648-4385-9fcb-b85c8677b8a5",
+      "tanggalAkses": "2026-11-05"
+    },
+    {
+      "tempatId": "T09",
+      "namaPerusahaan": "Infinid Indonesia",
+      "posisi": "Data Analyst Intern",
+      "bidang": "Data Science",
+      "lokasi": "Jakarta Selatan (Cipete)",
+      "modeKerja": "On-site",
+      "lat": -6.2775,
+      "lon": 106.799,
+      "benefitFinansial": null,
+      "reputasi": null,
+      "statusAlternatif": "Dipakai",
+      "alasanDikeluarkan": null,
+      "sumberUrl": "https://dealls.com/loker/data-analyst-intern-11~infinid-indonesia",
+      "tanggalAkses": "2026-11-05"
+    },
+    {
+      "tempatId": "T10",
+      "namaPerusahaan": "SIRCLO",
+      "posisi": "Data Engineer Intern",
+      "bidang": "Data Science",
+      "lokasi": "Tangerang Selatan",
+      "modeKerja": "Hybrid",
+      "lat": -6.2886,
+      "lon": 106.7179,
+      "benefitFinansial": null,
+      "reputasi": null,
+      "statusAlternatif": "Dipakai",
+      "alasanDikeluarkan": null,
+      "sumberUrl": "https://dealls.com/loker/data-engineer-intern-4~sirclo",
+      "tanggalAkses": "2026-11-05"
+    },
+    {
+      "tempatId": "T11",
+      "namaPerusahaan": "GITS Indonesia",
+      "posisi": "Software Engineer (Mobile) Internship",
+      "bidang": "Mobile Development",
+      "lokasi": "Kota Bandung (Summarecon Bandung)",
+      "modeKerja": "On-site (tersirat dari syarat penempatan)",
+      "lat": -6.9433,
+      "lon": 107.6957,
+      "benefitFinansial": null,
+      "reputasi": null,
+      "statusAlternatif": "Dipakai",
+      "alasanDikeluarkan": null,
+      "sumberUrl": "https://jobs.dicoding.com/gits-indonesia/software-engineer-mobile-internship-dc8711bc3b/11093",
+      "tanggalAkses": "2026-11-05"
+    },
+    {
+      "tempatId": "T12",
+      "namaPerusahaan": "Jubelio",
+      "posisi": "Quality Assurance Tester Intern",
+      "bidang": "Software Testing (QA)",
+      "lokasi": "Jakarta Selatan (Sudirman)",
+      "modeKerja": "On-site (WFO)",
+      "lat": -6.225,
+      "lon": 106.8087,
+      "benefitFinansial": 1.75,
+      "reputasi": null,
+      "statusAlternatif": "Dipakai",
+      "alasanDikeluarkan": null,
+      "sumberUrl": "https://dealls.com/loker/quality-assurance-tester-intern-1~jubelio",
+      "tanggalAkses": "2026-11-05"
+    },
+    {
+      "tempatId": "T13",
+      "namaPerusahaan": "Azura Labs (PT Insan Membangun Bangsa)",
+      "posisi": "Quality Assurance Intern",
+      "bidang": "Software Testing (QA)",
+      "lokasi": "Semarang",
+      "modeKerja": "Hybrid",
+      "lat": -6.9932,
+      "lon": 110.4203,
+      "benefitFinansial": null,
+      "reputasi": null,
+      "statusAlternatif": "Dipakai",
+      "alasanDikeluarkan": null,
+      "sumberUrl": "https://azuralabs.id/career/quality-assurance-intern",
+      "tanggalAkses": "2026-11-05"
+    },
+    {
+      "tempatId": "T14",
+      "namaPerusahaan": "Xapiens Teknologi Indonesia",
+      "posisi": "UI/UX Internship",
+      "bidang": "UI/UX Design",
+      "lokasi": "Tangerang Selatan",
+      "modeKerja": "On-site (WFO)",
+      "lat": -6.2886,
+      "lon": 106.7179,
+      "benefitFinansial": null,
+      "reputasi": null,
+      "statusAlternatif": "Dipakai",
+      "alasanDikeluarkan": null,
+      "sumberUrl": "https://dealls.com/en/loker/uiux-internship~xapiens-teknologi-indonesia",
+      "tanggalAkses": "2026-11-05"
+    },
+    {
+      "tempatId": "T15",
+      "namaPerusahaan": "Vidio",
+      "posisi": "IT Support Intern",
+      "bidang": "IT Support",
+      "lokasi": "Jakarta (Jakarta Pusat)",
+      "modeKerja": "Hybrid",
+      "lat": -6.1754,
+      "lon": 106.8272,
+      "benefitFinansial": null,
+      "reputasi": null,
+      "statusAlternatif": "Dipakai",
+      "alasanDikeluarkan": null,
+      "sumberUrl": "https://dealls.com/loker/it-support-intern~vidiodotcom",
+      "tanggalAkses": "2026-11-05"
+    },
+    {
+      "tempatId": "T16",
+      "namaPerusahaan": "PT Mitra Solusi Telematika",
+      "posisi": "Internship - Network Engineer",
+      "bidang": "Jaringan Komputer",
+      "lokasi": "Jakarta Selatan",
+      "modeKerja": "Tidak dinyatakan",
+      "lat": -6.2615,
+      "lon": 106.8106,
+      "benefitFinansial": null,
+      "reputasi": null,
+      "statusAlternatif": "Dipakai",
+      "alasanDikeluarkan": null,
+      "sumberUrl": "https://jobs.dicoding.com/pt-mitra-solusi-telematika/internship-638c56f1fd/1490",
+      "tanggalAkses": "2026-11-05"
+    },
+    {
+      "tempatId": "T17",
+      "namaPerusahaan": "CV deXza Purnama",
+      "posisi": "Magang Web App Developer",
+      "bidang": "Web Development",
+      "lokasi": "Tidak tercantum di halaman",
+      "modeKerja": "Tidak dinyatakan",
+      "lat": null,
+      "lon": null,
+      "benefitFinansial": null,
+      "reputasi": null,
+      "statusAlternatif": "Dikeluarkan",
+      "alasanDikeluarkan": "Lokasi tidak tercantum. Cari alamat kantor; bila ketemu ubah status menjadi Dipakai",
+      "sumberUrl": "https://mail.dexza-inc.com/karir/magang-web-app-developer",
+      "tanggalAkses": "2026-11-05"
+    }
+  ],
+  "kebutuhan": [
+    {
+      "kebutuhanId": "KB001",
+      "tempatId": "T01",
+      "kompetensiId": "K01",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB002",
+      "tempatId": "T01",
+      "kompetensiId": "K15",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB003",
+      "tempatId": "T01",
+      "kompetensiId": "K12",
+      "levelMinimum": 1,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB004",
+      "tempatId": "T01",
+      "kompetensiId": "K02",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB005",
+      "tempatId": "T01",
+      "kompetensiId": "K11",
+      "levelMinimum": 1,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB006",
+      "tempatId": "T02",
+      "kompetensiId": "K04",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB007",
+      "tempatId": "T02",
+      "kompetensiId": "K05",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB008",
+      "tempatId": "T02",
+      "kompetensiId": "K11",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB009",
+      "tempatId": "T02",
+      "kompetensiId": "K16",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB010",
+      "tempatId": "T03",
+      "kompetensiId": "K05",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB011",
+      "tempatId": "T03",
+      "kompetensiId": "K10",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB012",
+      "tempatId": "T03",
+      "kompetensiId": "K06",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB013",
+      "tempatId": "T03",
+      "kompetensiId": "K20",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB014",
+      "tempatId": "T03",
+      "kompetensiId": "K18",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB015",
+      "tempatId": "T04",
+      "kompetensiId": "K04",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB016",
+      "tempatId": "T04",
+      "kompetensiId": "K05",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB017",
+      "tempatId": "T04",
+      "kompetensiId": "K07",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB018",
+      "tempatId": "T05",
+      "kompetensiId": "K03",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB019",
+      "tempatId": "T05",
+      "kompetensiId": "K02",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB020",
+      "tempatId": "T05",
+      "kompetensiId": "K07",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB021",
+      "tempatId": "T05",
+      "kompetensiId": "K19",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB022",
+      "tempatId": "T06",
+      "kompetensiId": "K09",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB023",
+      "tempatId": "T06",
+      "kompetensiId": "K02",
+      "levelMinimum": 1,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB024",
+      "tempatId": "T06",
+      "kompetensiId": "K12",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB025",
+      "tempatId": "T06",
+      "kompetensiId": "K07",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB026",
+      "tempatId": "T06",
+      "kompetensiId": "K04",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB027",
+      "tempatId": "T06",
+      "kompetensiId": "K18",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB028",
+      "tempatId": "T06",
+      "kompetensiId": "K19",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB029",
+      "tempatId": "T06",
+      "kompetensiId": "K08",
+      "levelMinimum": 3,
+      "jenis": "opsional"
+    },
+    {
+      "kebutuhanId": "KB030",
+      "tempatId": "T06",
+      "kompetensiId": "K03",
+      "levelMinimum": 3,
+      "jenis": "opsional"
+    },
+    {
+      "kebutuhanId": "KB031",
+      "tempatId": "T06",
+      "kompetensiId": "K15",
+      "levelMinimum": 2,
+      "jenis": "opsional"
+    },
+    {
+      "kebutuhanId": "KB032",
+      "tempatId": "T07",
+      "kompetensiId": "K04",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB033",
+      "tempatId": "T07",
+      "kompetensiId": "K03",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB034",
+      "tempatId": "T07",
+      "kompetensiId": "K02",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB035",
+      "tempatId": "T07",
+      "kompetensiId": "K05",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB036",
+      "tempatId": "T07",
+      "kompetensiId": "K14",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB037",
+      "tempatId": "T08",
+      "kompetensiId": "K01",
+      "levelMinimum": 1,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB038",
+      "tempatId": "T08",
+      "kompetensiId": "K04",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB039",
+      "tempatId": "T08",
+      "kompetensiId": "K05",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB040",
+      "tempatId": "T08",
+      "kompetensiId": "K07",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB041",
+      "tempatId": "T08",
+      "kompetensiId": "K15",
+      "levelMinimum": 2,
+      "jenis": "opsional"
+    },
+    {
+      "kebutuhanId": "KB042",
+      "tempatId": "T08",
+      "kompetensiId": "K08",
+      "levelMinimum": 2,
+      "jenis": "opsional"
+    },
+    {
+      "kebutuhanId": "KB043",
+      "tempatId": "T09",
+      "kompetensiId": "K05",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB044",
+      "tempatId": "T09",
+      "kompetensiId": "K10",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB045",
+      "tempatId": "T09",
+      "kompetensiId": "K06",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB046",
+      "tempatId": "T09",
+      "kompetensiId": "K17",
+      "levelMinimum": 1,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB047",
+      "tempatId": "T09",
+      "kompetensiId": "K20",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB048",
+      "tempatId": "T10",
+      "kompetensiId": "K20",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB049",
+      "tempatId": "T10",
+      "kompetensiId": "K06",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB050",
+      "tempatId": "T10",
+      "kompetensiId": "K05",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB051",
+      "tempatId": "T10",
+      "kompetensiId": "K08",
+      "levelMinimum": 1,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB052",
+      "tempatId": "T10",
+      "kompetensiId": "K07",
+      "levelMinimum": 1,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB053",
+      "tempatId": "T11",
+      "kompetensiId": "K09",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB054",
+      "tempatId": "T11",
+      "kompetensiId": "K07",
+      "levelMinimum": 1,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB055",
+      "tempatId": "T11",
+      "kompetensiId": "K18",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB056",
+      "tempatId": "T11",
+      "kompetensiId": "K19",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB057",
+      "tempatId": "T12",
+      "kompetensiId": "K11",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB058",
+      "tempatId": "T12",
+      "kompetensiId": "K21",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB059",
+      "tempatId": "T12",
+      "kompetensiId": "K20",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB060",
+      "tempatId": "T13",
+      "kompetensiId": "K11",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB061",
+      "tempatId": "T13",
+      "kompetensiId": "K21",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB062",
+      "tempatId": "T13",
+      "kompetensiId": "K20",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB063",
+      "tempatId": "T13",
+      "kompetensiId": "K18",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB064",
+      "tempatId": "T13",
+      "kompetensiId": "K19",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB065",
+      "tempatId": "T13",
+      "kompetensiId": "K04",
+      "levelMinimum": 1,
+      "jenis": "opsional"
+    },
+    {
+      "kebutuhanId": "KB066",
+      "tempatId": "T14",
+      "kompetensiId": "K12",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB067",
+      "tempatId": "T14",
+      "kompetensiId": "K19",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB068",
+      "tempatId": "T15",
+      "kompetensiId": "K14",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB069",
+      "tempatId": "T15",
+      "kompetensiId": "K13",
+      "levelMinimum": 1,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB070",
+      "tempatId": "T15",
+      "kompetensiId": "K18",
+      "levelMinimum": 3,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB071",
+      "tempatId": "T15",
+      "kompetensiId": "K19",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB072",
+      "tempatId": "T16",
+      "kompetensiId": "K13",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB073",
+      "tempatId": "T16",
+      "kompetensiId": "K19",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB074",
+      "tempatId": "T16",
+      "kompetensiId": "K18",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB075",
+      "tempatId": "T17",
+      "kompetensiId": "K02",
+      "levelMinimum": 1,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB076",
+      "tempatId": "T17",
+      "kompetensiId": "K19",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB077",
+      "tempatId": "T17",
+      "kompetensiId": "K18",
+      "levelMinimum": 2,
+      "jenis": "wajib"
+    },
+    {
+      "kebutuhanId": "KB078",
+      "tempatId": "T17",
+      "kompetensiId": "K03",
+      "levelMinimum": 3,
+      "jenis": "opsional"
+    }
+  ],
+  "kompetensi": [
+    {
+      "id": "K01",
+      "nama": "Dasar Pemrograman"
+    },
+    {
+      "id": "K02",
+      "nama": "Pemrograman Web (HTML/CSS/JavaScript)"
+    },
+    {
+      "id": "K03",
+      "nama": "Frontend Framework (React/Vue/TypeScript)"
+    },
+    {
+      "id": "K04",
+      "nama": "Backend & REST API"
+    },
+    {
+      "id": "K05",
+      "nama": "Basis Data SQL"
+    },
+    {
+      "id": "K06",
+      "nama": "Python"
+    },
+    {
+      "id": "K07",
+      "nama": "Git / Version Control"
+    },
+    {
+      "id": "K08",
+      "nama": "DevOps, Docker & Cloud"
+    },
+    {
+      "id": "K09",
+      "nama": "Mobile Development (Flutter/React Native/Android)"
+    },
+    {
+      "id": "K10",
+      "nama": "Analisis & Visualisasi Data"
+    },
+    {
+      "id": "K11",
+      "nama": "Software Testing & QA"
+    },
+    {
+      "id": "K12",
+      "nama": "UI/UX Design"
+    },
+    {
+      "id": "K13",
+      "nama": "Jaringan Komputer"
+    },
+    {
+      "id": "K14",
+      "nama": "Hardware & Sistem Operasi"
+    },
+    {
+      "id": "K15",
+      "nama": "Algoritma & Struktur Data"
+    },
+    {
+      "id": "K16",
+      "nama": "OOP & Design Pattern"
+    },
+    {
+      "id": "K17",
+      "nama": "Machine Learning Dasar"
+    },
+    {
+      "id": "K18",
+      "nama": "Komunikasi"
+    },
+    {
+      "id": "K19",
+      "nama": "Kerja Sama Tim"
+    },
+    {
+      "id": "K20",
+      "nama": "Pemecahan Masalah & Berpikir Analitis"
+    },
+    {
+      "id": "K21",
+      "nama": "SDLC & Metodologi (Agile/Scrum)"
+    }
+  ]
+}

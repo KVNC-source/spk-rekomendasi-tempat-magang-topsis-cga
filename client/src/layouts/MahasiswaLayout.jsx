@@ -1,4 +1,4 @@
-import { ClipboardPenLine, Compass, FileCheck, House } from "lucide-react";
+import { BookmarkCheck, ClipboardPenLine, Compass, House } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { BrandMark } from "../components/ui";
 
@@ -14,7 +14,7 @@ const NAV = [
   { to: "/mahasiswa", label: "Beranda", icon: House, end: true },
   { to: "/mahasiswa/profil", label: "Profil", icon: ClipboardPenLine },
   { to: "/mahasiswa/rekomendasi", label: "Rekomendasi", icon: Compass },
-  { to: "/mahasiswa/pengajuan", label: "Pengajuan", icon: FileCheck },
+  { to: "/mahasiswa/pilihan", label: "Pilihan", icon: BookmarkCheck },
 ];
 
 function Avatar({ className = "" }) {

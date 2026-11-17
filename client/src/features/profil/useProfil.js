@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { getBidangMinat, getKompetensi, getProfil, saveProfil } from "../../api/profil";
+import { getBidangMinat, getKompetensi, getKotaDomisili, getProfil, saveProfil } from "../../api/profil";
 import { formatNumber, parseDecimal } from "../../lib/format";
 
 export function validateIpk(text) {
@@ -10,10 +10,26 @@ export function validateIpk(text) {
   return null;
 }
 
+/** Counts for C7. "0" is a valid, deliberate answer; blank is not. */
+export function validateCount(text, noun) {
+  const value = String(text).trim();
+  if (value === "") return `Isi jumlah ${noun}. Tulis 0 kalau belum ada.`;
+  if (!/^\d+$/.test(value)) return "Tulis angka bulat, misalnya 2.";
+  if (Number(value) > 99) return "Angkanya terlalu besar. Maksimal 99.";
+  return null;
+}
+
+const isAnswered = (level) => Number.isInteger(level);
+
 const sameForm = (a, b) =>
   a.ipk.trim() === b.ipk.trim() &&
   a.minat === b.minat &&
+  a.kota === b.kota &&
+  a.proyek.trim() === b.proyek.trim() &&
+  a.sertifikasi.trim() === b.sertifikasi.trim() &&
   Object.keys({ ...a.levels, ...b.levels }).every((id) => a.levels[id] === b.levels[id]);
+
+const EMPTY_FORM = { levels: {}, ipk: "", minat: "", kota: "", proyek: "", sertifikasi: "" };
 
 /** Loads the profil form data and owns its edit / validate / save state. */
 export function useProfil() {
@@ -22,27 +38,39 @@ export function useProfil() {
   const [kompetensi, setKompetensi] = useState([]);
   const [mahasiswa, setMahasiswa] = useState(null);
   const [bidangOptions, setBidangOptions] = useState([]);
-  const [form, setForm] = useState({ levels: {}, ipk: "", minat: "" });
+  const [kotaOptions, setKotaOptions] = useState([]);
+  const [initialOpen, setInitialOpen] = useState(null);
+  const [form, setForm] = useState(EMPTY_FORM);
   const [saved, setSaved] = useState(null);
+  // "Draf" | "Lengkap" as the server last saw the profile (not the unsaved form).
+  const [savedStatus, setSavedStatus] = useState("Draf");
   const [save, setSave] = useState({ status: "idle", error: null, savedAt: null });
-  const [ipkTouched, setIpkTouched] = useState(false);
+  const [touched, setTouched] = useState({});
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([getKompetensi(), getBidangMinat(), getProfil()])
-      .then(([kompetensiList, bidang, profil]) => {
+    Promise.all([getKompetensi(), getBidangMinat(), getKotaDomisili(), getProfil()])
+      .then(([kompetensiList, bidang, kota, profil]) => {
         if (cancelled) return;
         const snapshot = {
           levels: Object.fromEntries(profil.kompetensi.map((k) => [k.kompetensi_id, k.level_penguasaan])),
-          ipk: formatNumber(profil.ipk, 2),
+          ipk: profil.ipk == null ? "" : formatNumber(profil.ipk, 2),
           minat: profil.minat_bidang ?? "",
+          kota: profil.domisili?.kota ?? "",
+          proyek: profil.jumlah_proyek == null ? "" : String(profil.jumlah_proyek),
+          sertifikasi: profil.jumlah_sertifikasi == null ? "" : String(profil.jumlah_sertifikasi),
         };
+        // Open the first group that still has unanswered elements, once, at load.
+        const firstOpen = kompetensiList.find((k) => !isAnswered(snapshot.levels[k.kompetensi_id])) ?? kompetensiList[0];
         setKompetensi(kompetensiList);
         setMahasiswa(profil.mahasiswa);
         setBidangOptions(bidang);
+        setKotaOptions(kota);
+        setInitialOpen(firstOpen?.kategori ?? null);
         setForm(snapshot);
         setSaved(snapshot);
+        setSavedStatus(profil.status ?? "Draf");
         setLoad({ status: "ready", error: null });
       })
       .catch((error) => {
@@ -54,12 +82,40 @@ export function useProfil() {
   }, [reloadKey]);
 
   const answered = useMemo(
-    () => kompetensi.filter((k) => form.levels[k.kompetensi_id]).length,
+    () => kompetensi.filter((k) => isAnswered(form.levels[k.kompetensi_id])).length,
+    [kompetensi, form.levels],
+  );
+  const missingIds = useMemo(
+    () => kompetensi.filter((k) => !isAnswered(form.levels[k.kompetensi_id])).map((k) => k.kompetensi_id),
     [kompetensi, form.levels],
   );
   const dirty = saved !== null && !sameForm(form, saved);
-  const ipkError = ipkTouched || submitted ? validateIpk(form.ipk) : null;
-  const minatError = submitted && !form.minat ? "Pilih bidang minat." : null;
+
+  const show = (field) => touched[field] || submitted;
+  // A draft may leave fields blank, so only a value that was typed and is wrong is an error.
+  const filled = (text) => String(text).trim() !== "";
+  const errors = {
+    ipk: show("ipk") && filled(form.ipk) ? validateIpk(form.ipk) : null,
+    minat: null,
+    kota: null,
+    proyek: show("proyek") && filled(form.proyek) ? validateCount(form.proyek, "proyek") : null,
+    sertifikasi:
+      show("sertifikasi") && filled(form.sertifikasi) ? validateCount(form.sertifikasi, "sertifikasi") : null,
+  };
+  const dataKurang = [
+    !filled(form.ipk) && "IPK",
+    !form.minat && "bidang minat",
+    !form.kota && "kota domisili",
+    (!filled(form.proyek) || !filled(form.sertifikasi)) && "jumlah proyek dan sertifikasi",
+  ].filter(Boolean);
+  const dataComplete =
+    !validateIpk(form.ipk) &&
+    Boolean(form.minat) &&
+    Boolean(form.kota) &&
+    !validateCount(form.proyek, "proyek") &&
+    !validateCount(form.sertifikasi, "sertifikasi");
+  // The profile is "lengkap" only when every element is answered AND the data fields are valid.
+  const complete = kompetensi.length > 0 && missingIds.length === 0 && dataComplete;
 
   const reload = () => {
     setLoad({ status: "loading", error: null });
@@ -67,25 +123,35 @@ export function useProfil() {
   };
 
   const setLevel = (id, level) => setForm((f) => ({ ...f, levels: { ...f.levels, [id]: level } }));
-  const setIpk = (ipk) => setForm((f) => ({ ...f, ipk }));
-  const setMinat = (minat) => setForm((f) => ({ ...f, minat }));
+  const setField = (field) => (value) => setForm((f) => ({ ...f, [field]: value }));
+  const touch = (field) => () => setTouched((t) => ({ ...t, [field]: true }));
 
   /** Resolves to { ok } or { ok: false, field } so the page can focus the first invalid field. */
   const submit = async () => {
     setSubmitted(true);
-    if (validateIpk(form.ipk)) return { ok: false, field: "ipk" };
-    if (!form.minat) return { ok: false, field: "minat" };
+    // Blank fields are fine (it is saved as a draft); a filled-in invalid value is not.
+    if (filled(form.ipk) && validateIpk(form.ipk)) return { ok: false, field: "ipk" };
+    if (filled(form.proyek) && validateCount(form.proyek, "proyek")) return { ok: false, field: "proyek" };
+    if (filled(form.sertifikasi) && validateCount(form.sertifikasi, "sertifikasi")) {
+      return { ok: false, field: "sertifikasi" };
+    }
 
+    const kota = kotaOptions.find((k) => k.kota === form.kota);
     setSave((s) => ({ ...s, status: "saving", error: null }));
     try {
-      await saveProfil({
-        ipk: Number(parseDecimal(form.ipk).toFixed(2)),
-        minat_bidang: form.minat,
+      const result = await saveProfil({
+        ipk: filled(form.ipk) ? Number(parseDecimal(form.ipk).toFixed(2)) : null,
+        minat_bidang: form.minat || null,
+        domisili: kota ? { kota: kota.kota, lat: kota.lat, lon: kota.lon } : null,
+        jumlah_proyek: filled(form.proyek) ? Number(form.proyek) : null,
+        jumlah_sertifikasi: filled(form.sertifikasi) ? Number(form.sertifikasi) : null,
+        // A draft may be partial; every answer given (including 0) is sent.
         kompetensi: Object.entries(form.levels)
-          .filter(([, level]) => level)
-          .map(([id, level]) => ({ kompetensi_id: Number(id), level_penguasaan: level })),
+          .filter(([, level]) => isAnswered(level))
+          .map(([kompetensi_id, level_penguasaan]) => ({ kompetensi_id, level_penguasaan })),
       });
       setSaved(form);
+      setSavedStatus(result.status ?? "Draf");
       setSave({ status: "saved", error: null, savedAt: new Date() });
       return { ok: true };
     } catch (error) {
@@ -100,16 +166,20 @@ export function useProfil() {
     kompetensi,
     mahasiswa,
     bidangOptions,
+    kotaOptions,
+    initialOpen,
     form,
     answered,
+    missingIds,
+    dataKurang,
     dirty,
-    ipkError,
-    minatError,
+    complete,
+    savedStatus,
+    errors,
     save,
     setLevel,
-    setIpk,
-    setMinat,
-    touchIpk: () => setIpkTouched(true),
+    setField,
+    touch,
     submit,
   };
 }

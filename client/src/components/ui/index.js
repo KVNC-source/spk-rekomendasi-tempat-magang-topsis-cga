@@ -8,6 +8,7 @@ export { default as CountUp } from "./CountUp";
 export { default as EmptyState } from "./EmptyState";
 export { SelectField, TextField } from "./Field";
 export { default as LevelLadder, GapBadge, LadderGlyph } from "./LevelLadder";
+export { default as RelativeTime } from "./RelativeTime";
 export { default as ScoreBar } from "./ScoreBar";
 export { default as SegmentedProgress } from "./SegmentedProgress";
 export { default as Skeleton } from "./Skeleton";

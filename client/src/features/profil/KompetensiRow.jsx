@@ -1,11 +1,12 @@
 import { CircleAlert } from "lucide-react";
-import { Chip, LevelLadder } from "../../components/ui";
+import { LevelLadder } from "../../components/ui";
 import { levelLabel } from "../../lib/levels";
 
 /** One kompetensi element: its name, the chosen level, and the ladder to change it. */
 export default function KompetensiRow({ item, value, onChange, highlighted }) {
   const id = item.kompetensi_id;
   const hintId = `kompetensi-${id}-hint`;
+  const answered = Number.isInteger(value);
 
   return (
     <li
@@ -17,28 +18,29 @@ export default function KompetensiRow({ item, value, onChange, highlighted }) {
       <div className="mb-3 min-w-0 md:mb-0">
         <p className="font-semibold leading-snug text-ink">{item.nama_kompetensi}</p>
         {item.deskripsi && (
-          <p id={hintId} className="mt-0.5 max-w-prose text-sm leading-snug text-muted">
+          <p id={hintId} className="mt-0.5 line-clamp-2 max-w-prose text-sm leading-snug text-muted">
             {item.deskripsi}
           </p>
         )}
-        <div className="mt-2">
-          {value ? (
-            <Chip tone="sea">
+        <p className="mt-1.5 text-sm">
+          {answered ? (
+            <span className="font-medium text-sea-800">
               <span className="font-mono">Level {value}</span> · {levelLabel(value)}
-            </Chip>
+            </span>
           ) : highlighted ? (
-            <Chip tone="coral" icon={CircleAlert}>
-              Isi yang ini dulu, biar rekomendasinya bisa dihitung
-            </Chip>
+            <span className="inline-flex items-center gap-1.5 font-medium text-coral-700">
+              <CircleAlert aria-hidden="true" size={15} />
+              Pilih satu dulu, biar rekomendasinya bisa dihitung
+            </span>
           ) : (
-            <Chip tone="outline">Belum dipilih</Chip>
+            <span className="text-muted">Belum dipilih</span>
           )}
-        </div>
+        </p>
       </div>
       <LevelLadder
         name={`level-${id}`}
         label={item.nama_kompetensi}
-        value={value ?? null}
+        value={answered ? value : null}
         onChange={(level) => onChange(id, level)}
         describedBy={item.deskripsi ? hintId : undefined}
       />

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Check, CircleAlert, CircleHelp, RefreshCw, Save, SearchX } from "lucide-react";
+import { Check, CircleAlert, CircleHelp, FilePen, RefreshCw, Save, SearchX } from "lucide-react";
 import {
   ActionBar,
   BottomSheet,
@@ -14,37 +14,30 @@ import {
   TextField,
   WaveLine,
 } from "../../components/ui";
-import KompetensiRow from "../../features/profil/KompetensiRow";
+import KompetensiGroup from "../../features/profil/KompetensiGroup";
 import LevelGuide from "../../features/profil/LevelGuide";
 import ProfilSkeleton from "../../features/profil/ProfilSkeleton";
 import { useProfil } from "../../features/profil/useProfil";
 import { formatTime } from "../../lib/format";
 
-const KATEGORI = {
-  Teknis: { title: "Kompetensi Teknis", sub: "Hard skills", order: 0 },
-  "Non-Teknis": { title: "Kompetensi Non-Teknis", sub: "Soft skills", order: 1 },
-};
+// Used only while the kompetensi master data carries no kategori.
+const TANPA_KATEGORI = "Elemen kompetensi";
 
 const CONFIRMED_MS = 2400;
+const kategoriOf = (item) => item.kategori ?? TANPA_KATEGORI;
 
+/** One group per `kategori`, in the order the kategori first appears in the master data. */
 function groupByKategori(kompetensi) {
   const groups = new Map();
   for (const item of kompetensi) {
-    if (!groups.has(item.kategori)) groups.set(item.kategori, []);
-    groups.get(item.kategori).push(item);
+    const key = kategoriOf(item);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(item);
   }
-  return [...groups.entries()]
-    .map(([kategori, items]) => ({
-      kategori,
-      title: KATEGORI[kategori]?.title ?? kategori,
-      sub: KATEGORI[kategori]?.sub,
-      order: KATEGORI[kategori]?.order ?? 99,
-      items,
-    }))
-    .sort((a, b) => a.order - b.order);
+  return [...groups.entries()].map(([kategori, items]) => ({ kategori, title: kategori, items }));
 }
 
-function StatusText({ save, dirty }) {
+function StatusText({ save, dirty, reason }) {
   if (save.status === "saving") return "Lagi menyimpan…";
   if (save.status === "error") {
     return (
@@ -63,22 +56,23 @@ function StatusText({ save, dirty }) {
       </span>
     );
   }
-  return null;
+  return reason ? <span id="alasan-rekomendasi">{reason}</span> : null;
 }
 
 export default function ProfilKompetensi() {
   const profil = useProfil();
-  const { load, kompetensi, form, answered, dirty, save } = profil;
+  const { load, kompetensi, form, answered, missingIds, dataKurang, complete, dirty, errors, save, savedStatus } = profil;
   const [sheetOpen, setSheetOpen] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+  const [openOverride, setOpenOverride] = useState({});
   const confirmTimer = useRef(null);
   const [params] = useSearchParams();
-  const fokusId = Number(params.get("fokus")) || null;
+  const fokusId = params.get("fokus");
   const [highlightId, setHighlightId] = useState(fokusId);
 
   useEffect(() => () => clearTimeout(confirmTimer.current), []);
 
-  // Deep link from "Tidak dapat dihitung": scroll to and focus the missing element.
+  // Deep link (e.g. from Rekomendasi): scroll to and focus the element to fill in.
   useEffect(() => {
     if (load.status !== "ready" || !fokusId) return;
     const row = document.getElementById(`kompetensi-${fokusId}`);
@@ -88,11 +82,17 @@ export default function ProfilKompetensi() {
   }, [load.status, fokusId]);
 
   const total = kompetensi.length;
-  const pct = total ? Math.round((answered / total) * 100) : 0;
-  const complete = total > 0 && answered === total;
   const groups = groupByKategori(kompetensi);
   const ready = load.status === "ready" && total > 0;
   const firstName = profil.mahasiswa?.nama?.split(" ")[0];
+  const fokusKategori = (() => {
+    const target = kompetensi.find((k) => k.kompetensi_id === fokusId);
+    return target ? kategoriOf(target) : null;
+  })();
+  const defaultOpen = profil.initialOpen ?? TANPA_KATEGORI;
+
+  const isOpen = (kategori) => openOverride[kategori] ?? (kategori === defaultOpen || kategori === fokusKategori);
+  const toggleGroup = (kategori) => setOpenOverride((o) => ({ ...o, [kategori]: !isOpen(kategori) }));
 
   const saveStatus = save.status === "saving" ? "loading" : confirmed && !dirty ? "success" : "idle";
 
@@ -112,6 +112,20 @@ export default function ProfilKompetensi() {
       confirmTimer.current = setTimeout(() => setConfirmed(false), CONFIRMED_MS);
     }
   };
+
+  // "Lihat rekomendasi" opens only for a saved, complete profile.
+  const canView = savedStatus === "Lengkap" && !dirty;
+
+  const reasonText = "“Lihat rekomendasi” aktif setelah profilmu Lengkap dan tersimpan.";
+
+  const hint = (() => {
+    if (complete && dirty) return "Sudah lengkap. Simpan dulu supaya rekomendasi bisa dilihat.";
+    if (complete) return "Lengkap. Kamu sudah bisa melihat rekomendasi.";
+    const kurang = [];
+    if (missingIds.length > 0) kurang.push(`${missingIds.length} kompetensi belum dijawab (pilih satu jawaban tiap elemen, termasuk “Belum punya”)`);
+    if (dataKurang.length > 0) kurang.push(`data pendukung: ${dataKurang.join(", ")}`);
+    return `Belum lengkap. Masih kurang ${kurang.join("; ")}. Kamu boleh menyimpan sebagai draf dulu.`;
+  })();
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 pb-48 pt-4 md:px-8 lg:pb-10 lg:pt-8">
@@ -135,16 +149,14 @@ export default function ProfilKompetensi() {
               <div className="mb-2.5 flex items-baseline justify-between gap-3">
                 <p className="text-sm text-sea-200">
                   <span className="font-mono text-2xl font-semibold text-sand-100">{answered}</span> dari{" "}
-                  <span className="font-mono">{total}</span> elemen sudah terisi
+                  <span className="font-mono">{total}</span> kompetensi terisi
                 </p>
-                <span className="font-mono text-sm font-semibold text-sea-100">{pct}%</span>
+                <Chip tone="ondark" icon={savedStatus === "Lengkap" ? Check : FilePen}>
+                  Profil {savedStatus}
+                </Chip>
               </div>
               <SegmentedProgress done={answered} total={total} label="Kelengkapan profil kompetensi" onDark />
-              <p className="mt-2.5 text-sm text-sea-200">
-                {complete
-                  ? "Lengkap. Kamu sudah bisa minta rekomendasi."
-                  : "Lengkapi semuanya untuk mulai minta rekomendasi."}
-              </p>
+              <p className="mt-2.5 max-w-xl text-sm text-sea-200">{hint}</p>
             </>
           )}
         </div>
@@ -191,46 +203,18 @@ export default function ProfilKompetensi() {
 
           {ready && (
             <>
-              {groups.map((group, index) => {
-                const done = group.items.filter((item) => form.levels[item.kompetensi_id]).length;
-                const groupDone = done === group.items.length;
-                return (
-                  <Card
-                    key={group.kategori}
-                    as="section"
-                    padded={false}
-                    aria-labelledby={`grup-${group.kategori}`}
-                    className="motion-rise"
-                    style={{ "--i": index + 1 }}
-                  >
-                    <header className="flex items-center justify-between gap-3 border-b border-line px-4 py-4 md:px-5">
-                      <div className="min-w-0">
-                        <h2 id={`grup-${group.kategori}`} className="font-display text-xl font-bold leading-tight">
-                          {group.title}
-                        </h2>
-                        {group.sub && <p className="text-sm text-muted">{group.sub}</p>}
-                      </div>
-                      <Chip tone={groupDone ? "sea" : "neutral"} icon={groupDone ? Check : undefined}>
-                        <span className="font-mono">
-                          {done}/{group.items.length}
-                        </span>{" "}
-                        terisi
-                      </Chip>
-                    </header>
-                    <ul className="divide-y divide-line px-4 md:px-5">
-                      {group.items.map((item) => (
-                        <KompetensiRow
-                          key={item.kompetensi_id}
-                          item={item}
-                          value={form.levels[item.kompetensi_id]}
-                          onChange={handleLevel}
-                          highlighted={highlightId === item.kompetensi_id}
-                        />
-                      ))}
-                    </ul>
-                  </Card>
-                );
-              })}
+              {groups.map((group, index) => (
+                <KompetensiGroup
+                  key={group.kategori}
+                  group={group}
+                  index={index}
+                  levels={form.levels}
+                  open={isOpen(group.kategori)}
+                  onToggle={() => toggleGroup(group.kategori)}
+                  onChange={handleLevel}
+                  highlightId={highlightId}
+                />
+              ))}
 
               <Card
                 as="section"
@@ -243,7 +227,7 @@ export default function ProfilKompetensi() {
                   Data pendukung
                 </h2>
                 <p className="mt-1 max-w-prose text-sm text-muted">
-                  Dua hal ini membantu kami mencocokkan minat dan prestasi akademikmu.
+                  Dipakai untuk mencocokkan minat, prestasi akademik, jarak, dan pengalamanmu.
                 </p>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   <TextField
@@ -255,16 +239,16 @@ export default function ProfilKompetensi() {
                     placeholder="3,62"
                     hint="Skala 0–4. Boleh pakai koma."
                     value={form.ipk}
-                    error={profil.ipkError}
-                    onChange={(event) => profil.setIpk(event.target.value)}
-                    onBlur={profil.touchIpk}
+                    error={errors.ipk}
+                    onChange={(event) => profil.setField("ipk")(event.target.value)}
+                    onBlur={profil.touch("ipk")}
                   />
                   <SelectField
                     id="minat"
                     label="Bidang minat"
                     value={form.minat}
-                    error={profil.minatError}
-                    onChange={(event) => profil.setMinat(event.target.value)}
+                    error={errors.minat}
+                    onChange={(event) => profil.setField("minat")(event.target.value)}
                   >
                     <option value="">Pilih bidang</option>
                     {profil.bidangOptions.map((bidang) => (
@@ -273,10 +257,52 @@ export default function ProfilKompetensi() {
                       </option>
                     ))}
                   </SelectField>
+                  <SelectField
+                    id="kota"
+                    label="Kota domisili"
+                    hint="Dipakai untuk menghitung jarak ke tempat magang."
+                    value={form.kota}
+                    error={errors.kota}
+                    className="sm:col-span-2"
+                    onChange={(event) => profil.setField("kota")(event.target.value)}
+                  >
+                    <option value="">Pilih kota</option>
+                    {profil.kotaOptions.map((kota) => (
+                      <option key={kota.kota} value={kota.kota}>
+                        {kota.kota}
+                      </option>
+                    ))}
+                  </SelectField>
+                  <TextField
+                    id="proyek"
+                    label="Jumlah proyek"
+                    mono
+                    inputMode="numeric"
+                    autoComplete="off"
+                    placeholder="0"
+                    hint="Proyek yang pernah kamu kerjakan."
+                    value={form.proyek}
+                    error={errors.proyek}
+                    onChange={(event) => profil.setField("proyek")(event.target.value)}
+                    onBlur={profil.touch("proyek")}
+                  />
+                  <TextField
+                    id="sertifikasi"
+                    label="Jumlah sertifikasi"
+                    mono
+                    inputMode="numeric"
+                    autoComplete="off"
+                    placeholder="0"
+                    hint="Sertifikasi profesional yang relevan."
+                    value={form.sertifikasi}
+                    error={errors.sertifikasi}
+                    onChange={(event) => profil.setField("sertifikasi")(event.target.value)}
+                    onBlur={profil.touch("sertifikasi")}
+                  />
                 </div>
               </Card>
 
-              <ActionBar status={<StatusText save={save} dirty={dirty} />}>
+              <ActionBar status={<StatusText save={save} dirty={dirty} reason={canView ? null : reasonText} />}>
                 <Button
                   type="submit"
                   size="lg"
@@ -286,11 +312,21 @@ export default function ProfilKompetensi() {
                   successLabel="Tersimpan"
                   className="whitespace-nowrap"
                 >
-                  Simpan profil
+                  {complete || savedStatus === "Lengkap" ? "Simpan profil" : "Simpan draf"}
                 </Button>
-                {complete && !dirty && (
+                {canView ? (
                   <Button to="/mahasiswa/rekomendasi" variant="outline" size="lg" className="motion-pop whitespace-nowrap">
-                    Minta rekomendasi
+                    Lihat rekomendasi
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    disabled
+                    aria-describedby="alasan-rekomendasi"
+                    className="whitespace-nowrap"
+                  >
+                    Lihat rekomendasi
                   </Button>
                 )}
               </ActionBar>

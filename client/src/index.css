@@ -103,6 +103,12 @@
   animation-delay: calc(var(--i, 0) * 40ms);
 }
 
+/* The top card settles last, slightly slower. */
+@utility motion-rise-slow {
+  animation: rise 460ms var(--ease-out-soft) backwards;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+
 /* A state changed: a quick settle. */
 @utility motion-pop {
   animation: pop var(--duration-fast) var(--ease-out-soft) backwards;
@@ -284,6 +290,7 @@
 /* Reduced motion: swap movement for simple opacity changes. */
 @media (prefers-reduced-motion: reduce) {
   .motion-rise,
+  .motion-rise-slow,
   .motion-pop,
   .motion-grow {
     animation-name: fade-in;

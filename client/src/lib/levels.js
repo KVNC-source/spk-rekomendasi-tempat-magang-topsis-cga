@@ -1,4 +1,16 @@
-/** Tabel 2.1 — Skala Level Penguasaan Kompetensi. */
+/**
+ * Level 0 — "Belum punya" (tidak dimiliki). Added with the revised CGA: it is a
+ * deliberate answer, different from "not answered yet". Tabel 2.1 has no
+ * wording for it, so this description is new and should be added to the proposal.
+ */
+export const LEVEL_NOL = {
+  level: 0,
+  label: "Belum punya",
+  english: "None",
+  description: "Belum pernah mempelajari atau mencoba elemen ini. Ini jawaban yang sah, bukan kesalahan.",
+};
+
+/** Tabel 2.1 — Skala Level Penguasaan Kompetensi (levels 1–4). */
 export const LEVELS = [
   {
     level: 1,
@@ -30,11 +42,12 @@ export const LEVELS = [
   },
 ];
 
-export const levelLabel = (level) => LEVELS.find((l) => l.level === level)?.label ?? null;
+export const levelLabel = (level) =>
+  level === 0 ? LEVEL_NOL.label : (LEVELS.find((l) => l.level === level)?.label ?? null);
 
 /**
- * Tabel 2.2 — interpretasi nilai gap. `kind` drives the icon and tone so the
- * status never relies on colour alone.
+ * Tabel 2.2 — interpretasi nilai gap (student level 0–4 vs required 1–4). `kind`
+ * drives the icon and tone so the status never relies on colour alone.
  */
 export function gapStatus(studentLevel, requiredLevel) {
   if (!Number.isInteger(studentLevel) || !Number.isInteger(requiredLevel)) {

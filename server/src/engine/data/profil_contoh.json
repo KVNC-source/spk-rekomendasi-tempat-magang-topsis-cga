@@ -1,0 +1,29 @@
+{
+  "catatan": "CONTOH untuk mencoba engine, BUKAN data responden. Ganti dengan profil uji dari sheet profil_uji (tanpa nama) untuk BAB IV.",
+  "profil": [
+    {
+      "id": "CONTOH-WEB-MANADO",
+      "keterangan": "Mahasiswa berminat web, domisili Manado",
+      "ipk": 3.45,
+      "minatBidang": "Web Development",
+      "domisili": { "kota": "Manado", "lat": 1.4748, "lon": 124.8421 },
+      "skorPengalamanSertifikasi": 4,
+      "kompetensi": {
+        "K01": 3, "K02": 3, "K03": 2, "K04": 2, "K05": 2, "K07": 2,
+        "K12": 1, "K15": 2, "K16": 2, "K18": 3, "K19": 3, "K20": 2, "K21": 1
+      }
+    },
+    {
+      "id": "CONTOH-DATA-JAKARTA",
+      "keterangan": "Skenario: mahasiswa berminat data, domisili Jakarta Selatan",
+      "ipk": 3.70,
+      "minatBidang": "Data Science",
+      "domisili": { "kota": "Jakarta Selatan", "lat": -6.2615, "lon": 106.8106 },
+      "skorPengalamanSertifikasi": 6,
+      "kompetensi": {
+        "K01": 3, "K05": 3, "K06": 3, "K07": 2, "K10": 3, "K15": 2,
+        "K17": 2, "K18": 2, "K19": 3, "K20": 3
+      }
+    }
+  ]
+}

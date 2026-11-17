@@ -1,0 +1,12 @@
+{
+  "name": "spk-engine",
+  "private": true,
+  "version": "0.3.0",
+  "type": "module",
+  "description": "CGA + TOPSIS scoring engine (Business Logic Layer) for the SPK tempat magang",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "test": "node --test",
+    "demo": "node scripts/demo.js"
+  }
+}
