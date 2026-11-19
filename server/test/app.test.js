@@ -19,12 +19,13 @@ const post = (base, body) =>
     body: typeof body === 'string' ? body : JSON.stringify(body),
   });
 
-test('POST /api/rekomendasi: 201 with the service result', async () => {
-  const service = { hitungRekomendasi: async (id) => ({ mahasiswa: { mahasiswa_id: id }, rekomendasi: [] }) };
+test('POST /api/rekomendasi: 200 with the service result as-is (client contract)', async () => {
+  const hasil = { profilId: 'M7', ranking: [], excluded: [], warnings: [], dihitungPada: '2026-11-17T08:00:00.000Z' };
+  const service = { hitungRekomendasi: async (id) => ({ ...hasil, profilId: `M${id}` }) };
   await withServer(service, async (base) => {
     const res = await post(base, { mahasiswa_id: 7 });
-    assert.equal(res.status, 201);
-    assert.deepEqual(await res.json(), { mahasiswa: { mahasiswa_id: 7 }, rekomendasi: [] });
+    assert.equal(res.status, 200);
+    assert.deepEqual(await res.json(), hasil);
   });
 });
 

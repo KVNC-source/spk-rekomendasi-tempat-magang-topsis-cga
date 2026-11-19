@@ -8,7 +8,8 @@ export function createRekomendasiController({ rekomendasiService }) {
         throw new HttpError(400, 'mahasiswa_id wajib diisi dan berupa bilangan bulat positif');
       }
       const hasil = await rekomendasiService.hitungRekomendasi(mahasiswaId);
-      res.status(201).json(hasil);
+      // 200, as in the client contract (client/src/api/rekomendasi.js).
+      res.json(hasil);
     },
   };
 }

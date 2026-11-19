@@ -1,103 +1,95 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { criteriaC1C7 } from '../engine/spk-engine/src/index.js';
+import { readFileSync } from 'node:fs';
+import { recommend } from '../src/engine/src/matrix.js';
+import { criteriaC1C7 } from '../src/engine/src/topsis.js';
+import { ubahKeDataset } from '../src/services/dataset.js';
 import {
   buatKriteriaEngine,
   createRekomendasiService,
-  hitungKesesuaianBidang,
+  ubahKeProfilEngine,
 } from '../src/services/rekomendasi.service.js';
 import { HttpError } from '../src/lib/httpError.js';
 
-const CONFIG = { ncf: 0.6, nsf: 0.4, c7Placeholder: 0 };
+const readJson = (relative) => JSON.parse(readFileSync(new URL(relative, import.meta.url), 'utf8'));
+const dataset = readJson('../src/engine/data/dataset.json');
+const profilContoh = readJson('../src/engine/data/profil_contoh.json').profil.find((p) => p.id === 'CONTOH-WEB-MANADO');
+
+const CONFIG = { ncf: 0.6, nsf: 0.4, c7Placeholder: 4 };
+const NOW = new Date('2026-11-17T08:00:00.000Z');
+const DIPERBARUI = new Date('2026-11-16T09:30:00.000Z');
+
+// --- Database rows built from dataset.json, in the shape Prisma returns them.
+
+const kompetensiRows = dataset.kompetensi.map((k, i) => ({
+  kompetensi_id: i + 1,
+  kode_kompetensi: k.id,
+  nama_kompetensi: k.nama,
+  skala_maksimum: 4,
+}));
+
+const decimal = (value) => (value === null || value === undefined ? null : String(value));
+
+const tempatRows = dataset.tempat.map((t, i) => ({
+  tempat_id: i + 1,
+  kode_tempat: t.tempatId,
+  nama_perusahaan: t.namaPerusahaan,
+  posisi: t.posisi,
+  bidang_industri: t.bidang,
+  lokasi: t.lokasi,
+  mode_kerja: t.modeKerja,
+  latitude: decimal(t.lat),
+  longitude: decimal(t.lon),
+  benefit_finansial: decimal(t.benefitFinansial),
+  reputasi: t.reputasi,
+  status_alternatif: t.statusAlternatif,
+  alasan_dikeluarkan: t.alasanDikeluarkan,
+  sumber_url: t.sumberUrl,
+  tanggal_akses: t.tanggalAkses ? new Date(`${t.tanggalAkses}T00:00:00Z`) : null,
+  kebutuhan_kompetensi: dataset.kebutuhan
+    .filter((k) => k.tempatId === t.tempatId)
+    .map((k) => ({
+      kebutuhan_id: Number(k.kebutuhanId.replace('KB', '')),
+      level_minimum: k.levelMinimum,
+      is_mandatory: k.jenis === 'wajib',
+      kompetensi: { kode_kompetensi: k.kompetensiId },
+    })),
+}));
 
 const kriteriaRows = () =>
   criteriaC1C7().map((c, i) => ({
     kriteria_id: i + 1,
     kode_kriteria: c.code,
     nama_kriteria: c.label,
-    bobot: c.weight,
+    bobot: String(c.weight),
     tipe: c.type,
   }));
 
-const kebutuhan = (tempat_id, kompetensi_id, level_minimum, is_mandatory) => ({
-  tempat_id,
-  kompetensi_id,
-  level_minimum,
-  is_mandatory,
-  kompetensi: { nama_kompetensi: `K${kompetensi_id}`, skala_maksimum: 4 },
-});
-
-// Mahasiswa: levels K1=3, K2=3, no K3. IPK 3.5, minat 'web', domisili (0,0).
+/** The sample profile with all 21 answers (missing ones are an explicit level 0). */
 const mahasiswa = {
   mahasiswa_id: 1,
-  nim: '2020001',
-  nama: 'Uji',
-  ipk: '3.50',
-  minat_bidang: 'web',
-  domisili_latitude: 0,
-  domisili_longitude: 0,
-  kompetensi_mahasiswa: [
-    { kompetensi_id: 1, level_penguasaan: 3 },
-    { kompetensi_id: 2, level_penguasaan: 3 },
-  ],
+  nim: 'CONTOH-0001',
+  nama: 'CONTOH Mahasiswa Web Manado',
+  ipk: String(profilContoh.ipk),
+  minat_bidang: profilContoh.minatBidang,
+  domisili_latitude: String(profilContoh.domisili.lat),
+  domisili_longitude: String(profilContoh.domisili.lon),
+  diperbarui_pada: DIPERBARUI,
+  kompetensi_mahasiswa: kompetensiRows.map((k) => ({
+    kompetensi_id: k.kompetensi_id,
+    level_penguasaan: profilContoh.kompetensi[k.kode_kompetensi] ?? 0,
+    kompetensi: { kode_kompetensi: k.kode_kompetensi },
+  })),
 };
-
-const tempatList = [
-  {
-    // A: K1 wajib lvl3 (gap 0 -> 4.0), K2 opsional lvl2 (gap +1 -> 4.5)
-    // S_komp = 0.6*4.0 + 0.4*4.5 = 4.2 -> 4.2/4.5*100 = 93.333...
-    tempat_id: 10,
-    nama_perusahaan: 'A',
-    bidang_industri: 'web',
-    latitude: 0,
-    longitude: 0.1,
-    benefit_finansial: '2.00',
-    reputasi: 4,
-    kebutuhan_kompetensi: [kebutuhan(10, 1, 3, true), kebutuhan(10, 2, 2, false)],
-  },
-  {
-    // B: K1 wajib lvl4 (gap -1 -> 3.5), K2 opsional lvl3 (gap 0 -> 4.0)
-    // S_komp = 0.6*3.5 + 0.4*4.0 = 3.7 -> 3.7/4.5*100 = 82.222...
-    tempat_id: 11,
-    nama_perusahaan: 'B',
-    bidang_industri: 'data',
-    latitude: 0,
-    longitude: 1,
-    benefit_finansial: '1.00',
-    reputasi: 3,
-    kebutuhan_kompetensi: [kebutuhan(11, 1, 4, true), kebutuhan(11, 2, 3, false)],
-  },
-  {
-    tempat_id: 12,
-    nama_perusahaan: 'C (tanpa koordinat)',
-    bidang_industri: 'web',
-    latitude: null,
-    longitude: null,
-    benefit_finansial: '1.00',
-    reputasi: 3,
-    kebutuhan_kompetensi: [kebutuhan(12, 1, 3, true), kebutuhan(12, 2, 3, false)],
-  },
-  {
-    // D: K3 is wajib but the mahasiswa has no K3 -> incomplete profile for CGA
-    tempat_id: 13,
-    nama_perusahaan: 'D',
-    bidang_industri: 'web',
-    latitude: 0,
-    longitude: 0.5,
-    benefit_finansial: '1.00',
-    reputasi: 3,
-    kebutuhan_kompetensi: [kebutuhan(13, 3, 2, true), kebutuhan(13, 2, 3, false)],
-  },
-];
 
 function fakeRepository(overrides = {}) {
   const calls = { simpanHasil: [] };
   return {
     calls,
     findMahasiswa: async () => mahasiswa,
+    findKompetensi: async () => kompetensiRows,
     findKriteria: async () => kriteriaRows(),
-    findPemetaanBidang: async () => [{ minat_bidang: 'web', bidang_industri: 'data', nilai_kesesuaian: '50.00' }],
-    findTempatDenganKebutuhan: async () => tempatList,
+    findTempatDenganKebutuhan: async () => tempatRows,
     simpanHasil: async (mahasiswaId, items) => {
       calls.simpanHasil.push({ mahasiswaId, items });
       return items.map((it, i) => ({ tempatId: it.tempatId, cgaId: 100 + i, topsisId: 200 + i }));
@@ -106,11 +98,39 @@ function fakeRepository(overrides = {}) {
   };
 }
 
-test('hitungKesesuaianBidang: 100 if identical, mapped value if serumpun, else 0', () => {
-  const pemetaan = [{ minat_bidang: 'web', bidang_industri: 'data', nilai_kesesuaian: '50.00' }];
-  assert.equal(hitungKesesuaianBidang('Web', ' web ', pemetaan), 100);
-  assert.equal(hitungKesesuaianBidang('web', 'data', pemetaan), 50);
-  assert.equal(hitungKesesuaianBidang('web', 'jaringan', pemetaan), 0);
+const buatService = (overrides) => {
+  const repository = fakeRepository(overrides);
+  return { repository, service: createRekomendasiService({ repository, getConfig: () => CONFIG, now: () => NOW }) };
+};
+
+// --- dataset conversion
+
+test('ubahKeDataset: database rows convert back to the dataset.json shape', () => {
+  const { dataset: hasil } = ubahKeDataset({ tempatRows, kompetensiRows });
+  assert.deepEqual(hasil.tempat, dataset.tempat);
+  assert.deepEqual(
+    hasil.kebutuhan.map(({ tempatId, kompetensiId, levelMinimum, jenis }) => ({ tempatId, kompetensiId, levelMinimum, jenis })),
+    dataset.kebutuhan.map(({ tempatId, kompetensiId, levelMinimum, jenis }) => ({ tempatId, kompetensiId, levelMinimum, jenis }))
+  );
+  assert.deepEqual(hasil.kompetensi, dataset.kompetensi);
+  // null stays null (the engine imputes), numbers are numbers, dates are ISO dates
+  const t01 = hasil.tempat.find((t) => t.tempatId === 'T01');
+  assert.equal(t01.benefitFinansial, null);
+  assert.equal(t01.reputasi, null);
+  assert.equal(typeof t01.lat, 'number');
+  assert.equal(t01.tanggalAkses, '2026-11-05');
+});
+
+test('ubahKeProfilEngine: maps a mahasiswa row to the engine profile, C7 from the placeholder', () => {
+  const profil = ubahKeProfilEngine(mahasiswa, CONFIG);
+  assert.equal(profil.id, 'M1');
+  assert.equal(profil.ipk, 3.45);
+  assert.equal(profil.minatBidang, 'Web Development');
+  assert.deepEqual(profil.domisili, { lat: 1.4748, lon: 124.8421 });
+  assert.equal(profil.skorPengalamanSertifikasi, 4);
+  assert.equal(Object.keys(profil.kompetensi).length, 21);
+  assert.equal(profil.kompetensi.K01, 3);
+  assert.equal(profil.kompetensi.K06, 0);
 });
 
 test('buatKriteriaEngine: maps rows to engine criteria in C1..C7 order', () => {
@@ -127,91 +147,134 @@ test('buatKriteriaEngine: rejects missing criteria and invalid tipe', () => {
   assert.throws(() => buatKriteriaEngine(bad), HttpError);
 });
 
-test('hitungRekomendasi: hand-calculated CGA, C2, ranking, exclusions, persistence', async () => {
-  const repository = fakeRepository();
-  const service = createRekomendasiService({ repository, getConfig: () => CONFIG });
+// --- the recommendation
+
+test('hitungRekomendasi: the result equals the engine run on dataset.json (database is the same data)', async () => {
+  const { service } = buatService();
   const hasil = await service.hitungRekomendasi(1);
 
-  // A beats B on C1, C2, C4 (closer), C5, C6; C3 and C7 are constant -> Ci(A)=1, Ci(B)=0.
-  assert.deepEqual(hasil.rekomendasi.map((r) => r.nama_perusahaan), ['A', 'B']);
-  const [a, b] = hasil.rekomendasi;
-  assert.equal(a.ranking, 1);
-  assert.ok(Math.abs(a.nilai_preferensi - 1) < 1e-12);
-  assert.ok(Math.abs(b.nilai_preferensi - 0) < 1e-12);
+  const langsung = recommend(
+    { id: 'M1', ipk: 3.45, minatBidang: 'Web Development', domisili: { lat: 1.4748, lon: 124.8421 },
+      skorPengalamanSertifikasi: 4, kompetensi: profilContoh.kompetensi },
+    dataset
+  );
+  assert.equal(hasil.ranking.length, 15);
+  assert.deepEqual(hasil.ranking.map((r) => [r.id, r.rank]), langsung.ranking.map((r) => [r.id, r.rank]));
+  for (const [i, r] of hasil.ranking.entries()) {
+    assert.ok(Math.abs(r.ci - langsung.ranking[i].ci) < 1e-12);
+    assert.ok(Math.abs(r.values.C1 - langsung.ranking[i].values.C1) < 1e-12);
+  }
+  assert.deepEqual(hasil.ranking.slice(0, 3).map((r) => r.id), ['T05', 'T01', 'T04']);
+});
 
-  // CGA -> C1 (hand-calculated in the fixture comments)
-  assert.ok(Math.abs(a.nilai_kriteria.C1 - (4.2 / 4.5) * 100) < 1e-9);
-  assert.ok(Math.abs(b.nilai_kriteria.C1 - (3.7 / 4.5) * 100) < 1e-9);
-  assert.equal(a.compatibility_score, a.nilai_kriteria.C1);
+test('hitungRekomendasi: the response follows the client contract (client/src/api/rekomendasi.js)', async () => {
+  const { service } = buatService();
+  const hasil = await service.hitungRekomendasi(1);
 
-  // C2..C7 inputs
-  assert.equal(a.nilai_kriteria.C2, 100);
-  assert.equal(b.nilai_kriteria.C2, 50);
-  assert.equal(a.nilai_kriteria.C3, 3.5);
-  assert.ok(Math.abs(a.nilai_kriteria.C4 - (2 * Math.PI * 6371 * 0.1) / 360) < 1e-9);
-  assert.equal(a.nilai_kriteria.C5, 2);
-  assert.equal(a.nilai_kriteria.C6, 4);
-  assert.equal(a.nilai_kriteria.C7, 0);
+  for (const key of ['profilId', 'ranking', 'excluded', 'imputasi', 'warnings', 'steps', 'dihitungPada', 'profilDiperbaruiPada']) {
+    assert.ok(key in hasil, `missing ${key}`);
+  }
+  assert.equal(hasil.profilId, 'M1');
+  assert.equal(hasil.dihitungPada, NOW.toISOString());
+  assert.equal(hasil.profilDiperbaruiPada, DIPERBARUI.toISOString());
 
-  // C (no coordinates) and D (mandatory K3 unassessed) are reported, not silently dropped
-  assert.deepEqual(hasil.tidak_dapat_dihitung.map((t) => t.tempat_id).sort(), [12, 13]);
-  assert.match(hasil.tidak_dapat_dihitung.find((t) => t.tempat_id === 13).alasan, /Mandatory competency "3"/);
+  const [top] = hasil.ranking;
+  for (const key of ['id', 'rank', 'ci', 'dPlus', 'dMinus', 'namaPerusahaan', 'posisi', 'bidang', 'lokasi',
+    'sumberUrl', 'tanggalAkses', 'values', 'cga', 'flags', 'kesenjangan']) {
+    assert.ok(key in top, `ranking item misses ${key}`);
+  }
+  assert.deepEqual(Object.keys(top.values), ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7']);
+  assert.equal(top.values.C7, 4);
+  assert.ok(['NCF_NSF', 'WAJIB_SAJA'].includes(top.cga.aturan));
+  for (const el of top.cga.perElement) {
+    for (const key of ['id', 'nama', 'levelMahasiswa', 'levelKebutuhan', 'isMandatory', 'gap', 'weightScore']) {
+      assert.ok(key in el, `perElement misses ${key}`);
+    }
+  }
+  // names come from the kompetensi table
+  const k01 = hasil.ranking.flatMap((r) => r.cga.perElement).find((e) => e.id === 'K01');
+  assert.equal(k01.nama, 'Dasar Pemrograman');
+  assert.ok(top.sumberUrl.startsWith('http'));
+  assert.equal(top.flags.c6Imputasi, true);
 
-  // Persistence: one call, ranked order, generated ids come back in the response
+  // excluded lowongan carry a name and posisi for the client
+  assert.deepEqual(hasil.excluded.map((e) => e.tempatId).sort(), ['T02', 'T17']);
+  assert.ok(hasil.excluded.every((e) => e.namaPerusahaan && e.posisi && e.alasan));
+
+  // warnings are for the developer: the C7 placeholder and the unused NCF/NSF + pemetaan_bidang are stated
+  assert.ok(hasil.warnings.some((w) => w.startsWith('C7')));
+  assert.ok(hasil.warnings.some((w) => w.includes('pemetaan_bidang')));
+  assert.ok(hasil.steps.decisionMatrix.length === 15);
+});
+
+test('hitungRekomendasi: persists every ranked lowongan in one call, mapped to primary keys', async () => {
+  const { service, repository } = buatService();
+  const hasil = await service.hitungRekomendasi(1);
+
   assert.equal(repository.calls.simpanHasil.length, 1);
   const { mahasiswaId, items } = repository.calls.simpanHasil[0];
   assert.equal(mahasiswaId, 1);
-  assert.deepEqual(items.map((i) => [i.tempatId, i.ranking]), [[10, 1], [11, 2]]);
-  assert.deepEqual(items[0].detail.map((d) => [d.kompetensi_id, d.gap, d.nilai_bobot, d.is_mandatory]), [
-    [1, 0, 4, true],
-    [2, 1, 4.5, false],
-  ]);
-  assert.equal(a.cga_id, 100);
-  assert.equal(a.topsis_id, 200);
+  assert.equal(items.length, hasil.ranking.length);
 
-  // Intermediate steps are exposed for BAB IV
-  const steps = hasil.langkah_perhitungan;
-  assert.ok(Math.abs(steps.cga[0].s_komp - 4.2) < 1e-9);
-  assert.equal(steps.topsis.matriks_keputusan.length, 2);
-  assert.equal(steps.topsis.matriks_ternormalisasi[0].length, 7);
-  assert.equal(steps.topsis.solusi_ideal_positif.length, 7);
-  assert.deepEqual(steps.topsis.tempat_id, [10, 11]);
-
-  // Open issues are always flagged (C3 / C7) and the engine's constant-column warning surfaces
-  assert.ok(hasil.peringatan.some((w) => w.startsWith('C3')));
-  assert.ok(hasil.peringatan.some((w) => w.startsWith('C7')));
-  assert.ok(hasil.peringatan.some((w) => w.includes('Criterion C3 has an identical value')));
+  const first = items[0];
+  const idT05 = tempatRows.find((t) => t.kode_tempat === 'T05').tempat_id;
+  assert.equal(first.tempatId, idT05);
+  assert.equal(first.ranking, 1);
+  assert.equal(first.compatibilityScore, hasil.ranking[0].values.C1);
+  assert.equal(first.nilaiPreferensi, hasil.ranking[0].ci);
+  for (const d of first.detail) {
+    assert.ok(Number.isInteger(d.kompetensi_id));
+    assert.ok(Number.isInteger(d.level_minimum));
+    assert.equal(typeof d.is_mandatory, 'boolean');
+  }
+  // a level 0 answer is stored as 0, not as "unassessed"
+  const nolPertama = items.flatMap((i) => i.detail).find((d) => d.level_mahasiswa === 0);
+  assert.ok(nolPertama);
 });
 
-test('hitungRekomendasi: 404 for unknown mahasiswa, 422 without domisili coordinates', async () => {
-  const notFound = createRekomendasiService({
-    repository: fakeRepository({ findMahasiswa: async () => null }),
-    getConfig: () => CONFIG,
-  });
-  await assert.rejects(() => notFound.hitungRekomendasi(99), (e) => e.status === 404);
-
-  const noCoords = createRekomendasiService({
-    repository: fakeRepository({ findMahasiswa: async () => ({ ...mahasiswa, domisili_latitude: null }) }),
-    getConfig: () => CONFIG,
-  });
-  await assert.rejects(() => noCoords.hitungRekomendasi(1), (e) => e.status === 422);
+test('hitungRekomendasi: 404 for an unknown mahasiswa', async () => {
+  const { service } = buatService({ findMahasiswa: async () => null });
+  await assert.rejects(() => service.hitungRekomendasi(99), (e) => e.status === 404);
 });
 
-test('hitungRekomendasi: 422 and nothing persisted when no tempat magang can be computed', async () => {
-  const repository = fakeRepository({ findTempatDenganKebutuhan: async () => [tempatList[2]] });
-  const service = createRekomendasiService({ repository, getConfig: () => CONFIG });
+test('hitungRekomendasi: 422 lists what is missing, and nothing is persisted', async () => {
+  const sebagian = {
+    ...mahasiswa,
+    domisili_latitude: null,
+    kompetensi_mahasiswa: mahasiswa.kompetensi_mahasiswa.filter((km) => km.kompetensi.kode_kompetensi !== 'K05'),
+  };
+  const { service, repository } = buatService({ findMahasiswa: async () => sebagian });
   await assert.rejects(
     () => service.hitungRekomendasi(1),
-    (e) => e.status === 422 && e.details.tidak_dapat_dihitung.length === 1
+    (e) =>
+      e.status === 422 &&
+      e.details.belum_diisi.length === 1 &&
+      e.details.belum_diisi[0] === 'K05' &&
+      e.details.data_kurang.includes('domisili')
   );
+  assert.equal(repository.calls.simpanHasil.length, 0);
+});
+
+test('hitungRekomendasi: 422 for a minat bidang the engine does not know', async () => {
+  const { service, repository } = buatService({ findMahasiswa: async () => ({ ...mahasiswa, minat_bidang: 'QA' }) });
+  await assert.rejects(() => service.hitungRekomendasi(1), (e) => e.status === 422 && /bidang/i.test(e.message));
   assert.equal(repository.calls.simpanHasil.length, 0);
 });
 
 test('hitungRekomendasi: 422 and nothing persisted when kriteria_topsis weights do not sum to 1.0', async () => {
   const rows = kriteriaRows();
-  rows[0].bobot = 0.5; // sum becomes 1.2
-  const repository = fakeRepository({ findKriteria: async () => rows });
-  const service = createRekomendasiService({ repository, getConfig: () => CONFIG });
+  rows[0].bobot = '0.5'; // the sum becomes 1.2
+  const { service, repository } = buatService({ findKriteria: async () => rows });
   await assert.rejects(() => service.hitungRekomendasi(1), (e) => e.status === 422);
+  assert.equal(repository.calls.simpanHasil.length, 0);
+});
+
+test('hitungRekomendasi: 422 with the excluded list when no lowongan can be ranked', async () => {
+  const semuaDikeluarkan = tempatRows.map((t) => ({ ...t, status_alternatif: 'Dikeluarkan', alasan_dikeluarkan: 'uji' }));
+  const { service, repository } = buatService({ findTempatDenganKebutuhan: async () => semuaDikeluarkan });
+  await assert.rejects(
+    () => service.hitungRekomendasi(1),
+    (e) => e.status === 422 && e.details.excluded.length === 17
+  );
   assert.equal(repository.calls.simpanHasil.length, 0);
 });

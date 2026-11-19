@@ -1,39 +1,21 @@
 /**
  * Business Logic Layer — Mesin Pencocokan wrapper.
  *
- * Pipeline: CGA (per tempat magang) → Compatibility Score (C1) → TOPSIS → Ranking.
- * The formulas live in the standalone engine; this service only gathers the
- * C1–C7 inputs, calls the engine, persists the result and exposes every
- * intermediate step for BAB IV.
+ * Pipeline: database → dataset shape (services/dataset.js) → recommend() of
+ * spk-engine 0.3.0 (CGA per lowongan → C1 → TOPSIS → ranking). The formulas
+ * live in the engine (src/engine, never edited here). This service only reads
+ * the database, builds the profile, calls the engine, persists the result and
+ * returns the engine's output in the shape the client contract expects
+ * (client/src/api/rekomendasi.js).
  */
-import { calculateCompatibilityScore, runTopsis } from '../../engine/spk-engine/src/index.js';
+import { recommend } from '../engine/src/matrix.js';
 import { REQUIRED_CRITERIA_CODES, getScoringConfig } from '../config/scoring.js';
 import { HttpError } from '../lib/httpError.js';
-import { haversineKm } from '../lib/haversine.js';
+import { bacaDataset } from './dataset.js';
 
 const ENGINE_COMPETENCY_SCALE = 4;
 
-/** Open methodological issues, always returned so they are never silent. */
-const CATATAN_METODE = [
-  'C3 (IPK) adalah atribut mahasiswa sehingga bernilai sama untuk semua tempat magang pada satu perhitungan; C3 tidak memengaruhi urutan ranking. Masalah terbuka, menunggu keputusan.',
-  'C7 (Pengalaman & Sertifikasi) belum memiliki sumber data; setiap tempat magang diberi nilai placeholder konstan sehingga C7 tidak memengaruhi urutan ranking. Masalah terbuka, menunggu keputusan.',
-  'Bobot kriteria (kriteria_topsis) dan NCF/NSF bersifat sementara, menunggu validasi Koorprodi.',
-];
-
 const num = (value) => Number(value);
-
-const normalize = (text) => String(text).trim().toLowerCase();
-
-/** C2: 100 if identical, partial if listed in pemetaan_bidang (serumpun), else 0. */
-export function hitungKesesuaianBidang(minatBidang, bidangIndustri, pemetaan) {
-  if (normalize(minatBidang) === normalize(bidangIndustri)) return 100;
-  const row = pemetaan.find(
-    (p) =>
-      normalize(p.minat_bidang) === normalize(minatBidang) &&
-      normalize(p.bidang_industri) === normalize(bidangIndustri)
-  );
-  return row ? num(row.nilai_kesesuaian) : 0;
-}
 
 /** Validate kriteria_topsis and convert it to the engine's criteria array. */
 export function buatKriteriaEngine(rows) {
@@ -51,192 +33,104 @@ export function buatKriteriaEngine(rows) {
   });
 }
 
-export function createRekomendasiService({ repository, getConfig = getScoringConfig }) {
-  /**
-   * CGA + C1–C7 values for one tempat magang. Throws RangeError when the pair
-   * cannot be computed; the caller records it under tidak_dapat_dihitung.
-   */
-  function hitungAlternatif(mahasiswa, tempat, levelByKompetensi, pemetaan, config) {
-    if (tempat.latitude == null || tempat.longitude == null) {
-      throw new RangeError('koordinat tempat magang belum diisi (diperlukan untuk C4)');
-    }
-    if (tempat.kebutuhan_kompetensi.length === 0) {
-      throw new RangeError('tempat magang belum memiliki kebutuhan_kompetensi');
-    }
+/** Mahasiswa row → the engine's profile shape (engine/src/matrix.js header). */
+export function ubahKeProfilEngine(mahasiswa, config) {
+  return {
+    id: `M${mahasiswa.mahasiswa_id}`,
+    ipk: num(mahasiswa.ipk),
+    minatBidang: mahasiswa.minat_bidang,
+    domisili: { lat: num(mahasiswa.domisili_latitude), lon: num(mahasiswa.domisili_longitude) },
+    // C7 is still a constant (C7_PLACEHOLDER): there is no source for it yet.
+    skorPengalamanSertifikasi: config.c7Placeholder,
+    kompetensi: Object.fromEntries(
+      mahasiswa.kompetensi_mahasiswa.map((km) => [km.kompetensi.kode_kompetensi, km.level_penguasaan])
+    ),
+  };
+}
 
-    const comparisons = tempat.kebutuhan_kompetensi.map((k) => {
-      const level = levelByKompetensi.get(k.kompetensi_id);
-      return {
-        id: String(k.kompetensi_id),
-        levelMahasiswa: level,
-        levelKebutuhan: k.level_minimum,
-        isMandatory: k.is_mandatory,
-        assessed: level !== undefined,
-      };
-    });
-
-    const cga = calculateCompatibilityScore(comparisons, { ncf: config.ncf, nsf: config.nsf });
-
-    const values = {
-      C1: cga.compatibilityScore,
-      C2: hitungKesesuaianBidang(mahasiswa.minat_bidang, tempat.bidang_industri, pemetaan),
-      C3: num(mahasiswa.ipk),
-      C4: haversineKm(
-        num(mahasiswa.domisili_latitude),
-        num(mahasiswa.domisili_longitude),
-        num(tempat.latitude),
-        num(tempat.longitude)
-      ),
-      C5: num(tempat.benefit_finansial),
-      C6: num(tempat.reputasi),
-      C7: config.c7Placeholder,
-    };
-
-    const perKompetensi = cga.perElement.map((el, i) => {
-      const k = tempat.kebutuhan_kompetensi[i];
-      return {
-        kompetensi_id: k.kompetensi_id,
-        nama_kompetensi: k.kompetensi.nama_kompetensi,
-        level_mahasiswa: comparisons[i].assessed ? comparisons[i].levelMahasiswa : null,
-        level_minimum: k.level_minimum,
-        gap: el.gap,
-        nilai_bobot: el.weightScore,
-        is_mandatory: el.isMandatory,
-      };
-    });
-
-    return { cga, values, perKompetensi };
-  }
-
+export function createRekomendasiService({ repository, getConfig = getScoringConfig, now = () => new Date() }) {
   async function hitungRekomendasi(mahasiswaId) {
     const config = getConfig();
 
     const mahasiswa = await repository.findMahasiswa(mahasiswaId);
     if (!mahasiswa) throw new HttpError(404, `Mahasiswa ${mahasiswaId} tidak ditemukan`);
-    if (mahasiswa.domisili_latitude == null || mahasiswa.domisili_longitude == null) {
-      throw new HttpError(422, 'Koordinat domisili mahasiswa belum diisi (diperlukan untuk C4)');
+
+    const { dataset, tempatIdByKode, kompetensiIdByKode, kompetensiRows } = await bacaDataset(repository);
+
+    // The profile must be complete: all kompetensi answered (0 = "Belum punya" counts as an answer).
+    const dijawab = new Set(mahasiswa.kompetensi_mahasiswa.map((km) => km.kompetensi.kode_kompetensi));
+    const belumDiisi = kompetensiRows.map((k) => k.kode_kompetensi).filter((kode) => !dijawab.has(kode));
+    const dataKurang = [
+      mahasiswa.ipk == null && 'ipk',
+      !mahasiswa.minat_bidang && 'minat_bidang',
+      (mahasiswa.domisili_latitude == null || mahasiswa.domisili_longitude == null) && 'domisili',
+    ].filter(Boolean);
+    if (belumDiisi.length > 0 || dataKurang.length > 0) {
+      throw new HttpError(422, 'Profil belum lengkap.', { belum_diisi: belumDiisi, data_kurang: dataKurang });
     }
 
     const kriteria = buatKriteriaEngine(await repository.findKriteria());
-    const pemetaan = await repository.findPemetaanBidang();
-    const tempatList = await repository.findTempatDenganKebutuhan();
-    const levelByKompetensi = new Map(
-      mahasiswa.kompetensi_mahasiswa.map((km) => [km.kompetensi_id, km.level_penguasaan])
-    );
+    const profil = ubahKeProfilEngine(mahasiswa, config);
 
-    const peringatan = [...CATATAN_METODE];
-    const skalaDilaporkan = new Set();
-    const eligible = [];
-    const tidakDapatDihitung = [];
-
-    for (const tempat of tempatList) {
-      for (const k of tempat.kebutuhan_kompetensi) {
-        if (k.kompetensi.skala_maksimum !== ENGINE_COMPETENCY_SCALE && !skalaDilaporkan.has(k.kompetensi_id)) {
-          skalaDilaporkan.add(k.kompetensi_id);
-          peringatan.push(
-            `Kompetensi ${k.kompetensi_id} memiliki skala_maksimum ${k.kompetensi.skala_maksimum}, sedangkan engine CGA mengasumsikan skala 1-${ENGINE_COMPETENCY_SCALE} (Tabel 2.3).`
-          );
-        }
-      }
-      try {
-        const hasil = hitungAlternatif(mahasiswa, tempat, levelByKompetensi, pemetaan, config);
-        eligible.push({ tempat, ...hasil });
-      } catch (err) {
-        if (!(err instanceof RangeError)) throw err;
-        tidakDapatDihitung.push({
-          tempat_id: tempat.tempat_id,
-          nama_perusahaan: tempat.nama_perusahaan,
-          alasan: err.message,
-        });
-      }
-    }
-
-    if (eligible.length === 0) {
-      throw new HttpError(422, 'Tidak ada tempat magang yang dapat dihitung', { tidak_dapat_dihitung: tidakDapatDihitung });
-    }
-
-    let topsis;
+    let hasil;
     try {
-      topsis = runTopsis(
-        eligible.map((e) => ({ id: String(e.tempat.tempat_id), values: e.values })),
-        kriteria
-      );
+      hasil = recommend(profil, dataset, { criteria: kriteria });
     } catch (err) {
-      if (err instanceof RangeError) throw new HttpError(422, `Perhitungan TOPSIS gagal: ${err.message}`);
+      // The engine throws RangeError for input it will not guess about (unknown bidang, weights not summing to 1, ...).
+      if (err instanceof RangeError) throw new HttpError(422, err.message);
       throw err;
     }
-    peringatan.push(...topsis.warnings);
 
-    const byTempatId = new Map(eligible.map((e) => [String(e.tempat.tempat_id), e]));
-    const saved = await repository.simpanHasil(
+    const infoTempat = new Map(dataset.tempat.map((t) => [t.tempatId, t]));
+    const excluded = hasil.excluded.map((e) => ({
+      ...e,
+      namaPerusahaan: infoTempat.get(e.tempatId)?.namaPerusahaan,
+      posisi: infoTempat.get(e.tempatId)?.posisi,
+    }));
+
+    if (hasil.ranking.length === 0) {
+      throw new HttpError(422, 'Tidak ada tempat magang yang dapat dihitung', { excluded });
+    }
+
+    await repository.simpanHasil(
       mahasiswa.mahasiswa_id,
-      topsis.ranking.map((r) => {
-        const e = byTempatId.get(r.id);
-        return {
-          tempatId: e.tempat.tempat_id,
-          compatibilityScore: e.cga.compatibilityScore,
-          detail: e.perKompetensi.map((p) => ({
-            kompetensi_id: p.kompetensi_id,
-            level_mahasiswa: p.level_mahasiswa,
-            level_minimum: p.level_minimum,
-            gap: p.gap,
-            nilai_bobot: p.nilai_bobot,
-            is_mandatory: p.is_mandatory,
-          })),
-          nilaiPreferensi: r.ci,
-          ranking: r.rank,
-        };
-      })
+      hasil.ranking.map((r) => ({
+        tempatId: tempatIdByKode.get(r.id),
+        compatibilityScore: r.cga.compatibilityScore,
+        detail: r.cga.perElement.map((e) => ({
+          kompetensi_id: kompetensiIdByKode.get(e.id),
+          level_mahasiswa: e.levelMahasiswa,
+          level_minimum: e.levelKebutuhan,
+          gap: e.gap,
+          nilai_bobot: e.weightScore,
+          is_mandatory: e.isMandatory,
+        })),
+        nilaiPreferensi: r.ci,
+        ranking: r.rank,
+      }))
     );
-    const idsByTempat = new Map(saved.map((s) => [s.tempatId, s]));
+
+    // Notes for the developer / Bab IV (the client never shows `warnings` to the mahasiswa).
+    const warnings = [...hasil.warnings];
+    warnings.push(
+      `C7 (Pengalaman & Sertifikasi) memakai konstanta C7_PLACEHOLDER=${config.c7Placeholder}: belum ada sumber data, sehingga C7 tidak memengaruhi urutan.`,
+      'Bobot kriteria (kriteria_topsis) bersifat sementara, menunggu validasi Koorprodi.',
+      'NCF/NSF (0.6/0.4) dan nilai C2 bersumber dari engine 0.3.0 (cga.js, config.js; sementara, menunggu persetujuan dosen); tabel pemetaan_bidang dan CGA_NCF/CGA_NSF belum dipakai.'
+    );
+    for (const k of kompetensiRows) {
+      if (k.skala_maksimum !== ENGINE_COMPETENCY_SCALE) {
+        warnings.push(
+          `Kompetensi ${k.kode_kompetensi} memiliki skala_maksimum ${k.skala_maksimum}, sedangkan engine CGA mengasumsikan skala 0-${ENGINE_COMPETENCY_SCALE}.`
+        );
+      }
+    }
 
     return {
-      mahasiswa: { mahasiswa_id: mahasiswa.mahasiswa_id, nim: mahasiswa.nim, nama: mahasiswa.nama },
-      kriteria: kriteria.map((c) => ({ kode_kriteria: c.code, nama_kriteria: c.label, bobot: c.weight, tipe: c.type })),
-      konfigurasi: { ncf: config.ncf, nsf: config.nsf, c7_placeholder: config.c7Placeholder },
-      rekomendasi: topsis.ranking.map((r) => {
-        const e = byTempatId.get(r.id);
-        const ids = idsByTempat.get(e.tempat.tempat_id);
-        return {
-          ranking: r.rank,
-          tempat_id: e.tempat.tempat_id,
-          nama_perusahaan: e.tempat.nama_perusahaan,
-          cga_id: ids.cgaId,
-          topsis_id: ids.topsisId,
-          nilai_preferensi: r.ci,
-          d_plus: r.dPlus,
-          d_minus: r.dMinus,
-          compatibility_score: e.cga.compatibilityScore,
-          nilai_kriteria: e.values,
-        };
-      }),
-      tidak_dapat_dihitung: tidakDapatDihitung,
-      peringatan,
-      langkah_perhitungan: {
-        cga: eligible.map((e) => ({
-          tempat_id: e.tempat.tempat_id,
-          nama_perusahaan: e.tempat.nama_perusahaan,
-          ncf: e.cga.ncf,
-          nsf: e.cga.nsf,
-          avg_wajib: e.cga.avgWajib,
-          avg_opsional: e.cga.avgOpsional,
-          s_komp: e.cga.sKomp,
-          s_maks: e.cga.sMaks,
-          compatibility_score: e.cga.compatibilityScore,
-          per_kompetensi: e.perKompetensi,
-        })),
-        topsis: {
-          kriteria: topsis.steps.criteria,
-          tempat_id: topsis.steps.alternativeIds.map(Number),
-          matriks_keputusan: topsis.steps.decisionMatrix,
-          norma_kolom: topsis.steps.columnNorms,
-          matriks_ternormalisasi: topsis.steps.normalizedMatrix,
-          matriks_terbobot: topsis.steps.weightedMatrix,
-          solusi_ideal_positif: topsis.steps.idealPositive,
-          solusi_ideal_negatif: topsis.steps.idealNegative,
-          jarak: topsis.steps.distances.map((d) => ({ d_plus: d.dPlus, d_minus: d.dMinus })),
-        },
-      },
+      ...hasil,
+      excluded,
+      warnings,
+      dihitungPada: now().toISOString(),
+      profilDiperbaruiPada: new Date(mahasiswa.diperbarui_pada).toISOString(),
     };
   }
 

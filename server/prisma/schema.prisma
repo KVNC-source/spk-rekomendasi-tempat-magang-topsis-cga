@@ -50,6 +50,10 @@ model Mahasiswa {
   domisili_latitude  Decimal? @db.Decimal(8, 6)
   domisili_longitude Decimal? @db.Decimal(9, 6)
 
+  // [ADDED, Tahap 2] last time this row changed; returned by POST
+  // /api/rekomendasi as profilDiperbaruiPada so the client can tell a result is stale.
+  diperbarui_pada DateTime @updatedAt
+
   user                 User                  @relation(fields: [user_id], references: [user_id])
   kompetensi_mahasiswa KompetensiMahasiswa[]
   hasil_cga            HasilCga[]
@@ -60,6 +64,8 @@ model Mahasiswa {
 
 model Kompetensi {
   kompetensi_id   Int     @id @default(autoincrement())
+  // [ADDED, Tahap 2] public code ("K01") used by the engine and the API.
+  kode_kompetensi String  @unique @db.VarChar(10)
   nama_kompetensi String  @db.VarChar(255)
   kategori        String  @db.VarChar(100)
   deskripsi       String? @db.Text
@@ -86,14 +92,28 @@ model KompetensiMahasiswa {
   @@map("kompetensi_mahasiswa")
 }
 
+// One row = one lowongan (a company can have several posisi).
 model TempatMagang {
-  tempat_id         Int     @id @default(autoincrement())
-  nama_perusahaan   String  @db.VarChar(255)
-  bidang_industri   String  @db.VarChar(100) // [C2]
-  lokasi            String  @db.VarChar(255) // [C4] display label only
-  benefit_finansial Decimal @db.Decimal(8, 2) // [C5] juta Rp / bulan
-  reputasi          Int // [C6] 1-5
-  deskripsi         String? @db.Text
+  tempat_id       Int    @id @default(autoincrement())
+  // [ADDED, Tahap 2] public code ("T01") used by the engine, the API and the client routes.
+  kode_tempat     String @unique @db.VarChar(10)
+  nama_perusahaan String @db.VarChar(255)
+  bidang_industri String @db.VarChar(100) // [C2] must equal an engine config.BIDANG value
+  lokasi          String @db.VarChar(255) // [C4] display label only
+  // [C5] juta Rp / bulan. [Tahap 2] nullable: most lowongan do not state it; the
+  // engine imputes the median and flags the value as "perkiraan".
+  benefit_finansial Decimal? @db.Decimal(8, 2)
+  // [C6] 1-5. [Tahap 2] nullable: no lowongan has a value yet (engine uses a constant).
+  reputasi  Int?
+  deskripsi String? @db.Text
+
+  // [ADDED, Tahap 2] fields of the lowongan dataset that the engine needs.
+  posisi             String    @db.VarChar(255)
+  mode_kerja         String?   @db.VarChar(100) // remote / WFH lowongan are excluded (Batasan 3)
+  status_alternatif  String    @db.VarChar(50) // 'Dipakai' | 'Dikeluarkan'
+  alasan_dikeluarkan String?   @db.Text
+  sumber_url         String?   @db.VarChar(500) // original job posting
+  tanggal_akses      DateTime? @db.Date // when the posting was read
 
   // [ADDED, gap 2] tempat magang coordinates for C4 (Haversine).
   latitude  Decimal? @db.Decimal(8, 6)
@@ -179,6 +199,9 @@ model KriteriaTopsis {
 }
 
 // [ADDED, gap 4] C2 partial-match mapping (serumpun), managed by Administrator.
+// NOT USED YET: spk-engine 0.3.0 reads the serumpun pairs and scores from
+// server/src/engine/src/config.js (provisional, awaiting the dosen's approval),
+// so this table does not affect C2 until the engine can take it as input.
 // Identical minat/bidang scores 100 without needing a row; no row = 0.
 model PemetaanBidang {
   pemetaan_id      Int     @id @default(autoincrement())

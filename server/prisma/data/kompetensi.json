@@ -1,0 +1,131 @@
+{
+  "sumber": "sheet kompetensi, Dataset_Tempat_Magang_revisi.xlsx",
+  "kompetensi": [
+    {
+      "id": "K01",
+      "nama": "Dasar Pemrograman",
+      "kategori": "Pemrograman",
+      "deskripsi": "Logika dan konsep dasar bahasa pemrograman"
+    },
+    {
+      "id": "K02",
+      "nama": "Pemrograman Web (HTML/CSS/JavaScript)",
+      "kategori": "Web",
+      "deskripsi": "HTML, CSS, JavaScript, DOM, jQuery, Bootstrap"
+    },
+    {
+      "id": "K03",
+      "nama": "Frontend Framework (React/Vue/TypeScript)",
+      "kategori": "Web",
+      "deskripsi": "React, Vue, TypeScript, Tailwind, tooling frontend"
+    },
+    {
+      "id": "K04",
+      "nama": "Backend & REST API",
+      "kategori": "Web",
+      "deskripsi": "Framework backend (Node.js, Laravel, Go, dll.) dan REST API"
+    },
+    {
+      "id": "K05",
+      "nama": "Basis Data SQL",
+      "kategori": "Data",
+      "deskripsi": "PostgreSQL, MySQL, SQL Server, BigQuery; NoSQL digabung di sini"
+    },
+    {
+      "id": "K06",
+      "nama": "Python",
+      "kategori": "Pemrograman",
+      "deskripsi": "Python untuk aplikasi atau pengolahan data"
+    },
+    {
+      "id": "K07",
+      "nama": "Git / Version Control",
+      "kategori": "Tools",
+      "deskripsi": "Git, Git Flow"
+    },
+    {
+      "id": "K08",
+      "nama": "DevOps, Docker & Cloud",
+      "kategori": "Infrastruktur",
+      "deskripsi": "Docker, Kubernetes, Airflow, Firebase, layanan cloud"
+    },
+    {
+      "id": "K09",
+      "nama": "Mobile Development (Flutter/React Native/Android)",
+      "kategori": "Mobile",
+      "deskripsi": "Flutter, React Native, Android"
+    },
+    {
+      "id": "K10",
+      "nama": "Analisis & Visualisasi Data",
+      "kategori": "Data",
+      "deskripsi": "Teknik analisis data, Excel, Power BI, Looker, Tableau, Metabase"
+    },
+    {
+      "id": "K11",
+      "nama": "Software Testing & QA",
+      "kategori": "Kualitas Perangkat Lunak",
+      "deskripsi": "Manual/automation testing, test case, bug tracking"
+    },
+    {
+      "id": "K12",
+      "nama": "UI/UX Design",
+      "kategori": "Desain",
+      "deskripsi": "Desain antarmuka, Figma, portofolio UI/UX"
+    },
+    {
+      "id": "K13",
+      "nama": "Jaringan Komputer",
+      "kategori": "Infrastruktur",
+      "deskripsi": "Protokol jaringan, konfigurasi perangkat jaringan"
+    },
+    {
+      "id": "K14",
+      "nama": "Hardware & Sistem Operasi",
+      "kategori": "Infrastruktur",
+      "deskripsi": "Instalasi/troubleshooting OS dan hardware, Linux"
+    },
+    {
+      "id": "K15",
+      "nama": "Algoritma & Struktur Data",
+      "kategori": "Pemrograman",
+      "deskripsi": "Algoritma dan struktur data"
+    },
+    {
+      "id": "K16",
+      "nama": "OOP & Design Pattern",
+      "kategori": "Pemrograman",
+      "deskripsi": "Pemrograman berorientasi objek dan design pattern"
+    },
+    {
+      "id": "K17",
+      "nama": "Machine Learning Dasar",
+      "kategori": "Data",
+      "deskripsi": "Klasifikasi, regresi, clustering"
+    },
+    {
+      "id": "K18",
+      "nama": "Komunikasi",
+      "kategori": "Non-teknis",
+      "deskripsi": "Komunikasi lisan/tulisan dalam tim"
+    },
+    {
+      "id": "K19",
+      "nama": "Kerja Sama Tim",
+      "kategori": "Non-teknis",
+      "deskripsi": "Bekerja dalam tim"
+    },
+    {
+      "id": "K20",
+      "nama": "Pemecahan Masalah & Berpikir Analitis",
+      "kategori": "Non-teknis",
+      "deskripsi": "Problem solving, analytical thinking"
+    },
+    {
+      "id": "K21",
+      "nama": "SDLC & Metodologi (Agile/Scrum)",
+      "kategori": "Rekayasa Perangkat Lunak",
+      "deskripsi": "SDLC, STLC, Agile, Scrum"
+    }
+  ]
+}

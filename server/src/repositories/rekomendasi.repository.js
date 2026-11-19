@@ -7,25 +7,29 @@ export function createRekomendasiRepository(prisma) {
     findMahasiswa(mahasiswaId) {
       return prisma.mahasiswa.findUnique({
         where: { mahasiswa_id: mahasiswaId },
-        include: { kompetensi_mahasiswa: true },
+        include: {
+          kompetensi_mahasiswa: { include: { kompetensi: { select: { kode_kompetensi: true } } } },
+        },
       });
+    },
+
+    /** The kompetensi master table: the only source of names, kategori and deskripsi. */
+    findKompetensi() {
+      return prisma.kompetensi.findMany({ orderBy: { kode_kompetensi: 'asc' } });
     },
 
     findKriteria() {
       return prisma.kriteriaTopsis.findMany({ orderBy: { kode_kriteria: 'asc' } });
     },
 
-    findPemetaanBidang() {
-      return prisma.pemetaanBidang.findMany();
-    },
-
+    /** Every lowongan (including 'Dikeluarkan' ones; the engine decides who is excluded) with its requirements. */
     findTempatDenganKebutuhan() {
       return prisma.tempatMagang.findMany({
         orderBy: { tempat_id: 'asc' },
         include: {
           kebutuhan_kompetensi: {
             orderBy: { kompetensi_id: 'asc' },
-            include: { kompetensi: { select: { nama_kompetensi: true, skala_maksimum: true } } },
+            include: { kompetensi: { select: { kode_kompetensi: true } } },
           },
         },
       });
