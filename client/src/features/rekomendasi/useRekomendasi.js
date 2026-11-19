@@ -33,7 +33,7 @@ export function useRekomendasi() {
     };
   }, [reloadKey]);
 
-  // What is still missing before a calculation can run.
+  // What the profile still lacks (shown on the page; the profile must be Lengkap to calculate).
   const missingIds = useMemo(() => {
     if (!profil) return [];
     const answered = new Set(profil.kompetensi.map((k) => k.kompetensi_id));
@@ -50,9 +50,10 @@ export function useRekomendasi() {
     ].filter(Boolean);
   }, [profil]);
 
-  // An unanswered kompetensi does not block: the engine counts it as level 0 (Belum punya).
-  // Only the data fields (IPK, bidang, kota, counts) must be filled.
-  const profilLengkap = kompetensi.length > 0 && dataKurang.length === 0;
+  // A calculation is requested only for a saved profile with status Lengkap (every kompetensi
+  // answered, "Belum punya" included, and the data fields filled). The server itself would
+  // count an unanswered kompetensi as level 0, but this page waits for Lengkap.
+  const profilLengkap = profil !== null && profil.status === "Lengkap";
   const stale =
     hasil !== null &&
     profil !== null &&
@@ -64,7 +65,7 @@ export function useRekomendasi() {
   };
 
   const hitung = async () => {
-    if (calc.status === "computing") return { ok: false };
+    if (calc.status === "computing" || !profilLengkap) return { ok: false };
     setCalc({ status: "computing", error: null, belumDiisi: [] });
     try {
       const result = await requestRekomendasi();

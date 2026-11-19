@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { ClipboardList, Info, ListFilter, RefreshCw, Sparkles, TriangleAlert } from "lucide-react";
 import {
   ActionBar,
@@ -90,10 +91,17 @@ export default function Rekomendasi() {
   const computing = calc.status === "computing";
   const buttonStatus = computing ? "loading" : done ? "success" : "idle";
   const loaded = load.status === "ready";
-  const showBar = loaded && (hasil || rek.profilLengkap);
+  // No calculate button until the saved profile is Lengkap, even when an older result is shown.
+  const showBar = loaded && rek.profilLengkap;
   const kotaAsal = profil?.domisili?.kota;
 
-  const incompleteText = `Tinggal melengkapi ${rek.dataKurang.join(", ")} di profilmu, lalu rekomendasimu bisa dihitung.`;
+  const lengkapiJudul = "Lengkapi profilmu dulu (boleh pilih “Belum punya”)";
+  const kurang = [
+    rek.missingIds.length > 0 && `${rek.missingIds.length} kompetensi belum dijawab`,
+    rek.dataKurang.length > 0 && `data pendukung: ${rek.dataKurang.join(", ")}`,
+  ].filter(Boolean);
+  const lengkapiRinci = `Rekomendasi dihitung setelah profilmu Lengkap dan tersimpan. Masih kurang: ${kurang.join("; ")}.`;
+  const lengkapiTujuan = rek.missingIds[0] ? `/mahasiswa/profil?fokus=${rek.missingIds[0]}` : "/mahasiswa/profil";
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 pb-48 pt-6 md:px-8 lg:max-w-4xl lg:pb-10 lg:pt-8">
@@ -143,10 +151,10 @@ export default function Rekomendasi() {
         {loaded && !hasil && !rek.profilLengkap && (
           <EmptyState
             icon={ClipboardList}
-            title="Belum ada rekomendasi"
-            description={incompleteText}
+            title={lengkapiJudul}
+            description={lengkapiRinci}
             action={
-              <Button variant="secondary" to="/mahasiswa/profil">
+              <Button variant="secondary" to={lengkapiTujuan}>
                 Lengkapi profil
               </Button>
             }
@@ -184,7 +192,23 @@ export default function Rekomendasi() {
 
         {loaded && hasil && !computing && (
           <>
-            {rek.stale && (
+            {!rek.profilLengkap && (
+              <Card className="motion-pop flex gap-3 border-coral-300 bg-coral-50" role="status">
+                <TriangleAlert aria-hidden="true" size={20} className="mt-0.5 shrink-0 text-coral-700" />
+                <div className="max-w-prose text-sm leading-relaxed text-ink">
+                  <p className="font-semibold">{lengkapiJudul}</p>
+                  <p className="mt-1">
+                    {lengkapiRinci} Hasil di bawah masih dari perhitungan sebelumnya.{" "}
+                    <Link to={lengkapiTujuan} className="font-semibold text-sea-800 underline underline-offset-4">
+                      Lengkapi profil
+                    </Link>
+                  </p>
+                </div>
+              </Card>
+            )}
+
+            {/* "Hitung ulang" is not offered until the profile is Lengkap, so this hint waits too. */}
+            {rek.stale && rek.profilLengkap && (
               <Card className="motion-pop flex gap-3 border-coral-300 bg-coral-50">
                 <TriangleAlert aria-hidden="true" size={20} className="mt-0.5 shrink-0 text-coral-700" />
                 <p className="max-w-prose text-sm leading-relaxed text-ink">
