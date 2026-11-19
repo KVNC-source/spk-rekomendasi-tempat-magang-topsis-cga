@@ -92,12 +92,8 @@ export default function Rekomendasi() {
   const loaded = load.status === "ready";
   const showBar = loaded && (hasil || rek.profilLengkap);
   const kotaAsal = profil?.domisili?.kota;
-  const firstMissing = rek.missingIds[0];
 
-  const incompleteText =
-    rek.missingIds.length > 0
-      ? `Lengkapi profil kompetensimu dulu, cuma butuh beberapa menit. Masih ada ${rek.missingIds.length} elemen yang belum kamu jawab.`
-      : `Tinggal melengkapi ${rek.dataKurang.join(", ")} di profilmu, lalu rekomendasimu bisa dihitung.`;
+  const incompleteText = `Tinggal melengkapi ${rek.dataKurang.join(", ")} di profilmu, lalu rekomendasimu bisa dihitung.`;
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 pb-48 pt-6 md:px-8 lg:max-w-4xl lg:pb-10 lg:pt-8">
@@ -150,10 +146,7 @@ export default function Rekomendasi() {
             title="Belum ada rekomendasi"
             description={incompleteText}
             action={
-              <Button
-                variant="secondary"
-                to={firstMissing ? `/mahasiswa/profil?fokus=${firstMissing}` : "/mahasiswa/profil"}
-              >
+              <Button variant="secondary" to="/mahasiswa/profil">
                 Lengkapi profil
               </Button>
             }

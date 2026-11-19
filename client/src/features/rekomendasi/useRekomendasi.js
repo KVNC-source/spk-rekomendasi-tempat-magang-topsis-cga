@@ -50,7 +50,9 @@ export function useRekomendasi() {
     ].filter(Boolean);
   }, [profil]);
 
-  const profilLengkap = kompetensi.length > 0 && missingIds.length === 0 && dataKurang.length === 0;
+  // An unanswered kompetensi does not block: the engine counts it as level 0 (Belum punya).
+  // Only the data fields (IPK, bidang, kota, counts) must be filled.
+  const profilLengkap = kompetensi.length > 0 && dataKurang.length === 0;
   const stale =
     hasil !== null &&
     profil !== null &&

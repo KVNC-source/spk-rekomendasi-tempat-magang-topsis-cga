@@ -69,3 +69,23 @@ export function SelectField({ id, label, hint, error, className = "", children, 
     </div>
   );
 }
+
+/** Labelled multi-line input (same look and messages as TextField). */
+export function TextAreaField({ id, label, hint, error, className = "", rows = 3, ...textareaProps }) {
+  return (
+    <div className={className}>
+      <label htmlFor={id} className="mb-1.5 block text-sm font-semibold text-ink">
+        {label}
+      </label>
+      <textarea
+        id={id}
+        rows={rows}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy(id, error, hint)}
+        className={`${control} min-h-24 resize-y py-3 ${error ? "border-coral-600" : "border-line-strong"}`}
+        {...textareaProps}
+      />
+      <Message id={`${id}-msg`} error={error} hint={hint} />
+    </div>
+  );
+}

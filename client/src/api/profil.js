@@ -1,10 +1,12 @@
 /**
  * Profil + master-data API.
  *
- * CONTRACT — none of these endpoints exist on the server yet (server/ is
- * read-only for the frontend). The client codes against these shapes; until the
- * server implements them, VITE_USE_MOCK (default: on) serves the same shapes
- * from ./mock. Set VITE_USE_MOCK=false to call the real API.
+ * CONTRACT. Only GET /api/kompetensi exists on the server so far (it reads the
+ * kompetensi table on every call, so a kompetensi the Administrator adds shows
+ * up in the form at once). The other endpoints below are not built yet, so the
+ * profile form cannot be used against the real server until they are. The client
+ * codes against these shapes; VITE_USE_MOCK (default: on) serves the same
+ * shapes from ./mock. Set VITE_USE_MOCK=false to call the real API.
  *
  *   GET  /api/kompetensi
  *        -> [{ kompetensi_id: "K01", nama_kompetensi, kategori, deskripsi, skala_maksimum }]

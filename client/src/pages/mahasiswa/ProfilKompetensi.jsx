@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Check, CircleAlert, CircleHelp, FilePen, RefreshCw, Save, SearchX } from "lucide-react";
+import { Check, CircleAlert, CircleHelp, FilePen, Info, RefreshCw, Save, SearchX } from "lucide-react";
 import {
   ActionBar,
   BottomSheet,
@@ -113,10 +113,16 @@ export default function ProfilKompetensi() {
     }
   };
 
-  // "Lihat rekomendasi" opens only for a saved, complete profile.
+  // "Lihat rekomendasi" opens only for a saved, complete profile (status Lengkap): every kompetensi
+  // answered, "Belum punya" included. The server itself does not reject an unanswered kompetensi (it
+  // counts as level 0), but this button still waits for Lengkap.
   const canView = savedStatus === "Lengkap" && !dirty;
 
   const reasonText = "“Lihat rekomendasi” aktif setelah profilmu Lengkap dan tersimpan.";
+
+  // Names of the kompetensi still unanswered (new ones the Administrator added show up here).
+  const namaBelumDiisi = kompetensi.filter((k) => missingIds.includes(k.kompetensi_id)).map((k) => k.nama_kompetensi);
+  const MAKS_NAMA = 3;
 
   const hint = (() => {
     if (complete && dirty) return "Sudah lengkap. Simpan dulu supaya rekomendasi bisa dilihat.";
@@ -203,6 +209,23 @@ export default function ProfilKompetensi() {
 
           {ready && (
             <>
+              {missingIds.length > 0 && (
+                <Card tone="quiet" role="note" className="motion-pop flex gap-3">
+                  <Info aria-hidden="true" size={20} className="mt-0.5 shrink-0 text-sea-700" />
+                  <div className="max-w-prose text-sm leading-relaxed text-ink">
+                    <p className="font-semibold">
+                      <span className="font-mono">{missingIds.length}</span> kompetensi belum kamu isi
+                    </p>
+                    <p className="mt-1">
+                      {namaBelumDiisi.slice(0, MAKS_NAMA).join(", ")}
+                      {namaBelumDiisi.length > MAKS_NAMA && ` dan ${namaBelumDiisi.length - MAKS_NAMA} lainnya`}.
+                      Isi semuanya (boleh “Belum punya”) supaya profilmu Lengkap dan rekomendasi bisa dilihat. Yang masih
+                      kosong dihitung sebagai “Belum punya” (level 0).
+                    </p>
+                  </div>
+                </Card>
+              )}
+
               {groups.map((group, index) => (
                 <KompetensiGroup
                   key={group.kategori}

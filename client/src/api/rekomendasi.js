@@ -25,8 +25,10 @@
  *             excluded: [{ tempatId, alasan, namaPerusahaan?, posisi? }],
  *             imputasi, warnings: [string], steps,
  *             dihitungPada: ISO date, profilDiperbaruiPada: ISO date }
- *        -> 422 { error, belum_diisi: [kompetensi_id], data_kurang: [field] }
- *           when the profile is incomplete
+ *        -> 422 { error, belum_diisi: [], data_kurang: [field] }
+ *           when a data field of the profile is empty (ipk, minat_bidang, domisili).
+ *           An unanswered kompetensi does NOT block: it counts as level 0 (Belum punya),
+ *           so belum_diisi is always empty.
  *
  *   GET  /api/rekomendasi/terakhir
  *        -> 200, same shape as above, or 404 { error } if none was calculated yet

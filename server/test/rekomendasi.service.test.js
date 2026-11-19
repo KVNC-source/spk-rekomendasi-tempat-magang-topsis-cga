@@ -1,8 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { recommend } from '../src/engine/src/matrix.js';
-import { criteriaC1C7 } from '../src/engine/src/topsis.js';
 import { ubahKeDataset } from '../src/services/dataset.js';
 import {
   buatKriteriaEngine,
@@ -11,76 +9,17 @@ import {
 } from '../src/services/rekomendasi.service.js';
 import { HttpError } from '../src/lib/httpError.js';
 
-const readJson = (relative) => JSON.parse(readFileSync(new URL(relative, import.meta.url), 'utf8'));
-const dataset = readJson('../src/engine/data/dataset.json');
-const profilContoh = readJson('../src/engine/data/profil_contoh.json').profil.find((p) => p.id === 'CONTOH-WEB-MANADO');
-
-const CONFIG = { ncf: 0.6, nsf: 0.4, c7Placeholder: 4 };
-const NOW = new Date('2026-11-17T08:00:00.000Z');
-const DIPERBARUI = new Date('2026-11-16T09:30:00.000Z');
-
-// --- Database rows built from dataset.json, in the shape Prisma returns them.
-
-const kompetensiRows = dataset.kompetensi.map((k, i) => ({
-  kompetensi_id: i + 1,
-  kode_kompetensi: k.id,
-  nama_kompetensi: k.nama,
-  skala_maksimum: 4,
-}));
-
-const decimal = (value) => (value === null || value === undefined ? null : String(value));
-
-const tempatRows = dataset.tempat.map((t, i) => ({
-  tempat_id: i + 1,
-  kode_tempat: t.tempatId,
-  nama_perusahaan: t.namaPerusahaan,
-  posisi: t.posisi,
-  bidang_industri: t.bidang,
-  lokasi: t.lokasi,
-  mode_kerja: t.modeKerja,
-  latitude: decimal(t.lat),
-  longitude: decimal(t.lon),
-  benefit_finansial: decimal(t.benefitFinansial),
-  reputasi: t.reputasi,
-  status_alternatif: t.statusAlternatif,
-  alasan_dikeluarkan: t.alasanDikeluarkan,
-  sumber_url: t.sumberUrl,
-  tanggal_akses: t.tanggalAkses ? new Date(`${t.tanggalAkses}T00:00:00Z`) : null,
-  kebutuhan_kompetensi: dataset.kebutuhan
-    .filter((k) => k.tempatId === t.tempatId)
-    .map((k) => ({
-      kebutuhan_id: Number(k.kebutuhanId.replace('KB', '')),
-      level_minimum: k.levelMinimum,
-      is_mandatory: k.jenis === 'wajib',
-      kompetensi: { kode_kompetensi: k.kompetensiId },
-    })),
-}));
-
-const kriteriaRows = () =>
-  criteriaC1C7().map((c, i) => ({
-    kriteria_id: i + 1,
-    kode_kriteria: c.code,
-    nama_kriteria: c.label,
-    bobot: String(c.weight),
-    tipe: c.type,
-  }));
-
-/** The sample profile with all 21 answers (missing ones are an explicit level 0). */
-const mahasiswa = {
-  mahasiswa_id: 1,
-  nim: 'CONTOH-0001',
-  nama: 'CONTOH Mahasiswa Web Manado',
-  ipk: String(profilContoh.ipk),
-  minat_bidang: profilContoh.minatBidang,
-  domisili_latitude: String(profilContoh.domisili.lat),
-  domisili_longitude: String(profilContoh.domisili.lon),
-  diperbarui_pada: DIPERBARUI,
-  kompetensi_mahasiswa: kompetensiRows.map((k) => ({
-    kompetensi_id: k.kompetensi_id,
-    level_penguasaan: profilContoh.kompetensi[k.kode_kompetensi] ?? 0,
-    kompetensi: { kode_kompetensi: k.kode_kompetensi },
-  })),
-};
+import {
+  CONFIG,
+  DIPERBARUI,
+  NOW,
+  dataset,
+  kompetensiRows,
+  kriteriaRows,
+  mahasiswa,
+  profilContoh,
+  tempatRows,
+} from './fixtures-db.js';
 
 function fakeRepository(overrides = {}) {
   const calls = { simpanHasil: [] };
@@ -237,22 +176,38 @@ test('hitungRekomendasi: 404 for an unknown mahasiswa', async () => {
   await assert.rejects(() => service.hitungRekomendasi(99), (e) => e.status === 404);
 });
 
-test('hitungRekomendasi: 422 lists what is missing, and nothing is persisted', async () => {
-  const sebagian = {
-    ...mahasiswa,
-    domisili_latitude: null,
-    kompetensi_mahasiswa: mahasiswa.kompetensi_mahasiswa.filter((km) => km.kompetensi.kode_kompetensi !== 'K05'),
-  };
-  const { service, repository } = buatService({ findMahasiswa: async () => sebagian });
+test('hitungRekomendasi: 422 lists the missing data fields, and nothing is persisted', async () => {
+  const tanpaDomisili = { ...mahasiswa, domisili_latitude: null };
+  const { service, repository } = buatService({ findMahasiswa: async () => tanpaDomisili });
   await assert.rejects(
     () => service.hitungRekomendasi(1),
-    (e) =>
-      e.status === 422 &&
-      e.details.belum_diisi.length === 1 &&
-      e.details.belum_diisi[0] === 'K05' &&
-      e.details.data_kurang.includes('domisili')
+    (e) => e.status === 422 && e.details.data_kurang.includes('domisili')
   );
   assert.equal(repository.calls.simpanHasil.length, 0);
+});
+
+test('hitungRekomendasi: an unanswered kompetensi does not block; it counts as level 0 (Belum punya)', async () => {
+  // K05 has no answer (as if the Administrator had just added it)
+  const sebagian = {
+    ...mahasiswa,
+    kompetensi_mahasiswa: mahasiswa.kompetensi_mahasiswa.filter((km) => km.kompetensi.kode_kompetensi !== 'K05'),
+  };
+  const lengkap = await buatService().service.hitungRekomendasi(1);
+  const { service, repository } = buatService({ findMahasiswa: async () => sebagian });
+  const hasil = await service.hitungRekomendasi(1);
+
+  assert.equal(hasil.ranking.length, 15);
+  assert.equal(repository.calls.simpanHasil.length, 1); // it was calculated and stored
+  const el = hasil.ranking.flatMap((r) => r.cga.perElement).find((e) => e.id === 'K05');
+  assert.equal(el.levelMahasiswa, 0);
+
+  // the sample profile answers K05 with level 2, so counting it as 0 must change the result
+  const k05Lengkap = lengkap.ranking.flatMap((r) => r.cga.perElement).find((e) => e.id === 'K05');
+  assert.equal(k05Lengkap.levelMahasiswa, 2);
+  const naik = (r, id) => r.cga.perElement.find((e) => e.id === id)?.weightScore;
+  const rLengkap = lengkap.ranking.find((r) => r.cga.perElement.some((e) => e.id === 'K05'));
+  const rSebagian = hasil.ranking.find((r) => r.id === rLengkap.id);
+  assert.ok(naik(rSebagian, 'K05') < naik(rLengkap, 'K05'));
 });
 
 test('hitungRekomendasi: 422 for a minat bidang the engine does not know', async () => {

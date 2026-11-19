@@ -6,7 +6,7 @@ export { default as Card } from "./Card";
 export { default as Chip } from "./Chip";
 export { default as CountUp } from "./CountUp";
 export { default as EmptyState } from "./EmptyState";
-export { SelectField, TextField } from "./Field";
+export { SelectField, TextAreaField, TextField } from "./Field";
 export { default as LevelLadder, GapBadge, LadderGlyph } from "./LevelLadder";
 export { default as RelativeTime } from "./RelativeTime";
 export { default as ScoreBar } from "./ScoreBar";

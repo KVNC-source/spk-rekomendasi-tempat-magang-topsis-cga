@@ -6,7 +6,12 @@ import AdminLayout from "./layouts/AdminLayout";
 import MahasiswaLayout from "./layouts/MahasiswaLayout";
 import Landing from "./pages/Landing";
 import Masuk from "./pages/Masuk";
+import RequireServer from "./features/admin/RequireServer";
 import AdminHome from "./pages/admin/AdminHome";
+import KompetensiAdmin from "./pages/admin/KompetensiAdmin";
+import KriteriaAdmin from "./pages/admin/KriteriaAdmin";
+import TempatAdmin from "./pages/admin/TempatAdmin";
+import TempatForm from "./pages/admin/TempatForm";
 import ComingSoon from "./pages/mahasiswa/ComingSoon";
 import DetailRekomendasi from "./pages/mahasiswa/DetailRekomendasi";
 import Pilihan from "./pages/mahasiswa/Pilihan";
@@ -37,7 +42,14 @@ export default function App() {
 
           <Route element={<RequireRole role="administrator" />}>
             <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<AdminHome />} />
+              <Route element={<RequireServer />}>
+                <Route index element={<AdminHome />} />
+                <Route path="tempat" element={<TempatAdmin />} />
+                <Route path="tempat/baru" element={<TempatForm />} />
+                <Route path="tempat/:kode" element={<TempatForm />} />
+                <Route path="kompetensi" element={<KompetensiAdmin />} />
+                <Route path="kriteria" element={<KriteriaAdmin />} />
+              </Route>
             </Route>
           </Route>
           {import.meta.env.DEV && (

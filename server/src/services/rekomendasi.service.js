@@ -57,16 +57,16 @@ export function createRekomendasiService({ repository, getConfig = getScoringCon
 
     const { dataset, tempatIdByKode, kompetensiIdByKode, kompetensiRows } = await bacaDataset(repository);
 
-    // The profile must be complete: all kompetensi answered (0 = "Belum punya" counts as an answer).
-    const dijawab = new Set(mahasiswa.kompetensi_mahasiswa.map((km) => km.kompetensi.kode_kompetensi));
-    const belumDiisi = kompetensiRows.map((k) => k.kode_kompetensi).filter((kode) => !dijawab.has(kode));
+    // The data fields must be filled. A kompetensi the mahasiswa has not answered (for
+    // example one the Administrator added later) does NOT block the calculation: the
+    // engine counts it as level 0 "Belum punya" (engine/src/matrix.js: a missing key = 0).
     const dataKurang = [
       mahasiswa.ipk == null && 'ipk',
       !mahasiswa.minat_bidang && 'minat_bidang',
       (mahasiswa.domisili_latitude == null || mahasiswa.domisili_longitude == null) && 'domisili',
     ].filter(Boolean);
-    if (belumDiisi.length > 0 || dataKurang.length > 0) {
-      throw new HttpError(422, 'Profil belum lengkap.', { belum_diisi: belumDiisi, data_kurang: dataKurang });
+    if (dataKurang.length > 0) {
+      throw new HttpError(422, 'Profil belum lengkap.', { belum_diisi: [], data_kurang: dataKurang });
     }
 
     const kriteria = buatKriteriaEngine(await repository.findKriteria());

@@ -231,7 +231,7 @@ async function withAuthApp(fn, { authConfig = AUTH_CONFIG } = {}) {
   const server = createApp({
     rekomendasiService: stubService,
     pilihanService: stubService,
-    adminService: { daftarKriteria: async () => kriteriaRows.map((r) => ({ ...r, bobot: Number(r.bobot) })) },
+    adminService: { daftarKriteria: async () => ({ kriteria: kriteriaRows.map((r) => ({ ...r, bobot: Number(r.bobot) })) }) },
     authService: ctx.authService,
     authConfig,
   }).listen(0);

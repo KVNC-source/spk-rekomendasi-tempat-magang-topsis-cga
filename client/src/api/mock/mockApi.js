@@ -128,17 +128,11 @@ export async function putProfil(payload) {
   return withStatus(store.profil);
 }
 
-function belumDiisi(profil) {
-  const answered = new Set(profil.kompetensi.map((k) => k.kompetensi_id));
-  return KOMPETENSI.filter((k) => !answered.has(k.kompetensi_id)).map((k) => k.kompetensi_id);
-}
-
 export async function postRekomendasi() {
   await latency(1100);
   const store = readStore();
   const { profil } = store;
 
-  const missing = belumDiisi(profil);
   const dataKurang = [
     profil.ipk == null && "ipk",
     !profil.minat_bidang && "minat_bidang",
@@ -146,8 +140,9 @@ export async function postRekomendasi() {
     profil.jumlah_proyek == null && "jumlah_proyek",
     profil.jumlah_sertifikasi == null && "jumlah_sertifikasi",
   ].filter(Boolean);
-  if (missing.length > 0 || dataKurang.length > 0) {
-    throw new ApiError(422, "Profil belum lengkap.", { belum_diisi: missing, data_kurang: dataKurang });
+  // An unanswered kompetensi does not block: the engine counts a missing key as level 0.
+  if (dataKurang.length > 0) {
+    throw new ApiError(422, "Profil belum lengkap.", { belum_diisi: [], data_kurang: dataKurang });
   }
 
   const engineProfil = {
