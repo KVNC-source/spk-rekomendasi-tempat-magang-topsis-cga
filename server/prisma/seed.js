@@ -10,7 +10,9 @@
  *  3. tempat_magang + kebutuhan_kompetensi: from the engine's dataset.json
  *     (generated from the xlsx, so it is the source of truth for these rows).
  *     Re-running this script re-syncs them; it does not duplicate rows.
- *  4. ONE sample mahasiswa (clearly marked CONTOH) from the engine's
+ *  4. role: only 'mahasiswa' and 'administrator'. The koordinator magang is not
+ *     a system user (approval happens outside the system, Batasan 6).
+ *  5. ONE sample mahasiswa (clearly marked CONTOH) from the engine's
  *     profil_contoh.json, profile CONTOH-WEB-MANADO. Not respondent data.
  *
  * Run: npm run seed
@@ -96,10 +98,20 @@ for (const k of dataset.kebutuhan) {
   });
 }
 
-// --- 4. sample mahasiswa (CONTOH)
-let role = await prisma.role.findFirst({ where: { nama_role: 'Mahasiswa' } });
-if (!role) role = await prisma.role.create({ data: { nama_role: 'Mahasiswa' } });
+// --- 4. role
+const ROLES = ['mahasiswa', 'administrator'];
+const roleByName = new Map();
+for (const nama_role of ROLES) {
+  // Match case-insensitively so an older 'Mahasiswa' row is renamed, not duplicated.
+  const existing = await prisma.role.findFirst({ where: { nama_role: { equals: nama_role, mode: 'insensitive' } } });
+  const row = existing
+    ? await prisma.role.update({ where: { role_id: existing.role_id }, data: { nama_role } })
+    : await prisma.role.create({ data: { nama_role } });
+  roleByName.set(nama_role, row);
+}
+const role = roleByName.get('mahasiswa');
 
+// --- 5. sample mahasiswa (CONTOH)
 const USERNAME = 'contoh-web-manado';
 let user = await prisma.user.findFirst({ where: { username: USERNAME } });
 if (!user) {
@@ -144,7 +156,7 @@ for (const [kode, kompetensi_id] of kompetensiIdByKode) {
 
 console.log(
   `Seeded: ${kompetensiIdByKode.size} kompetensi, ${tempatIdByKode.size} tempat magang, ` +
-    `${dataset.kebutuhan.length} kebutuhan, kriteria C1-C7 (existing weights untouched), ` +
+    `${dataset.kebutuhan.length} kebutuhan, role ${ROLES.join(', ')}, kriteria C1-C7 (existing weights untouched), ` +
     `sample mahasiswa_id=${mahasiswa.mahasiswa_id} (${mahasiswa.nama}).`
 );
 await prisma.$disconnect();

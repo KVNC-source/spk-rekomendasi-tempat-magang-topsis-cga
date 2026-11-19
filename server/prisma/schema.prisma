@@ -57,7 +57,7 @@ model Mahasiswa {
   user                 User                  @relation(fields: [user_id], references: [user_id])
   kompetensi_mahasiswa KompetensiMahasiswa[]
   hasil_cga            HasilCga[]
-  pengajuan            Pengajuan[]
+  pilihan              Pilihan? // the single active choice
 
   @@map("mahasiswa")
 }
@@ -121,7 +121,7 @@ model TempatMagang {
 
   kebutuhan_kompetensi KebutuhanKompetensi[]
   hasil_cga            HasilCga[]
-  pengajuan            Pengajuan[]
+  pilihan              Pilihan[]
 
   @@map("tempat_magang")
 }
@@ -183,7 +183,7 @@ model HasilTopsis {
   tanggal_hitung   DateTime @default(now())
 
   hasil_cga HasilCga    @relation(fields: [cga_id], references: [cga_id])
-  pengajuan Pengajuan[]
+  pilihan Pilihan[]
 
   @@map("hasil_topsis")
 }
@@ -213,18 +213,21 @@ model PemetaanBidang {
   @@map("pemetaan_bidang")
 }
 
-model Pengajuan {
-  pengajuan_id        Int      @id @default(autoincrement())
-  mahasiswa_id        Int
-  tempat_id           Int
-  topsis_id           Int
-  tanggal_pengajuan   DateTime @db.Date
-  status              String   @db.VarChar(50) // dalam_proses | disetujui | ditolak
-  catatan_koordinator String?  @db.Text
+// [Tahap 3] replaces "pengajuan". The koordinator magang is NOT a system user:
+// approval of the internship happens outside the system (Batasan 6 of the thesis),
+// so there is no status and no koordinator note. A mahasiswa keeps ONE active
+// choice (mahasiswa_id is unique); choosing again replaces it.
+model Pilihan {
+  pilihan_id   Int      @id @default(autoincrement())
+  mahasiswa_id Int      @unique
+  tempat_id    Int
+  // The hasil_topsis row the mahasiswa was looking at when choosing (optional).
+  topsis_id    Int?
+  dipilih_pada DateTime @default(now())
 
   mahasiswa     Mahasiswa    @relation(fields: [mahasiswa_id], references: [mahasiswa_id])
   tempat_magang TempatMagang @relation(fields: [tempat_id], references: [tempat_id])
-  hasil_topsis  HasilTopsis  @relation(fields: [topsis_id], references: [topsis_id])
+  hasil_topsis  HasilTopsis? @relation(fields: [topsis_id], references: [topsis_id], onDelete: SetNull)
 
-  @@map("pengajuan")
+  @@map("pilihan")
 }

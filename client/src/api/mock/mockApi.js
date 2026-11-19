@@ -208,6 +208,7 @@ export async function putPilihan(tempatId) {
     posisi: item.posisi,
     sumberUrl: item.sumberUrl,
     tanggalAkses: item.tanggalAkses,
+    topsis_id: null,
     disimpan_pada: now(),
   };
   writeStore(store);

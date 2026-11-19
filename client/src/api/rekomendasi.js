@@ -38,6 +38,7 @@
  */
 import { ApiError, apiFetch } from "./http";
 import { loadMock, useMock } from "./profil";
+import { MAHASISWA_ID } from "./session";
 
 export const requestRekomendasi = () =>
   useMock ? loadMock().then((m) => m.postRekomendasi()) : apiFetch("/api/rekomendasi", { method: "POST", body: {} });
@@ -56,21 +57,33 @@ export async function getRekomendasiTerakhir() {
 
 /**
  * Pilihan: the lowongan the mahasiswa saves as their own choice. The
- * koordinator's approval happens outside the system (Batasan 6), so there is no
- * submission flow and no status here. One choice at a time.
+ * koordinator is not a system user and approval happens outside the system
+ * (Batasan 6), so there is no submission flow and no status here. One choice at
+ * a time: saving again replaces the earlier one.
  *
- *   GET    /api/mahasiswa/me/pilihan  -> { tempat_id, namaPerusahaan, posisi, sumberUrl,
- *                                          tanggalAkses, disimpan_pada } | null
- *   PUT    /api/mahasiswa/me/pilihan  body { tempat_id } -> same shape (replaces any earlier choice)
- *   DELETE /api/mahasiswa/me/pilihan  -> 204
+ * tempat_id is always the tempat CODE ("T05"), never the numeric primary key.
+ * Until authentication exists the mahasiswa is named in the request (see
+ * MAHASISWA_ID in ./session).
+ *
+ *   GET    /api/pilihan/:mahasiswa_id
+ *          -> 200 { tempat_id, namaPerusahaan, posisi, sumberUrl, tanggalAkses,
+ *                   topsis_id, disimpan_pada } | 200 null when nothing is chosen
+ *   PUT    /api/pilihan   body { mahasiswa_id, tempat_id, topsis_id? }
+ *          -> 200, same shape (replaces any earlier choice)
+ *          -> 404 unknown mahasiswa / tempat; 422 tempat not in the calculated list,
+ *             or topsis_id is not this mahasiswa's result for that tempat
+ *   DELETE /api/pilihan/:mahasiswa_id  -> 204 (also when nothing was chosen)
+ *
+ * topsis_id (the hasil_topsis row seen when choosing) is optional and the client
+ * does not send it yet. VITE_USE_MOCK serves the same shapes from ./mock.
  */
 export const getPilihan = () =>
-  useMock ? loadMock().then((m) => m.getPilihan()) : apiFetch("/api/mahasiswa/me/pilihan");
+  useMock ? loadMock().then((m) => m.getPilihan()) : apiFetch(`/api/pilihan/${MAHASISWA_ID}`);
 
 export const simpanPilihan = (tempatId) =>
   useMock
     ? loadMock().then((m) => m.putPilihan(tempatId))
-    : apiFetch("/api/mahasiswa/me/pilihan", { method: "PUT", body: { tempat_id: tempatId } });
+    : apiFetch("/api/pilihan", { method: "PUT", body: { mahasiswa_id: MAHASISWA_ID, tempat_id: tempatId } });
 
 export const hapusPilihan = () =>
-  useMock ? loadMock().then((m) => m.deletePilihan()) : apiFetch("/api/mahasiswa/me/pilihan", { method: "DELETE" });
+  useMock ? loadMock().then((m) => m.deletePilihan()) : apiFetch(`/api/pilihan/${MAHASISWA_ID}`, { method: "DELETE" });
