@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createApp } from '../src/app.js';
 import { HttpError } from '../src/lib/httpError.js';
 import { createPilihanService, ubahKeResponsPilihan } from '../src/services/pilihan.service.js';
+import { cookie, sendJson, withApp } from './helpers.js';
 
 // --- fakes, in the shape Prisma returns
 
@@ -124,108 +124,112 @@ test('hapus: removes the choice, is not an error when there is none, 404 for an 
   await assert.rejects(() => service.hapus(99), (e) => e.status === 404);
 });
 
-// --- HTTP routes (service faked, so no database is needed)
+// --- HTTP routes (service faked, so no database is needed). The mahasiswa is the
+// signed-in one (id 7 in helpers.js): there is no id in the URL or the body.
 
-async function withServer(pilihanService, fn) {
-  const server = createApp({ rekomendasiService: {}, pilihanService }).listen(0);
-  try {
-    await fn(`http://127.0.0.1:${server.address().port}`);
-  } finally {
-    server.close();
-  }
-}
+const MAHASISWA_LOGIN = 7;
 
-const json = (method, url, body) =>
-  fetch(url, {
-    method,
-    headers: { 'content-type': 'application/json' },
-    body: body === undefined ? undefined : typeof body === 'string' ? body : JSON.stringify(body),
-  });
-
-test('PUT /api/pilihan: 200 with the saved choice; the service gets the code and the ids', async () => {
+test('PUT /api/pilihan: 200 with the saved choice; the service gets the session mahasiswa and the code', async () => {
   const seen = [];
-  const service = {
+  const pilihanService = {
     simpan: async (args) => {
       seen.push(args);
       return { tempat_id: 'T05', namaPerusahaan: 'PT Qtera Mandiri', disimpan_pada: 'x' };
     },
   };
-  await withServer(service, async (base) => {
-    const res = await json('PUT', `${base}/api/pilihan`, { mahasiswa_id: 1, tempat_id: ' T05 ', topsis_id: 200 });
+  await withApp({ pilihanService }, async (base) => {
+    // a mahasiswa_id in the body is ignored
+    const res = await sendJson(
+      'PUT',
+      `${base}/api/pilihan`,
+      { mahasiswa_id: 999, tempat_id: ' T05 ', topsis_id: 200 },
+      cookie('tok-mhs')
+    );
     assert.equal(res.status, 200);
     assert.deepEqual(await res.json(), { tempat_id: 'T05', namaPerusahaan: 'PT Qtera Mandiri', disimpan_pada: 'x' });
-    assert.deepEqual(seen, [{ mahasiswaId: 1, kodeTempat: 'T05', topsisId: 200 }]);
+    assert.deepEqual(seen, [{ mahasiswaId: MAHASISWA_LOGIN, kodeTempat: 'T05', topsisId: 200 }]);
 
     // topsis_id is optional
-    await json('PUT', `${base}/api/pilihan`, { mahasiswa_id: 1, tempat_id: 'T05' });
+    await sendJson('PUT', `${base}/api/pilihan`, { tempat_id: 'T05' }, cookie('tok-mhs'));
     assert.equal(seen[1].topsisId, null);
   });
 });
 
 test('PUT /api/pilihan: 400 for a bad body, and the service is not called', async () => {
-  const service = { simpan: async () => assert.fail('must not be called') };
-  await withServer(service, async (base) => {
+  const pilihanService = { simpan: async () => assert.fail('must not be called') };
+  await withApp({ pilihanService }, async (base) => {
     for (const body of [
       {},
-      { mahasiswa_id: '1', tempat_id: 'T05' },
-      { mahasiswa_id: 0, tempat_id: 'T05' },
-      { mahasiswa_id: 1 },
-      { mahasiswa_id: 1, tempat_id: 5 }, // a number is not a code
-      { mahasiswa_id: 1, tempat_id: '  ' },
-      { mahasiswa_id: 1, tempat_id: 'T05', topsis_id: 'abc' },
-      { mahasiswa_id: 1, tempat_id: 'T05', topsis_id: -3 },
+      { tempat_id: 5 }, // a number is not a code
+      { tempat_id: '  ' },
+      { tempat_id: 'T05', topsis_id: 'abc' },
+      { tempat_id: 'T05', topsis_id: -3 },
       '{oops',
     ]) {
-      assert.equal((await json('PUT', `${base}/api/pilihan`, body)).status, 400, JSON.stringify(body));
+      const res = await sendJson('PUT', `${base}/api/pilihan`, body, cookie('tok-mhs'));
+      assert.equal(res.status, 400, JSON.stringify(body));
     }
   });
 });
 
-test('GET /api/pilihan/:mahasiswa_id: 200 with the choice, or null when there is none', async () => {
+test('GET /api/pilihan: 200 with the choice of the signed-in mahasiswa, or null when there is none', async () => {
   const pilihan = { tempat_id: 'T05', namaPerusahaan: 'PT Qtera Mandiri' };
-  const service = { ambil: async (id) => (id === 1 ? pilihan : null) };
-  await withServer(service, async (base) => {
-    const ada = await fetch(`${base}/api/pilihan/1`);
+  const pilihanService = { ambil: async (id) => (id === MAHASISWA_LOGIN ? pilihan : null) };
+  await withApp({ pilihanService }, async (base) => {
+    const ada = await fetch(`${base}/api/pilihan`, { headers: cookie('tok-mhs') });
     assert.equal(ada.status, 200);
     assert.deepEqual(await ada.json(), pilihan);
-
-    const kosong = await fetch(`${base}/api/pilihan/2`);
+  });
+  await withApp({ pilihanService: { ambil: async () => null } }, async (base) => {
+    const kosong = await fetch(`${base}/api/pilihan`, { headers: cookie('tok-mhs') });
     assert.equal(kosong.status, 200);
     assert.equal(await kosong.json(), null);
   });
 });
 
-test('GET and DELETE /api/pilihan/:id: 400 for an id that is not a positive integer', async () => {
-  const service = { ambil: async () => assert.fail('no'), hapus: async () => assert.fail('no') };
-  await withServer(service, async (base) => {
-    for (const id of ['abc', '0', '-1', '1.5']) {
-      assert.equal((await fetch(`${base}/api/pilihan/${id}`)).status, 400, `GET ${id}`);
-      assert.equal((await fetch(`${base}/api/pilihan/${id}`, { method: 'DELETE' })).status, 400, `DELETE ${id}`);
+test('DELETE /api/pilihan: 204 with an empty body, for the signed-in mahasiswa', async () => {
+  let dihapus = null;
+  const pilihanService = {
+    hapus: async (id) => {
+      dihapus = id;
+    },
+  };
+  await withApp({ pilihanService }, async (base) => {
+    const res = await fetch(`${base}/api/pilihan`, { method: 'DELETE', headers: cookie('tok-mhs') });
+    assert.equal(res.status, 204);
+    assert.equal(await res.text(), '');
+    assert.equal(dihapus, MAHASISWA_LOGIN);
+  });
+});
+
+test('/api/pilihan: 401 without a session and 403 for the administrator, service not called', async () => {
+  const gagal = () => assert.fail('must not be called');
+  const pilihanService = { simpan: gagal, ambil: gagal, hapus: gagal };
+  await withApp({ pilihanService }, async (base) => {
+    for (const headers of [{}, cookie('tok-admin')]) {
+      const status = headers.cookie ? 403 : 401;
+      assert.equal((await sendJson('PUT', `${base}/api/pilihan`, { tempat_id: 'T05' }, headers)).status, status);
+      assert.equal((await fetch(`${base}/api/pilihan`, { headers })).status, status);
+      assert.equal((await fetch(`${base}/api/pilihan`, { method: 'DELETE', headers })).status, status);
     }
   });
 });
 
-test('DELETE /api/pilihan/:id: 204 with an empty body', async () => {
-  let dihapus = null;
-  const service = { hapus: async (id) => { dihapus = id; } };
-  await withServer(service, async (base) => {
-    const res = await fetch(`${base}/api/pilihan/7`, { method: 'DELETE' });
-    assert.equal(res.status, 204);
-    assert.equal(await res.text(), '');
-    assert.equal(dihapus, 7);
-  });
-});
-
 test('/api/pilihan: HttpError status passes through (404, 422)', async () => {
-  const service = {
-    simpan: async () => { throw new HttpError(422, 'tidak bisa dipilih'); },
-    ambil: async () => { throw new HttpError(404, 'tidak ditemukan'); },
+  const pilihanService = {
+    simpan: async () => {
+      throw new HttpError(422, 'tidak bisa dipilih');
+    },
+    ambil: async () => {
+      throw new HttpError(404, 'tidak ditemukan');
+    },
   };
-  await withServer(service, async (base) => {
-    const put = await json('PUT', `${base}/api/pilihan`, { mahasiswa_id: 1, tempat_id: 'T02' });
+  await withApp({ pilihanService }, async (base) => {
+    const put = await sendJson('PUT', `${base}/api/pilihan`, { tempat_id: 'T02' }, cookie('tok-mhs'));
     assert.equal(put.status, 422);
     assert.deepEqual(await put.json(), { error: 'tidak bisa dipilih' });
-    const get = await fetch(`${base}/api/pilihan/99`);
+    const get = await fetch(`${base}/api/pilihan`, { headers: cookie('tok-mhs') });
     assert.equal(get.status, 404);
   });
 });
+

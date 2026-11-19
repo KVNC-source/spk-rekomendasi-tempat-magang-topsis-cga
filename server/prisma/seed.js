@@ -14,12 +14,19 @@
  *     a system user (approval happens outside the system, Batasan 6).
  *  5. ONE sample mahasiswa (clearly marked CONTOH) from the engine's
  *     profil_contoh.json, profile CONTOH-WEB-MANADO. Not respondent data.
+ *  6. TWO login accounts, both CONTOH: the sample mahasiswa and one administrator.
+ *     Log in with the EMAIL. Their passwords are read from server/.env
+ *     (SEED_PASSWORD_MAHASISWA, SEED_PASSWORD_ADMIN); the seed stops if one is
+ *     empty. Passwords are never written in code and never printed; they are
+ *     stored as scrypt hashes. Running the seed again resets both passwords to
+ *     whatever .env says.
  *
  * Run: npm run seed
  */
 import 'dotenv/config';
 import { readFileSync } from 'node:fs';
 import { criteriaC1C7 } from '../src/engine/src/topsis.js';
+import { hashPassword } from '../src/lib/password.js';
 import { prisma } from '../src/lib/prisma.js';
 
 const readJson = (relative) => JSON.parse(readFileSync(new URL(relative, import.meta.url), 'utf8'));
@@ -30,6 +37,20 @@ const profilContoh = readJson('../src/engine/data/profil_contoh.json').profil.fi
   (p) => p.id === 'CONTOH-WEB-MANADO'
 );
 if (!profilContoh) throw new Error('profil CONTOH-WEB-MANADO tidak ditemukan di profil_contoh.json');
+
+// --- 0. passwords for the sample accounts come from .env only
+const passwordMahasiswa = process.env.SEED_PASSWORD_MAHASISWA ?? '';
+const passwordAdmin = process.env.SEED_PASSWORD_ADMIN ?? '';
+const kosong = [
+  passwordMahasiswa === '' && 'SEED_PASSWORD_MAHASISWA',
+  passwordAdmin === '' && 'SEED_PASSWORD_ADMIN',
+].filter(Boolean);
+if (kosong.length > 0) {
+  throw new Error(`Seed berhenti: ${kosong.join(' dan ')} belum diisi di server/.env. Isi dulu, lalu jalankan lagi.`);
+}
+for (const [nama, nilai] of [['SEED_PASSWORD_MAHASISWA', passwordMahasiswa], ['SEED_PASSWORD_ADMIN', passwordAdmin]]) {
+  if (nilai.length < 8) console.warn(`Peringatan: ${nama} kurang dari 8 karakter. Cukup untuk pengembangan, jangan dipakai di tempat lain.`);
+}
 
 // --- 1. kriteria_topsis
 for (const c of criteriaC1C7()) {
@@ -111,22 +132,26 @@ for (const nama_role of ROLES) {
 }
 const role = roleByName.get('mahasiswa');
 
-// --- 5. sample mahasiswa (CONTOH)
-const USERNAME = 'contoh-web-manado';
-let user = await prisma.user.findFirst({ where: { username: USERNAME } });
-if (!user) {
-  user = await prisma.user.create({
-    data: {
-      role_id: role.role_id,
-      username: USERNAME,
-      // Not a real credential: there is no login yet, so this account cannot sign in.
-      password: 'TIDAK-UNTUK-LOGIN',
-      email: 'contoh-web-manado@example.invalid',
-      status: 'contoh',
-    },
-  });
+// --- 5. login accounts (CONTOH). The email is the login identifier: stored trimmed and lower-case.
+async function upsertAkun({ email, username, role_id, password }) {
+  const data = { username, role_id, password: await hashPassword(password), status: 'aktif' };
+  return prisma.user.upsert({ where: { email }, update: data, create: { email, ...data } });
 }
 
+const user = await upsertAkun({
+  email: 'contoh-web-manado@example.invalid',
+  username: 'contoh-web-manado',
+  role_id: role.role_id,
+  password: passwordMahasiswa,
+});
+const admin = await upsertAkun({
+  email: 'contoh-admin@example.invalid',
+  username: 'contoh-admin',
+  role_id: roleByName.get('administrator').role_id,
+  password: passwordAdmin,
+});
+
+// --- sample mahasiswa (CONTOH) profile
 const mahasiswaData = {
   nim: 'CONTOH-0001',
   nama: 'CONTOH Mahasiswa Web Manado',
@@ -157,6 +182,7 @@ for (const [kode, kompetensi_id] of kompetensiIdByKode) {
 console.log(
   `Seeded: ${kompetensiIdByKode.size} kompetensi, ${tempatIdByKode.size} tempat magang, ` +
     `${dataset.kebutuhan.length} kebutuhan, role ${ROLES.join(', ')}, kriteria C1-C7 (existing weights untouched), ` +
-    `sample mahasiswa_id=${mahasiswa.mahasiswa_id} (${mahasiswa.nama}).`
+    `sample mahasiswa_id=${mahasiswa.mahasiswa_id} (${mahasiswa.nama}). ` +
+    `Login accounts: ${user.email} (mahasiswa), ${admin.email} (administrator); passwords come from .env.`
 );
 await prisma.$disconnect();

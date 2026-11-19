@@ -1,14 +1,9 @@
 import { BookmarkCheck, ClipboardPenLine, Compass, House } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { BrandMark } from "../components/ui";
-
-// MOCK: replace with the signed-in user once auth exists.
-const USER = { nama: "Keefa Noah Lasut", nim: "230211060068" };
-const initials = USER.nama
-  .split(" ")
-  .slice(0, 2)
-  .map((part) => part[0])
-  .join("");
+import KeluarButton from "../features/auth/KeluarButton";
+import { useAuth } from "../features/auth/useAuth";
+import { inisial } from "../lib/format";
 
 const NAV = [
   { to: "/mahasiswa", label: "Beranda", icon: House, end: true },
@@ -17,18 +12,19 @@ const NAV = [
   { to: "/mahasiswa/pilihan", label: "Pilihan", icon: BookmarkCheck },
 ];
 
-function Avatar({ className = "" }) {
+function Avatar({ nama, className = "" }) {
   return (
     <span
       aria-hidden="true"
       className={`grid size-10 shrink-0 place-items-center rounded-full bg-sea-100 font-display text-sm font-bold text-sea-900 ${className}`}
     >
-      {initials}
+      {inisial(nama)}
     </span>
   );
 }
 
 function Sidebar() {
+  const { user } = useAuth();
   return (
     <aside className="on-dark sticky top-0 hidden h-dvh flex-col bg-sea-900 p-5 text-sand-100 lg:flex">
       <div className="flex items-center gap-3 px-1 pb-8 pt-1">
@@ -59,29 +55,35 @@ function Sidebar() {
         ))}
       </nav>
 
-      <div className="mt-auto flex items-center gap-3 rounded-ctl bg-sea-800 p-3">
-        <Avatar />
-        <div className="min-w-0 leading-tight">
-          <p className="truncate text-sm font-semibold">{USER.nama}</p>
-          <p className="font-mono text-xs text-sea-200">{USER.nim}</p>
+      <div className="mt-auto space-y-2">
+        <div className="flex items-center gap-3 rounded-ctl bg-sea-800 p-3">
+          <Avatar nama={user.nama} />
+          <div className="min-w-0 leading-tight">
+            <p className="truncate text-sm font-semibold">{user.nama}</p>
+            {user.nim && <p className="font-mono text-xs text-sea-200">{user.nim}</p>}
+          </div>
         </div>
+        <KeluarButton />
       </div>
     </aside>
   );
 }
 
 function TopBar() {
+  const { user } = useAuth();
   return (
     <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-canvas px-4 pb-2.5 pt-[calc(0.625rem+env(safe-area-inset-top))] lg:hidden">
       <div className="flex items-center gap-2.5">
         <BrandMark className="size-9" />
         <span className="font-display text-lg font-extrabold text-sea-900">SPK Magang</span>
       </div>
-      <span className="flex items-center gap-2">
+      <span className="flex items-center gap-1">
         <span className="sr-only">
-          {USER.nama}, NIM {USER.nim}
+          {user.nama}
+          {user.nim ? `, NIM ${user.nim}` : ""}
         </span>
-        <Avatar />
+        <Avatar nama={user.nama} />
+        <KeluarButton compact />
       </span>
     </header>
   );

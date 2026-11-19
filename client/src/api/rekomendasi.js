@@ -1,8 +1,10 @@
 /**
  * Rekomendasi API.
  *
- * CONTRACT (not on the server yet; mocked in ./mock, which runs a copy of the
- * spk-engine). The response IS the engine's recommend() output:
+ * CONTRACT. POST /api/rekomendasi and the pilihan endpoints are implemented by
+ * server/src (GET /api/rekomendasi/terakhir is not built yet). VITE_USE_MOCK
+ * (default on) serves the same shapes from ./mock, which runs a copy of the
+ * spk-engine. The response IS the engine's recommend() output:
  *
  *   POST /api/rekomendasi      body {} — the server uses the signed-in
  *                              mahasiswa's saved profile
@@ -38,7 +40,6 @@
  */
 import { ApiError, apiFetch } from "./http";
 import { loadMock, useMock } from "./profil";
-import { MAHASISWA_ID } from "./session";
 
 export const requestRekomendasi = () =>
   useMock ? loadMock().then((m) => m.postRekomendasi()) : apiFetch("/api/rekomendasi", { method: "POST", body: {} });
@@ -62,28 +63,28 @@ export async function getRekomendasiTerakhir() {
  * a time: saving again replaces the earlier one.
  *
  * tempat_id is always the tempat CODE ("T05"), never the numeric primary key.
- * Until authentication exists the mahasiswa is named in the request (see
- * MAHASISWA_ID in ./session).
+ * The mahasiswa is the signed-in one (session cookie): there is no mahasiswa id
+ * in the URL or the body, and the endpoints are for the "mahasiswa" role only
+ * (401 without a session, 403 for another role).
  *
- *   GET    /api/pilihan/:mahasiswa_id
+ *   GET    /api/pilihan
  *          -> 200 { tempat_id, namaPerusahaan, posisi, sumberUrl, tanggalAkses,
  *                   topsis_id, disimpan_pada } | 200 null when nothing is chosen
- *   PUT    /api/pilihan   body { mahasiswa_id, tempat_id, topsis_id? }
+ *   PUT    /api/pilihan   body { tempat_id, topsis_id? }
  *          -> 200, same shape (replaces any earlier choice)
- *          -> 404 unknown mahasiswa / tempat; 422 tempat not in the calculated list,
+ *          -> 404 unknown tempat; 422 tempat not in the calculated list,
  *             or topsis_id is not this mahasiswa's result for that tempat
- *   DELETE /api/pilihan/:mahasiswa_id  -> 204 (also when nothing was chosen)
+ *   DELETE /api/pilihan  -> 204 (also when nothing was chosen)
  *
  * topsis_id (the hasil_topsis row seen when choosing) is optional and the client
  * does not send it yet. VITE_USE_MOCK serves the same shapes from ./mock.
  */
-export const getPilihan = () =>
-  useMock ? loadMock().then((m) => m.getPilihan()) : apiFetch(`/api/pilihan/${MAHASISWA_ID}`);
+export const getPilihan = () => (useMock ? loadMock().then((m) => m.getPilihan()) : apiFetch("/api/pilihan"));
 
 export const simpanPilihan = (tempatId) =>
   useMock
     ? loadMock().then((m) => m.putPilihan(tempatId))
-    : apiFetch("/api/pilihan", { method: "PUT", body: { mahasiswa_id: MAHASISWA_ID, tempat_id: tempatId } });
+    : apiFetch("/api/pilihan", { method: "PUT", body: { tempat_id: tempatId } });
 
 export const hapusPilihan = () =>
-  useMock ? loadMock().then((m) => m.deletePilihan()) : apiFetch(`/api/pilihan/${MAHASISWA_ID}`, { method: "DELETE" });
+  useMock ? loadMock().then((m) => m.deletePilihan()) : apiFetch("/api/pilihan", { method: "DELETE" });

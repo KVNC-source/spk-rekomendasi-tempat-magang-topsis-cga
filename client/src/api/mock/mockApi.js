@@ -222,3 +222,71 @@ export async function deletePilihan() {
   writeStore(store);
   return null;
 }
+
+// --- Login (mock). Development only: it accepts the two CONTOH emails with ANY
+// non-empty password. The real server checks a hashed password and limits attempts.
+
+const SESSION_KEY = "spk-magang:mock-session";
+const AKUN_CONTOH = {
+  "contoh-web-manado@example.invalid": "mahasiswa",
+  "contoh-admin@example.invalid": "administrator",
+};
+
+function penggunaDariSesi(email) {
+  const role = AKUN_CONTOH[email];
+  if (!role) return null;
+  if (role === "administrator") {
+    return { user_id: 3, email, username: "contoh-admin", role, mahasiswa_id: null, nama: "contoh-admin", nim: null };
+  }
+  const { mahasiswa } = readStore().profil;
+  return {
+    user_id: 1,
+    email,
+    username: "contoh-web-manado",
+    role,
+    mahasiswa_id: mahasiswa.mahasiswa_id,
+    nama: mahasiswa.nama,
+    nim: mahasiswa.nim,
+  };
+}
+
+export async function login(email, password) {
+  seed();
+  await wait(600);
+  // ?mock=terkunci shows the "too many attempts" state.
+  if (mode() === "terkunci") {
+    throw new ApiError(429, "Terlalu banyak percobaan masuk. Coba lagi dalam 15 menit.");
+  }
+  const emailBersih = String(email ?? "").trim().toLowerCase();
+  if (!AKUN_CONTOH[emailBersih] || !password) throw new ApiError(401, "Email atau kata sandi salah.");
+  try {
+    window.localStorage.setItem(SESSION_KEY, emailBersih);
+  } catch {
+    /* storage unavailable: the mock session just does not persist */
+  }
+  return penggunaDariSesi(emailBersih);
+}
+
+export async function logout() {
+  await wait(200);
+  try {
+    window.localStorage.removeItem(SESSION_KEY);
+  } catch {
+    /* nothing to clear */
+  }
+}
+
+/** The signed-in user; throws 401 when nobody is signed in, like GET /api/auth/me. */
+export async function me() {
+  seed();
+  await wait(250);
+  let email = null;
+  try {
+    email = window.localStorage.getItem(SESSION_KEY);
+  } catch {
+    /* treated as signed out */
+  }
+  const user = email ? penggunaDariSesi(email) : null;
+  if (!user) throw new ApiError(401, "Silakan masuk dulu.");
+  return user;
+}

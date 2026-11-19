@@ -48,3 +48,14 @@ export function formatRelative(from, now = Date.now()) {
   if (hours < 24) return rtf.format(-hours, "hour");
   return rtf.format(-Math.round(hours / 24), "day");
 }
+
+/** "Keefa Noah" -> "KN" (first letters of the first two words). */
+export function inisial(nama = "") {
+  return nama
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
+}

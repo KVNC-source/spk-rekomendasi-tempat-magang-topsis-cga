@@ -25,15 +25,36 @@ model Role {
 model User {
   user_id  Int    @id @default(autoincrement())
   role_id  Int
-  username String @db.VarChar(100)
+  username String @db.VarChar(100) // shown in the UI; NOT used to log in
+  // [Tahap 4] scrypt hash: "scrypt$N$r$p$salt$hash" (see src/lib/password.js), never plain text.
   password String @db.VarChar(255)
-  email    String @db.VarChar(255)
+  // [Tahap 4] the login identifier. Unique; always stored trimmed and lower-case.
+  email    String @unique @db.VarChar(255)
+  // Only 'aktif' accounts can log in.
   status   String @db.VarChar(50)
 
   role      Role       @relation(fields: [role_id], references: [role_id])
   mahasiswa Mahasiswa?
+  sesi      Sesi[]
 
   @@map("users")
+}
+
+// [ADDED, Tahap 4] login sessions. The browser holds a random token in an
+// httpOnly cookie; only its SHA-256 hash is stored here, so a leaked table
+// cannot be used to sign in. Logging out deletes the row, and expired rows are
+// deleted at every login.
+model Sesi {
+  sesi_id          Int      @id @default(autoincrement())
+  user_id          Int
+  token_hash       String   @unique @db.VarChar(64)
+  dibuat_pada      DateTime @default(now())
+  kedaluwarsa_pada DateTime
+
+  user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  @@index([kedaluwarsa_pada])
+  @@map("sesi")
 }
 
 model Mahasiswa {
