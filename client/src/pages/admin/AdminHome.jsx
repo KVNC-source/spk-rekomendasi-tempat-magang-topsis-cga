@@ -56,7 +56,7 @@ export default function AdminHome() {
       {status === "ready" && (
         <div className="mt-5 space-y-4">
           {!totalBenar && (
-            <Card className="flex gap-3 border-coral-300 bg-coral-50" role="alert">
+            <Card tone="alert" className="flex gap-3" role="alert">
               <TriangleAlert aria-hidden="true" size={20} className="mt-0.5 shrink-0 text-coral-700" />
               <p className="max-w-prose text-sm leading-relaxed text-ink">
                 Total bobot kriteria sekarang <span className="font-mono">{formatNumber(total, 2)}</span>, bukan 1,00.

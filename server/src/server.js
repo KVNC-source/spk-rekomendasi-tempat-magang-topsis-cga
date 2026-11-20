@@ -6,11 +6,13 @@ import { prisma } from './lib/prisma.js';
 import { createAdminRepository } from './repositories/admin.repository.js';
 import { createAuthRepository } from './repositories/auth.repository.js';
 import { createPilihanRepository } from './repositories/pilihan.repository.js';
+import { createProfilRepository } from './repositories/profil.repository.js';
 import { createRekomendasiRepository } from './repositories/rekomendasi.repository.js';
 import { createAdminService } from './services/admin.service.js';
 import { createAuthService } from './services/auth.service.js';
 import { createKompetensiService } from './services/kompetensi.service.js';
 import { createPilihanService } from './services/pilihan.service.js';
+import { createProfilService } from './services/profil.service.js';
 import { createRekomendasiService } from './services/rekomendasi.service.js';
 
 const authConfig = getAuthConfig();
@@ -25,8 +27,17 @@ const pilihanService = createPilihanService({ repository: createPilihanRepositor
 const adminRepository = createAdminRepository(prisma);
 const adminService = createAdminService({ repository: adminRepository });
 const kompetensiService = createKompetensiService({ repository: adminRepository });
+const profilService = createProfilService({ repository: createProfilRepository(prisma) });
 
 const port = Number(process.env.PORT) || 3000;
-createApp({ rekomendasiService, pilihanService, adminService, kompetensiService, authService, authConfig }).listen(port, () => {
+createApp({
+  rekomendasiService,
+  pilihanService,
+  adminService,
+  kompetensiService,
+  profilService,
+  authService,
+  authConfig,
+}).listen(port, () => {
   console.log(`API listening on port ${port}`);
 });

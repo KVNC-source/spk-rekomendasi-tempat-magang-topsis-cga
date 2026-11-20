@@ -59,5 +59,5 @@ export async function bacaDataset(repository) {
     repository.findTempatDenganKebutuhan(),
     repository.findKompetensi(),
   ]);
-  return { ...ubahKeDataset({ tempatRows, kompetensiRows }), kompetensiRows };
+  return { ...ubahKeDataset({ tempatRows, kompetensiRows }), kompetensiRows, tempatRows };
 }

@@ -1,8 +1,8 @@
 /**
  * Rekomendasi API.
  *
- * CONTRACT. POST /api/rekomendasi and the pilihan endpoints are implemented by
- * server/src (GET /api/rekomendasi/terakhir is not built yet). VITE_USE_MOCK
+ * CONTRACT. POST /api/rekomendasi, GET /api/rekomendasi/terakhir and the pilihan
+ * endpoints are implemented by server/src. VITE_USE_MOCK
  * (default on) serves the same shapes from ./mock, which runs a copy of the
  * spk-engine. The response IS the engine's recommend() output:
  *
@@ -24,14 +24,21 @@
  *              in perElement and kesenjangan, and sumberUrl / tanggalAkses per item)
  *             excluded: [{ tempatId, alasan, namaPerusahaan?, posisi? }],
  *             imputasi, warnings: [string], steps,
- *             dihitungPada: ISO date, profilDiperbaruiPada: ISO date }
+ *             dihitungPada: ISO date, profilDiperbaruiPada: ISO date,
+ *             basi: boolean, penyebabBasi: ["profil"|"data"] }   (POST: always false / [])
  *        -> 422 { error, belum_diisi: [], data_kurang: [field] }
  *           when a data field of the profile is empty (ipk, minat_bidang, domisili).
  *           An unanswered kompetensi does NOT block: it counts as level 0 (Belum punya),
  *           so belum_diisi is always empty.
  *
  *   GET  /api/rekomendasi/terakhir
- *        -> 200, same shape as above, or 404 { error } if none was calculated yet
+ *        -> 200, same shape as above (the stored result, not recalculated), or
+ *           404 { error } if none was calculated yet.
+ *           basi is true when, since that calculation, the mahasiswa's profile changed
+ *           ("profil") or the Administrator changed a kriteria weight, a tempat magang,
+ *           a kebutuhan kompetensi, a kompetensi name or the engine configuration ("data").
+ *           The page then shows "Data berubah sejak perhitungan terakhir. Hitung ulang
+ *           untuk hasil terbaru."
  *
  * Shown to the mahasiswa: rank, C1 as a percentage, gaps (named via
  * /api/kompetensi), an "estimate" tag when c5Imputasi/c6Imputasi is true.

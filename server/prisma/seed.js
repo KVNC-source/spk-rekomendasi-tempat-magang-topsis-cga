@@ -20,6 +20,9 @@
  *     are never written in code or printed; they are stored as scrypt hashes.
  *  6. ONE sample mahasiswa profile (CONTOH-WEB-MANADO from profil_contoh.json),
  *     ONLY when that mahasiswa row does not exist yet. Not respondent data.
+ *     For a row that already exists, only the columns added in Tahap 5 are filled
+ *     when they are still empty (kota_domisili, jumlah_proyek, jumlah_sertifikasi),
+ *     so the sample account is "Lengkap"; nothing else in the profile is touched.
  *
  * Run: npm run seed
  */
@@ -169,6 +172,8 @@ const admin = await pastikanAkun({
 ringkasan.push('akun CONTOH: password disetel ulang dari .env');
 
 // --- 6. sample mahasiswa profile (CONTOH): only when this mahasiswa does not exist yet
+// Kota from profil_contoh.json; 2 proyek + 2 sertifikasi are sample numbers (score 4, as in that file).
+const ISIAN_TAHAP_5 = { kota_domisili: profilContoh.domisili.kota, jumlah_proyek: 2, jumlah_sertifikasi: 2 };
 if (!(await prisma.mahasiswa.findUnique({ where: { user_id: user.user_id } }))) {
   const mahasiswa = await prisma.mahasiswa.create({
     data: {
@@ -180,6 +185,7 @@ if (!(await prisma.mahasiswa.findUnique({ where: { user_id: user.user_id } }))) 
       minat_bidang: profilContoh.minatBidang,
       domisili_latitude: profilContoh.domisili.lat,
       domisili_longitude: profilContoh.domisili.lon,
+      ...ISIAN_TAHAP_5,
     },
   });
   // profil_contoh.json lists 13 of 21; the others mean "tidak dimiliki", stored as an explicit level 0.
@@ -190,7 +196,15 @@ if (!(await prisma.mahasiswa.findUnique({ where: { user_id: user.user_id } }))) 
   }
   ringkasan.push(`mahasiswa CONTOH: dibuat (mahasiswa_id=${mahasiswa.mahasiswa_id}) dengan ${kompetensiIdByKode.size} level`);
 } else {
-  ringkasan.push('mahasiswa CONTOH: dilewati (sudah ada, profil tidak diubah)');
+  // Fill only what the Tahap 5 migration added and left empty; never overwrite an answer.
+  const ada = await prisma.mahasiswa.findUnique({ where: { user_id: user.user_id } });
+  const isi = Object.fromEntries(Object.entries(ISIAN_TAHAP_5).filter(([kolom]) => ada[kolom] == null));
+  if (Object.keys(isi).length > 0) {
+    await prisma.mahasiswa.update({ where: { mahasiswa_id: ada.mahasiswa_id }, data: isi });
+    ringkasan.push(`mahasiswa CONTOH: dilengkapi (${Object.keys(isi).join(', ')}), isian lain tidak diubah`);
+  } else {
+    ringkasan.push('mahasiswa CONTOH: dilewati (sudah ada, profil tidak diubah)');
+  }
 }
 
 console.log(`Seed selesai. ${ringkasan.join('; ')}.`);

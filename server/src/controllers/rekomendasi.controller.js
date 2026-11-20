@@ -8,5 +8,10 @@ export function createRekomendasiController({ rekomendasiService }) {
       // 200, as in the client contract (client/src/api/rekomendasi.js).
       res.json(hasil);
     },
+
+    /** The latest result (same shape as POST) with the stale flag; 404 when none exists yet. */
+    async terakhir(req, res) {
+      res.json(await rekomendasiService.ambilTerakhir(mahasiswaIdDariSesi(req)));
+    },
   };
 }

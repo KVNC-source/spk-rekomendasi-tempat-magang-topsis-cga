@@ -139,7 +139,8 @@ export default function KriteriaAdmin() {
             <Card
               as="section"
               aria-label="Total bobot"
-              className={`flex flex-wrap items-center justify-between gap-3 ${totalUnit !== null && !totalTepat ? "border-coral-300 bg-coral-50" : ""}`}
+              tone={totalUnit !== null && !totalTepat ? "alert" : "plain"}
+              className="flex flex-wrap items-center justify-between gap-3"
             >
               <p className="text-base font-semibold text-ink">Total bobot</p>
               <p aria-live="polite" className="flex items-center gap-2 font-mono text-2xl font-semibold text-ink">

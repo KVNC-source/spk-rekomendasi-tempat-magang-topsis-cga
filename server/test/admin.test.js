@@ -4,7 +4,7 @@ import { BIDANG } from '../src/engine/src/config.js';
 import { createAdminService } from '../src/services/admin.service.js';
 import { createKompetensiService } from '../src/services/kompetensi.service.js';
 import { createRekomendasiService } from '../src/services/rekomendasi.service.js';
-import { CONFIG, NOW, kompetensiRows, kriteriaRows, mahasiswa, tempatRows } from './fixtures-db.js';
+import { NOW, kompetensiRows, kriteriaRows, mahasiswa, tempatRows } from './fixtures-db.js';
 import { cookie, sendJson, withApp } from './helpers.js';
 
 const KATEGORI = 'Web';
@@ -150,7 +150,6 @@ test('kriteria: the weights the Administrator saves are the ones the NEXT recomm
       findTempatDenganKebutuhan: async () => tempatRows,
       simpanHasil: async (_id, items) => items.map((it, i) => ({ tempatId: it.tempatId, cgaId: i, topsisId: i })),
     },
-    getConfig: () => CONFIG,
     now: () => NOW,
   });
 

@@ -193,7 +193,7 @@ export default function Rekomendasi() {
         {loaded && hasil && !computing && (
           <>
             {!rek.profilLengkap && (
-              <Card className="motion-pop flex gap-3 border-coral-300 bg-coral-50" role="status">
+              <Card tone="alert" className="motion-pop flex gap-3" role="status">
                 <TriangleAlert aria-hidden="true" size={20} className="mt-0.5 shrink-0 text-coral-700" />
                 <div className="max-w-prose text-sm leading-relaxed text-ink">
                   <p className="font-semibold">{lengkapiJudul}</p>
@@ -209,11 +209,10 @@ export default function Rekomendasi() {
 
             {/* "Hitung ulang" is not offered until the profile is Lengkap, so this hint waits too. */}
             {rek.stale && rek.profilLengkap && (
-              <Card className="motion-pop flex gap-3 border-coral-300 bg-coral-50">
+              <Card tone="alert" className="motion-pop flex gap-3">
                 <TriangleAlert aria-hidden="true" size={20} className="mt-0.5 shrink-0 text-coral-700" />
                 <p className="max-w-prose text-sm leading-relaxed text-ink">
-                  Profilmu berubah sejak perhitungan terakhir. Hitung ulang supaya urutannya sesuai dengan profilmu
-                  yang sekarang.
+                  Data berubah sejak perhitungan terakhir. Hitung ulang untuk hasil terbaru.
                 </p>
               </Card>
             )}
@@ -266,7 +265,7 @@ export default function Rekomendasi() {
         <ActionBar
           status={
             rek.stale && !computing
-              ? "Profilmu berubah sejak perhitungan terakhir."
+              ? "Data berubah sejak perhitungan terakhir."
               : computing
                 ? "Mesin sedang membandingkan profilmu…"
                 : null

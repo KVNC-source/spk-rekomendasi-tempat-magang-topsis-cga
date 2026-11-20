@@ -6,7 +6,6 @@ const readJson = (relative) => JSON.parse(readFileSync(new URL(relative, import.
 export const dataset = readJson('../src/engine/data/dataset.json');
 export const profilContoh = readJson('../src/engine/data/profil_contoh.json').profil.find((p) => p.id === 'CONTOH-WEB-MANADO');
 
-export const CONFIG = { ncf: 0.6, nsf: 0.4, c7Placeholder: 4 };
 export const NOW = new Date('2026-11-17T08:00:00.000Z');
 export const DIPERBARUI = new Date('2026-11-16T09:30:00.000Z');
 
@@ -65,6 +64,9 @@ export const mahasiswa = {
   minat_bidang: profilContoh.minatBidang,
   domisili_latitude: String(profilContoh.domisili.lat),
   domisili_longitude: String(profilContoh.domisili.lon),
+  kota_domisili: 'Manado',
+  jumlah_proyek: 2, // C7 = 2 + 2 = 4, the skorPengalamanSertifikasi of profil_contoh.json
+  jumlah_sertifikasi: 2,
   diperbarui_pada: DIPERBARUI,
   kompetensi_mahasiswa: kompetensiRows.map((k) => ({
     kompetensi_id: k.kompetensi_id,

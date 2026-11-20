@@ -1,0 +1,167 @@
+{
+  "catatan": "Titik pusat kota, perkiraan (bukan hasil geocoding). Titik Jakarta, Tangerang Selatan, Yogyakarta, dan Semarang sama dengan yang dipakai di dataset lowongan. Verifikasi di peta sebelum dipakai untuk BAB IV.",
+  "kota": [
+    {
+      "kota": "Manado",
+      "provinsi": "Sulawesi Utara",
+      "lat": 1.4748,
+      "lon": 124.8421
+    },
+    {
+      "kota": "Bitung",
+      "provinsi": "Sulawesi Utara",
+      "lat": 1.4404,
+      "lon": 125.1217
+    },
+    {
+      "kota": "Tomohon",
+      "provinsi": "Sulawesi Utara",
+      "lat": 1.3254,
+      "lon": 124.8389
+    },
+    {
+      "kota": "Tondano (Minahasa)",
+      "provinsi": "Sulawesi Utara",
+      "lat": 1.3047,
+      "lon": 124.9086
+    },
+    {
+      "kota": "Airmadidi (Minahasa Utara)",
+      "provinsi": "Sulawesi Utara",
+      "lat": 1.423,
+      "lon": 124.978
+    },
+    {
+      "kota": "Kotamobagu",
+      "provinsi": "Sulawesi Utara",
+      "lat": 0.7244,
+      "lon": 124.3199
+    },
+    {
+      "kota": "Gorontalo",
+      "provinsi": "Gorontalo",
+      "lat": 0.5435,
+      "lon": 123.0568
+    },
+    {
+      "kota": "Palu",
+      "provinsi": "Sulawesi Tengah",
+      "lat": -0.8917,
+      "lon": 119.8707
+    },
+    {
+      "kota": "Makassar",
+      "provinsi": "Sulawesi Selatan",
+      "lat": -5.1477,
+      "lon": 119.4327
+    },
+    {
+      "kota": "Jakarta Pusat",
+      "provinsi": "DKI Jakarta",
+      "lat": -6.1754,
+      "lon": 106.8272
+    },
+    {
+      "kota": "Jakarta Selatan",
+      "provinsi": "DKI Jakarta",
+      "lat": -6.2615,
+      "lon": 106.8106
+    },
+    {
+      "kota": "Jakarta Utara",
+      "provinsi": "DKI Jakarta",
+      "lat": -6.1384,
+      "lon": 106.863
+    },
+    {
+      "kota": "Jakarta Barat",
+      "provinsi": "DKI Jakarta",
+      "lat": -6.1683,
+      "lon": 106.7588
+    },
+    {
+      "kota": "Jakarta Timur",
+      "provinsi": "DKI Jakarta",
+      "lat": -6.225,
+      "lon": 106.9004
+    },
+    {
+      "kota": "Tangerang Selatan",
+      "provinsi": "Banten",
+      "lat": -6.2886,
+      "lon": 106.7179
+    },
+    {
+      "kota": "Tangerang",
+      "provinsi": "Banten",
+      "lat": -6.1783,
+      "lon": 106.6319
+    },
+    {
+      "kota": "Depok",
+      "provinsi": "Jawa Barat",
+      "lat": -6.4025,
+      "lon": 106.7942
+    },
+    {
+      "kota": "Bogor",
+      "provinsi": "Jawa Barat",
+      "lat": -6.5971,
+      "lon": 106.806
+    },
+    {
+      "kota": "Bekasi",
+      "provinsi": "Jawa Barat",
+      "lat": -6.2383,
+      "lon": 106.9756
+    },
+    {
+      "kota": "Bandung",
+      "provinsi": "Jawa Barat",
+      "lat": -6.9175,
+      "lon": 107.6191
+    },
+    {
+      "kota": "Yogyakarta",
+      "provinsi": "DI Yogyakarta",
+      "lat": -7.7956,
+      "lon": 110.3695
+    },
+    {
+      "kota": "Semarang",
+      "provinsi": "Jawa Tengah",
+      "lat": -6.9932,
+      "lon": 110.4203
+    },
+    {
+      "kota": "Surabaya",
+      "provinsi": "Jawa Timur",
+      "lat": -7.2575,
+      "lon": 112.7521
+    },
+    {
+      "kota": "Malang",
+      "provinsi": "Jawa Timur",
+      "lat": -7.9666,
+      "lon": 112.6326
+    },
+    {
+      "kota": "Denpasar",
+      "provinsi": "Bali",
+      "lat": -8.6705,
+      "lon": 115.2126
+    },
+    {
+      "kota": "Balikpapan",
+      "provinsi": "Kalimantan Timur",
+      "lat": -1.2379,
+      "lon": 116.8529
+    },
+    {
+      "kota": "Medan",
+      "provinsi": "Sumatera Utara",
+      "lat": 3.5952,
+      "lon": 98.6722
+    }
+  ]
+}

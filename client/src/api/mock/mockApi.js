@@ -10,7 +10,8 @@ import { ApiError } from "../http";
 import dataset from "./data/dataset.json";
 import { recommend } from "./engine/matrix.js";
 import { BIDANG, KOMPETENSI, KOTA } from "./masterData";
-import { hitungSkorPengalaman } from "./skorPengalaman";
+// The C7 formula lives in ONE file, the server's; the mock runs the very same code.
+import { hitungSkorPengalaman } from "../../../../server/src/lib/skorPengalaman.js";
 
 // v3: the saved pilihan joined the store. Bump again when the stored shape changes.
 const KEY = "spk-magang:mock-v3";
@@ -174,14 +175,16 @@ export async function postRekomendasi() {
     profilDiperbaruiPada: profil.diperbarui_pada,
   };
   writeStore(store);
-  return store.rekomendasi;
+  return { ...store.rekomendasi, basi: false, penyebabBasi: [] };
 }
 
 export async function getRekomendasiTerakhir() {
   await latency();
-  const { rekomendasi } = readStore();
+  const { rekomendasi, profil } = readStore();
   if (!rekomendasi) throw new ApiError(404, "Belum ada rekomendasi.");
-  return rekomendasi;
+  // The real server compares fingerprints; the mock only knows when the profile last changed.
+  const profilBerubah = new Date(profil.diperbarui_pada).getTime() > new Date(rekomendasi.profilDiperbaruiPada).getTime();
+  return { ...rekomendasi, basi: profilBerubah, penyebabBasi: profilBerubah ? ["profil"] : [] };
 }
 
 // --- Pilihan: the lowongan the mahasiswa saved as their choice (one at a time).

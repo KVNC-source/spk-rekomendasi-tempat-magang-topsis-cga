@@ -303,7 +303,7 @@ export default function ProfilKompetensi() {
                     inputMode="numeric"
                     autoComplete="off"
                     placeholder="0"
-                    hint="Proyek yang pernah kamu kerjakan."
+                    hint="Hanya proyek yang relevan dengan bidang TI."
                     value={form.proyek}
                     error={errors.proyek}
                     onChange={(event) => profil.setField("proyek")(event.target.value)}
@@ -316,7 +316,7 @@ export default function ProfilKompetensi() {
                     inputMode="numeric"
                     autoComplete="off"
                     placeholder="0"
-                    hint="Sertifikasi profesional yang relevan."
+                    hint="Hanya sertifikasi profesional yang relevan dengan bidang TI."
                     value={form.sertifikasi}
                     error={errors.sertifikasi}
                     onChange={(event) => profil.setField("sertifikasi")(event.target.value)}

@@ -1,12 +1,10 @@
 /**
  * Profil + master-data API.
  *
- * CONTRACT. Only GET /api/kompetensi exists on the server so far (it reads the
- * kompetensi table on every call, so a kompetensi the Administrator adds shows
- * up in the form at once). The other endpoints below are not built yet, so the
- * profile form cannot be used against the real server until they are. The client
- * codes against these shapes; VITE_USE_MOCK (default: on) serves the same
- * shapes from ./mock. Set VITE_USE_MOCK=false to call the real API.
+ * CONTRACT. Every endpoint below is implemented by server/src (GET /api/kompetensi
+ * reads the kompetensi table on every call, so a kompetensi the Administrator adds
+ * shows up in the form at once). VITE_USE_MOCK (default: on) serves the same shapes
+ * from ./mock. Set VITE_USE_MOCK=false to call the real API.
  *
  *   GET  /api/kompetensi
  *        -> [{ kompetensi_id: "K01", nama_kompetensi, kategori, deskripsi, skala_maksimum }]
@@ -14,7 +12,7 @@
  *        -> [string]        EXACTLY the engine's BIDANG values (the engine
  *                           throws on an unknown bidang)
  *   GET  /api/kota-domisili
- *        -> [{ kota, lat, lon }]
+ *        -> [{ kota, provinsi, lat, lon }]   the 27 kota of the master list
  *   GET  /api/mahasiswa/me/profil
  *        -> { mahasiswa: { mahasiswa_id, nim, nama, angkatan },
  *             status: "Draf" | "Lengkap",   server-computed: "Lengkap" only when all
@@ -32,9 +30,16 @@
  *        A draft is accepted: kompetensi may be partial and ipk / minat_bidang /
  *        domisili / jumlah_* may be null. Completeness is enforced when
  *        recommendations are requested.
+ *        PUT REPLACES the whole set of answers: a kompetensi that is not sent
+ *        counts as not answered, so the client sends every answer it has, always.
+ *        A value that is sent must be valid, else 422 { error, kesalahan:{ field: message } }
+ *        (ipk 0-4, minat_bidang one of the list, domisili.kota one of the list — its
+ *        lat/lon are ignored, jumlah_* whole numbers 0-99, level 0 to skala_maksimum).
  *
- * "me" assumes the server resolves the signed-in mahasiswa (auth not specified).
- * C7 is sent as two counts; the server turns them into the C7 score.
+ * "me" is the signed-in mahasiswa (session cookie); only the mahasiswa role may call it.
+ * C7 is sent as two counts (only projects and certifications relevant to IT count);
+ * the server turns them into the C7 score with one formula, server/src/lib/skorPengalaman.js,
+ * which the mock imports too.
  */
 import { apiFetch } from "./http";
 

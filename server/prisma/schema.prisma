@@ -58,18 +58,26 @@ model Sesi {
 }
 
 model Mahasiswa {
-  mahasiswa_id Int     @id @default(autoincrement())
-  user_id      Int     @unique
-  nim          String  @db.VarChar(50)
-  nama         String  @db.VarChar(255)
+  mahasiswa_id Int      @id @default(autoincrement())
+  user_id      Int      @unique
+  nim          String   @db.VarChar(50)
+  nama         String   @db.VarChar(255)
   angkatan     Int
-  ipk          Decimal @db.Decimal(3, 2) // [C3]
-  minat_bidang String  @db.VarChar(100) // [C2, student side]
+  // [Tahap 5] nullable: a draft profile may leave the data fields empty. A profile is
+  // "Lengkap" only when all of them and every kompetensi are filled (computed, not stored).
+  ipk          Decimal? @db.Decimal(3, 2) // [C3]
+  minat_bidang String?  @db.VarChar(100) // [C2, student side]
 
   // [ADDED, gap 2] domisili coordinates for C4 (Haversine). Nullable: a
   // mahasiswa without coordinates cannot be ranked (rekomendasi returns 422).
   domisili_latitude  Decimal? @db.Decimal(8, 6)
   domisili_longitude Decimal? @db.Decimal(9, 6)
+  // [ADDED, Tahap 5] the kota chosen in the form (a name from data/kota_domisili.json).
+  // domisili_latitude/longitude are filled from that list when the profile is saved.
+  kota_domisili      String?  @db.VarChar(100)
+  // [ADDED, Tahap 5] the two counts behind C7 (see src/lib/skorPengalaman.js).
+  jumlah_proyek      Int?
+  jumlah_sertifikasi Int?
 
   // [ADDED, Tahap 2] last time this row changed; returned by POST
   // /api/rekomendasi as profilDiperbaruiPada so the client can tell a result is stale.
@@ -79,8 +87,29 @@ model Mahasiswa {
   kompetensi_mahasiswa KompetensiMahasiswa[]
   hasil_cga            HasilCga[]
   pilihan              Pilihan? // the single active choice
+  hasil_rekomendasi    HasilRekomendasi? // the latest full result (Tahap 5)
 
   @@map("mahasiswa")
+}
+
+// [ADDED, Tahap 5] the LATEST recommendation of a mahasiswa, stored whole (the same
+// JSON POST /api/rekomendasi returned) so GET /api/rekomendasi/terakhir can serve it
+// without recalculating. One row per mahasiswa, replaced at every calculation in the
+// same transaction as hasil_cga / hasil_topsis (which keep one row per lowongan per run).
+// sidik_profil / sidik_data: SHA-256 fingerprints of the inputs at calculation time; a
+// result is stale when a fingerprint computed from today's data differs (src/lib/sidikJari.js).
+model HasilRekomendasi {
+  hasil_rekomendasi_id   Int      @id @default(autoincrement())
+  mahasiswa_id           Int      @unique
+  hasil                  Json
+  dihitung_pada          DateTime
+  profil_diperbarui_pada DateTime
+  sidik_profil           String   @db.VarChar(64)
+  sidik_data             String   @db.VarChar(64)
+
+  mahasiswa Mahasiswa @relation(fields: [mahasiswa_id], references: [mahasiswa_id])
+
+  @@map("hasil_rekomendasi")
 }
 
 model Kompetensi {
@@ -115,18 +144,18 @@ model KompetensiMahasiswa {
 
 // One row = one lowongan (a company can have several posisi).
 model TempatMagang {
-  tempat_id       Int    @id @default(autoincrement())
+  tempat_id         Int      @id @default(autoincrement())
   // [ADDED, Tahap 2] public code ("T01") used by the engine, the API and the client routes.
-  kode_tempat     String @unique @db.VarChar(10)
-  nama_perusahaan String @db.VarChar(255)
-  bidang_industri String @db.VarChar(100) // [C2] must equal an engine config.BIDANG value
-  lokasi          String @db.VarChar(255) // [C4] display label only
+  kode_tempat       String   @unique @db.VarChar(10)
+  nama_perusahaan   String   @db.VarChar(255)
+  bidang_industri   String   @db.VarChar(100) // [C2] must equal an engine config.BIDANG value
+  lokasi            String   @db.VarChar(255) // [C4] display label only
   // [C5] juta Rp / bulan. [Tahap 2] nullable: most lowongan do not state it; the
   // engine imputes the median and flags the value as "perkiraan".
   benefit_finansial Decimal? @db.Decimal(8, 2)
   // [C6] 1-5. [Tahap 2] nullable: no lowongan has a value yet (engine uses a constant).
-  reputasi  Int?
-  deskripsi String? @db.Text
+  reputasi          Int?
+  deskripsi         String?  @db.Text
 
   // [ADDED, Tahap 2] fields of the lowongan dataset that the engine needs.
   posisi             String    @db.VarChar(255)
@@ -203,8 +232,8 @@ model HasilTopsis {
   ranking          Int
   tanggal_hitung   DateTime @default(now())
 
-  hasil_cga HasilCga    @relation(fields: [cga_id], references: [cga_id])
-  pilihan Pilihan[]
+  hasil_cga HasilCga  @relation(fields: [cga_id], references: [cga_id])
+  pilihan   Pilihan[]
 
   @@map("hasil_topsis")
 }

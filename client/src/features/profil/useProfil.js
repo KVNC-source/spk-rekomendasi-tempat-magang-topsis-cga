@@ -145,8 +145,10 @@ export function useProfil() {
         domisili: kota ? { kota: kota.kota, lat: kota.lat, lon: kota.lon } : null,
         jumlah_proyek: filled(form.proyek) ? Number(form.proyek) : null,
         jumlah_sertifikasi: filled(form.sertifikasi) ? Number(form.sertifikasi) : null,
-        // A draft may be partial; every answer given (including 0) is sent.
-        kompetensi: Object.entries(form.levels)
+        // PUT replaces the whole set on the server, so every answer must go out every time, drafts
+        // included. The form starts from the server's answers and never removes one; merging in the
+        // last saved answers makes that a guarantee, not an assumption: an answer cannot be dropped.
+        kompetensi: Object.entries({ ...saved?.levels, ...form.levels })
           .filter(([, level]) => isAnswered(level))
           .map(([kompetensi_id, level_penguasaan]) => ({ kompetensi_id, level_penguasaan })),
       });

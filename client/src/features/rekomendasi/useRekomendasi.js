@@ -54,10 +54,13 @@ export function useRekomendasi() {
   // answered, "Belum punya" included, and the data fields filled). The server itself would
   // count an unanswered kompetensi as level 0, but this page waits for Lengkap.
   const profilLengkap = profil !== null && profil.status === "Lengkap";
+  // The server says whether the result is stale (profile or reference data changed since it was
+  // calculated); fall back to comparing the profile's timestamp if a result has no flag.
   const stale =
     hasil !== null &&
-    profil !== null &&
-    new Date(profil.diperbarui_pada).getTime() > new Date(hasil.profilDiperbaruiPada).getTime();
+    (typeof hasil.basi === "boolean"
+      ? hasil.basi
+      : profil !== null && new Date(profil.diperbarui_pada).getTime() > new Date(hasil.profilDiperbaruiPada).getTime());
 
   const reload = () => {
     setLoad({ status: "loading", error: null });
