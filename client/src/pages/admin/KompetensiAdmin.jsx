@@ -10,7 +10,7 @@ import {
   Skeleton,
   TextAreaField,
   TextField,
-  WaveLine,
+  Divider,
 } from "../../components/ui";
 import { useLoad } from "../../features/admin/useLoad";
 
@@ -101,7 +101,7 @@ export default function KompetensiAdmin() {
     <div className="mx-auto w-full max-w-4xl px-4 pb-16 pt-6 md:px-8 lg:pt-8">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl font-extrabold leading-[1.05] text-ink md:text-4xl">Kompetensi</h1>
+          <h1 className="font-display text-3xl font-semibold leading-[1.05] text-ink md:text-4xl">Kompetensi</h1>
           <p className="mt-2 max-w-prose text-base text-muted">
             Elemen yang dinilai mahasiswa di profilnya. Skala level tetap 0 sampai 4 (Belum punya sampai Ahli) dan tidak
             bisa diubah dari sini.
@@ -111,10 +111,10 @@ export default function KompetensiAdmin() {
           Tambah kompetensi
         </Button>
       </header>
-      <WaveLine className="mt-4 text-sea-400" />
+      <Divider className="mt-4 text-navy-400" />
 
       {pesan && (
-        <p role="status" className="motion-pop mt-4 flex items-center gap-2 rounded-ctl bg-sea-100 px-4 py-3 text-sm font-semibold text-sea-900">
+        <p role="status" className="motion-pop mt-4 flex items-center gap-2 rounded-ctl bg-navy-100 px-4 py-3 text-sm font-semibold text-navy-900">
           <Check aria-hidden="true" size={16} strokeWidth={3} />
           {pesan}
         </p>
@@ -153,7 +153,7 @@ export default function KompetensiAdmin() {
         {status === "ready" &&
           groups.map((group) => (
             <section key={group.kategori} aria-label={`Kategori ${group.kategori}`}>
-              <h2 className="mb-2 flex items-center gap-2 font-display text-xl font-bold text-ink">
+              <h2 className="mb-2 flex items-center gap-2 font-display text-xl font-semibold text-ink">
                 {group.kategori}
                 <Chip>
                   <span className="font-mono">{group.items.length}</span>
@@ -165,7 +165,7 @@ export default function KompetensiAdmin() {
                     <li key={k.kode_kompetensi} className="flex items-start justify-between gap-3 p-4 md:px-5">
                       <div className="min-w-0">
                         <p className="flex flex-wrap items-baseline gap-2">
-                          <span className="font-mono text-sm font-semibold text-sea-800">{k.kode_kompetensi}</span>
+                          <span className="font-mono text-sm font-semibold text-navy-800">{k.kode_kompetensi}</span>
                           <span className="font-semibold text-ink">{k.nama_kompetensi}</span>
                         </p>
                         {k.deskripsi && <p className="mt-0.5 max-w-prose text-sm text-muted">{k.deskripsi}</p>}
@@ -197,8 +197,8 @@ export default function KompetensiAdmin() {
                 </p>
               </div>
             ) : (
-              <div role="note" className="flex gap-3 rounded-ctl bg-sand-200/60 p-3 text-sm leading-relaxed text-ink">
-                <TriangleAlert aria-hidden="true" size={18} className="mt-0.5 shrink-0 text-sea-700" />
+              <div role="note" className="flex gap-3 rounded-ctl bg-mist-200/60 p-3 text-sm leading-relaxed text-ink">
+                <TriangleAlert aria-hidden="true" size={18} className="mt-0.5 shrink-0 text-navy-700" />
                 <p>Nama dan kategori yang kamu ubah tampil di semua halaman, termasuk hasil rekomendasi mahasiswa.</p>
               </div>
             )}

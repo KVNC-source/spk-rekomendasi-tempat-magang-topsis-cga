@@ -5,14 +5,14 @@ const base =
   "press inline-flex min-h-11 min-w-11 select-none items-center justify-center gap-2 rounded-ctl px-4 text-base font-semibold leading-none disabled:cursor-not-allowed disabled:opacity-60 aria-busy:pointer-events-none";
 
 const variants = {
-  // Coral is reserved for the main action on a screen.
-  primary: "bg-coral-600 text-white hover:bg-coral-700 active:bg-coral-700",
-  secondary: "bg-sea-700 text-white hover:bg-sea-800 active:bg-sea-800",
-  outline: "border-2 border-sea-700 bg-transparent text-sea-800 hover:bg-sea-50 active:bg-sea-100",
-  ghost: "text-sea-800 hover:bg-sea-100 active:bg-sea-200",
-  light: "bg-sand-100 text-sea-900 hover:bg-sand-200 active:bg-sand-300",
+  // Azure is reserved for the main action on a screen.
+  primary: "bg-azure-600 text-white hover:bg-azure-700 active:bg-azure-700",
+  secondary: "bg-navy-700 text-white hover:bg-navy-800 active:bg-navy-800",
+  outline: "border-2 border-navy-700 bg-transparent text-navy-800 hover:bg-navy-50 active:bg-navy-100",
+  ghost: "text-navy-800 hover:bg-navy-100 active:bg-navy-200",
+  light: "bg-mist-100 text-navy-900 hover:bg-mist-200 active:bg-mist-300",
   // The "it worked" state, reached through `status="success"`.
-  success: "bg-sea-700 text-white",
+  success: "bg-navy-700 text-white",
 };
 
 const sizes = {

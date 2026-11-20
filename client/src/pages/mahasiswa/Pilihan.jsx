@@ -1,5 +1,5 @@
 import { BookmarkCheck, Check, ExternalLink, Info, RefreshCw, X } from "lucide-react";
-import { Button, Card, Chip, EmptyState, RelativeTime, ScoreBar, Skeleton, WaveLine } from "../../components/ui";
+import { Button, Card, Chip, EmptyState, RelativeTime, ScoreBar, Skeleton, Divider } from "../../components/ui";
 import { usePilihan } from "../../features/rekomendasi/usePilihan";
 import { formatDate } from "../../lib/format";
 
@@ -30,7 +30,7 @@ export default function Pilihan() {
   return (
     <div className="mx-auto w-full max-w-3xl px-4 pb-32 pt-6 md:px-8 lg:max-w-4xl lg:pb-10 lg:pt-8">
       <header>
-        <h1 className="font-display text-3xl font-extrabold leading-[1.05] text-ink md:text-4xl">Pilihanmu</h1>
+        <h1 className="font-display text-3xl font-semibold leading-[1.05] text-ink md:text-4xl">Pilihanmu</h1>
         <div className="mt-2 text-base text-muted">
           {!loaded && load.status === "loading" && <Skeleton className="h-6 w-48" />}
           {loaded && pilihan && (
@@ -40,7 +40,7 @@ export default function Pilihan() {
           )}
           {loaded && !pilihan && "Tempat magang yang kamu simpan akan tampil di sini."}
         </div>
-        <WaveLine className="mt-4 text-sea-400" />
+        <Divider className="mt-4 text-navy-400" />
       </header>
 
       <div className="mt-5 space-y-4">
@@ -75,10 +75,10 @@ export default function Pilihan() {
         {loaded && pilihan && (
           <>
             <Card as="article" aria-labelledby="pilihan-nama" className="motion-rise">
-              <Chip tone="sea" icon={BookmarkCheck} className="mb-2">
+              <Chip tone="navy" icon={BookmarkCheck} className="mb-2">
                 Pilihanmu
               </Chip>
-              <h2 id="pilihan-nama" className="font-display text-2xl font-bold leading-snug">
+              <h2 id="pilihan-nama" className="font-display text-2xl font-semibold leading-snug">
                 {pilihan.namaPerusahaan}
               </h2>
               <p className="mt-0.5 text-base text-muted">{pilihan.posisi}</p>
@@ -93,7 +93,7 @@ export default function Pilihan() {
 
                   <div className="mt-4">
                     {gaps.length === 0 ? (
-                      <p className="flex items-center gap-1.5 text-sm font-medium text-sea-800">
+                      <p className="flex items-center gap-1.5 text-sm font-medium text-navy-800">
                         <Check aria-hidden="true" size={16} strokeWidth={3} />
                         Semua syarat kompetensinya sudah terpenuhi
                       </p>
@@ -124,7 +124,7 @@ export default function Pilihan() {
                   </div>
                 </>
               ) : (
-                <p className="mt-4 max-w-prose rounded-ctl bg-sand-100 p-3 text-sm leading-relaxed text-ink">
+                <p className="mt-4 max-w-prose rounded-ctl bg-mist-100 p-3 text-sm leading-relaxed text-ink">
                   Skor kecocokannya belum bisa ditampilkan karena rekomendasimu belum dihitung, atau hasil barunya sudah
                   tidak memuat tempat magang ini.
                 </p>
@@ -137,7 +137,7 @@ export default function Pilihan() {
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="press mt-1 inline-flex min-h-11 items-center gap-1.5 font-semibold text-sea-800 underline underline-offset-4"
+                    className="press mt-1 inline-flex min-h-11 items-center gap-1.5 font-semibold text-navy-800 underline underline-offset-4"
                   >
                     Lihat lowongan asli
                     <ExternalLink aria-hidden="true" size={16} />
@@ -176,7 +176,7 @@ export default function Pilihan() {
             </Card>
 
             <Card tone="quiet" className="motion-rise flex gap-3" style={{ "--i": 1 }}>
-              <Info aria-hidden="true" size={20} className="mt-0.5 shrink-0 text-sea-700" />
+              <Info aria-hidden="true" size={20} className="mt-0.5 shrink-0 text-navy-700" />
               <p className="max-w-prose text-sm leading-relaxed text-ink">
                 Ini hanya catatan pilihanmu di sini. Persetujuan dari koordinator tetap kamu urus di luar sistem, dan
                 kamu boleh mengganti pilihan kapan saja.

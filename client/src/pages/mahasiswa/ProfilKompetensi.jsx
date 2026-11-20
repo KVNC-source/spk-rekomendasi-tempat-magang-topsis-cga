@@ -12,7 +12,7 @@ import {
   SelectField,
   Skeleton,
   TextField,
-  WaveLine,
+  Divider,
 } from "../../components/ui";
 import KompetensiGroup from "../../features/profil/KompetensiGroup";
 import LevelGuide from "../../features/profil/LevelGuide";
@@ -50,7 +50,7 @@ function StatusText({ save, dirty, reason }) {
   if (dirty) return "Ada perubahan yang belum disimpan.";
   if (save.savedAt) {
     return (
-      <span className="inline-flex items-center gap-1.5 font-medium text-sea-800">
+      <span className="inline-flex items-center gap-1.5 font-medium text-navy-800">
         <Check aria-hidden="true" size={16} strokeWidth={3} />
         Tersimpan pukul <span className="font-mono">{formatTime(save.savedAt)}</span>
       </span>
@@ -135,26 +135,26 @@ export default function ProfilKompetensi() {
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 pb-48 pt-4 md:px-8 lg:pb-10 lg:pt-8">
-      <section className="on-dark relative overflow-hidden rounded-card bg-sea-900 px-5 py-6 text-sand-100 md:px-8 md:py-8">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-sea-200">
+      <section className="on-dark relative overflow-hidden rounded-card bg-navy-900 px-5 py-6 text-mist-100 md:px-8 md:py-8">
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-navy-200">
           {firstName ? `Halo, ${firstName}` : "Halo"} · langkah 1 dari 3
         </p>
-        <h1 className="mt-2 font-display text-3xl font-extrabold leading-[1.05] md:text-4xl">
+        <h1 className="mt-2 font-display text-3xl font-semibold leading-[1.05] md:text-4xl">
           Profil Kompetensi
         </h1>
-        <p className="mt-3 max-w-xl text-base leading-relaxed text-sea-100">
+        <p className="mt-3 max-w-xl text-base leading-relaxed text-navy-100">
           Nilai seberapa jauh kemampuanmu di tiap elemen. Jawabanmu dipakai untuk mencocokkanmu dengan tempat magang.
         </p>
 
-        <WaveLine className="mt-5 text-sea-300/60" />
+        <Divider className="mt-5 text-navy-300/60" />
 
         <div className="mt-4 empty:hidden">
-          {load.status === "loading" && <Skeleton className="h-10 w-full bg-sea-800" />}
+          {load.status === "loading" && <Skeleton className="h-10 w-full bg-navy-800" />}
           {ready && (
             <>
               <div className="mb-2.5 flex items-baseline justify-between gap-3">
-                <p className="text-sm text-sea-200">
-                  <span className="font-mono text-2xl font-semibold text-sand-100">{answered}</span> dari{" "}
+                <p className="text-sm text-navy-200">
+                  <span className="font-mono text-2xl font-semibold text-mist-100">{answered}</span> dari{" "}
                   <span className="font-mono">{total}</span> kompetensi terisi
                 </p>
                 <Chip tone="ondark" icon={savedStatus === "Lengkap" ? Check : FilePen}>
@@ -162,7 +162,7 @@ export default function ProfilKompetensi() {
                 </Chip>
               </div>
               <SegmentedProgress done={answered} total={total} label="Kelengkapan profil kompetensi" onDark />
-              <p className="mt-2.5 max-w-xl text-sm text-sea-200">{hint}</p>
+              <p className="mt-2.5 max-w-xl text-sm text-navy-200">{hint}</p>
             </>
           )}
         </div>
@@ -211,7 +211,7 @@ export default function ProfilKompetensi() {
             <>
               {missingIds.length > 0 && (
                 <Card tone="quiet" role="note" className="motion-pop flex gap-3">
-                  <Info aria-hidden="true" size={20} className="mt-0.5 shrink-0 text-sea-700" />
+                  <Info aria-hidden="true" size={20} className="mt-0.5 shrink-0 text-navy-700" />
                   <div className="max-w-prose text-sm leading-relaxed text-ink">
                     <p className="font-semibold">
                       <span className="font-mono">{missingIds.length}</span> kompetensi belum kamu isi
@@ -246,7 +246,7 @@ export default function ProfilKompetensi() {
                 className="motion-rise"
                 style={{ "--i": groups.length + 1 }}
               >
-                <h2 id="grup-data" className="font-display text-xl font-bold leading-tight">
+                <h2 id="grup-data" className="font-display text-xl font-semibold leading-tight">
                   Data pendukung
                 </h2>
                 <p className="mt-1 max-w-prose text-sm text-muted">
@@ -359,7 +359,7 @@ export default function ProfilKompetensi() {
 
         <aside aria-label="Panduan level" className="hidden 2xl:sticky 2xl:top-8 2xl:block">
           <Card tone="quiet">
-            <h2 className="mb-2 font-display text-xl font-bold">Panduan level</h2>
+            <h2 className="mb-2 font-display text-xl font-semibold">Panduan level</h2>
             <LevelGuide />
           </Card>
         </aside>

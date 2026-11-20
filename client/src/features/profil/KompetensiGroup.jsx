@@ -29,10 +29,10 @@ export default function KompetensiGroup({ group, levels, open, onToggle, onChang
           className="press flex min-h-16 w-full items-center justify-between gap-3 rounded-card px-4 py-3.5 text-left md:px-5"
         >
           <span className="min-w-0">
-            <span className="block font-display text-xl font-bold leading-tight text-ink">{group.title}</span>
+            <span className="block font-display text-xl font-semibold leading-tight text-ink">{group.title}</span>
                       </span>
           <span className="flex shrink-0 items-center gap-2.5">
-            <Chip tone={groupDone ? "sea" : "neutral"} icon={groupDone ? Check : undefined}>
+            <Chip tone={groupDone ? "navy" : "neutral"} icon={groupDone ? Check : undefined}>
               <span className="font-mono">
                 {done}/{group.items.length}
               </span>{" "}

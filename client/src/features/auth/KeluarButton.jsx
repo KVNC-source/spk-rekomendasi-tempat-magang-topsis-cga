@@ -26,7 +26,7 @@ export default function KeluarButton({ compact = false, className = "" }) {
         onClick={handleClick}
         aria-label="Keluar"
         aria-busy={busy || undefined}
-        className={`press grid size-11 place-items-center rounded-full text-sea-900 hover:bg-sea-100 ${className}`}
+        className={`press grid size-11 place-items-center rounded-full text-navy-900 hover:bg-navy-100 ${className}`}
       >
         <LogOut aria-hidden="true" size={20} strokeWidth={1.9} />
       </button>
@@ -38,7 +38,7 @@ export default function KeluarButton({ compact = false, className = "" }) {
       type="button"
       onClick={handleClick}
       aria-busy={busy || undefined}
-      className={`press flex min-h-11 w-full items-center gap-3 rounded-ctl px-4 text-base font-semibold text-sea-100 hover:bg-sea-800 ${className}`}
+      className={`press flex min-h-11 w-full items-center gap-3 rounded-ctl px-4 text-base font-semibold text-navy-100 hover:bg-navy-800 ${className}`}
     >
       <LogOut aria-hidden="true" size={20} strokeWidth={1.9} />
       {busy ? "Keluar…" : "Keluar"}

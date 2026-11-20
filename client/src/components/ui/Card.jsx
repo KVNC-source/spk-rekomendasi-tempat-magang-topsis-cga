@@ -2,7 +2,7 @@
 // secondary content and drops the border so it recedes.
 const tones = {
   plain: "border border-line bg-surface",
-  quiet: "bg-sand-200/60",
+  quiet: "bg-mist-200/60",
 };
 
 /** Surface container. `as` lets callers pick the right semantic element. */

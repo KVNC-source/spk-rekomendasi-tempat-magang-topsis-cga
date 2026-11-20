@@ -13,7 +13,7 @@ export default function StatCard({ label, value, unit, hint, icon: Icon, classNa
         {hint && <p className="mt-1 text-sm text-muted">{hint}</p>}
       </div>
       {Icon && (
-        <span className="grid size-10 shrink-0 place-items-center rounded-ctl bg-sea-100 text-sea-800">
+        <span className="grid size-10 shrink-0 place-items-center rounded-ctl bg-navy-100 text-navy-800">
           <Icon aria-hidden="true" size={20} strokeWidth={1.9} />
         </span>
       )}

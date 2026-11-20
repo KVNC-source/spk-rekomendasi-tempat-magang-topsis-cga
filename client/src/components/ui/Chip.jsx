@@ -1,10 +1,11 @@
 const tones = {
-  neutral: "bg-sand-200 text-ink",
-  sea: "bg-sea-100 text-sea-900",
+  neutral: "bg-mist-200 text-ink",
+  navy: "bg-navy-100 text-navy-900",
+  azure: "bg-azure-100 text-navy-900",
   coral: "bg-coral-100 text-coral-700",
   outline: "border border-line-strong bg-transparent text-ink",
   // For dark surfaces (the rank-1 card).
-  ondark: "bg-sea-800 text-sea-100",
+  ondark: "bg-navy-800 text-navy-100",
 };
 
 /** Small label. Always pair a tone with text (and an icon where it carries status). */

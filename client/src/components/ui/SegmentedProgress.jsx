@@ -1,8 +1,8 @@
 /** Fill gauge made of one notch per item. A notch fills from the left when its item is answered. */
 export default function SegmentedProgress({ done, total, label, onDark = false }) {
   const segments = Array.from({ length: Math.max(total, 1) }, (_, i) => i < done);
-  const on = onDark ? "bg-coral-400" : "bg-sea-600";
-  const off = onDark ? "bg-sea-700" : "bg-sand-300";
+  const on = onDark ? "bg-azure-400" : "bg-navy-600";
+  const off = onDark ? "bg-navy-700" : "bg-mist-300";
 
   return (
     <div

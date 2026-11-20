@@ -2,9 +2,9 @@ import { formatNumber } from "../../lib/format";
 import CountUp from "./CountUp";
 
 const fills = {
-  sea: "bg-sea-600",
-  coral: "bg-coral-500",
-  ondark: "bg-coral-400",
+  navy: "bg-navy-600",
+  azure: "bg-azure-500",
+  ondark: "bg-azure-400",
 };
 
 /**
@@ -16,7 +16,7 @@ export default function ScoreBar({
   value,
   max = 100,
   unit = "%",
-  tone = "sea",
+  tone = "navy",
   digits = 1,
   countUp = false,
   onDark = false,
@@ -26,8 +26,8 @@ export default function ScoreBar({
   return (
     <div className={className}>
       <div className="mb-1.5 flex items-baseline justify-between gap-3">
-        <span className={`text-sm font-medium ${onDark ? "text-sea-200" : "text-muted"}`}>{label}</span>
-        <span className={`font-mono text-sm font-semibold ${onDark ? "text-sand-100" : "text-ink"}`}>
+        <span className={`text-sm font-medium ${onDark ? "text-navy-200" : "text-muted"}`}>{label}</span>
+        <span className={`font-mono text-sm font-semibold ${onDark ? "text-mist-100" : "text-ink"}`}>
           {countUp ? <CountUp value={value} digits={digits} /> : formatNumber(value, digits)}
           {unit}
         </span>
@@ -39,7 +39,7 @@ export default function ScoreBar({
         aria-valuemax={max}
         aria-valuenow={value}
         aria-valuetext={`${formatNumber(value, digits)}${unit}`}
-        className={`h-2.5 overflow-hidden rounded-full ${onDark ? "bg-sea-700" : "bg-sand-200"}`}
+        className={`h-2.5 overflow-hidden rounded-full ${onDark ? "bg-navy-700" : "bg-mist-200"}`}
       >
         <div
           className={`motion-grow h-full w-full rounded-full ${fills[onDark ? "ondark" : tone]}`}

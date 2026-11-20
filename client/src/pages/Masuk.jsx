@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { ArrowLeft, CircleAlert } from "lucide-react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { BrandMark, Button, Card, TextField, WaveLine } from "../components/ui";
+import { BrandMark, Button, Card, TextField, Divider } from "../components/ui";
 import { homeFor, insideArea, useAuth } from "../features/auth/useAuth";
 
 /** Where to go after login: the page the visitor was sent away from, if their role may use it. */
@@ -58,14 +58,14 @@ export default function Masuk() {
         <div className="mb-6 flex items-center gap-3">
           <BrandMark className="size-12" />
           <div className="leading-tight">
-            <p className="font-display text-xl font-extrabold text-sea-900">SPK Magang</p>
+            <p className="font-display text-xl font-semibold text-navy-900">SPK Magang</p>
             <p className="text-xs text-muted">Teknik Informatika · Unsrat</p>
           </div>
         </div>
 
-        <h1 className="font-display text-3xl font-extrabold leading-[1.05] text-ink md:text-4xl">Masuk</h1>
+        <h1 className="font-display text-3xl font-semibold leading-[1.05] text-ink md:text-4xl">Masuk</h1>
         <p className="mt-2 text-base text-muted">Pakai email dan kata sandi akunmu.</p>
-        <WaveLine className="mt-4 text-sea-400" />
+        <Divider className="mt-4 text-navy-400" />
 
         <Card className="mt-5">
           <form noValidate onSubmit={handleSubmit} className="space-y-4" aria-describedby={error ? "masuk-error" : undefined}>
@@ -112,7 +112,7 @@ export default function Masuk() {
                   type="checkbox"
                   checked={lihat}
                   onChange={(event) => setLihat(event.target.checked)}
-                  className="size-5 accent-sea-700"
+                  className="size-5 accent-navy-700"
                 />
                 Tampilkan kata sandi
               </label>

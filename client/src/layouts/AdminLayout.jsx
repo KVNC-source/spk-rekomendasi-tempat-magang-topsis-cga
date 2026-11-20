@@ -17,7 +17,7 @@ export default function AdminLayout() {
     <div className="min-h-dvh bg-canvas">
       <a
         href="#konten"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-ctl focus:bg-sea-900 focus:px-4 focus:py-3 focus:text-sand-100"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-ctl focus:bg-navy-900 focus:px-4 focus:py-3 focus:text-mist-100"
       >
         Lewati ke konten
       </a>
@@ -25,8 +25,8 @@ export default function AdminLayout() {
         <div className="flex items-center justify-between gap-3 px-4 py-2.5 md:px-8">
           <div className="flex items-center gap-2.5">
             <BrandMark className="size-9" />
-            <span className="font-display text-lg font-extrabold text-sea-900">SPK Magang</span>
-            <Chip tone="sea" className="ml-1">
+            <span className="font-display text-lg font-semibold text-navy-900">SPK Magang</span>
+            <Chip tone="navy" className="ml-1">
               Administrator
             </Chip>
           </div>
@@ -43,7 +43,7 @@ export default function AdminLayout() {
               end={end}
               className={({ isActive }) =>
                 `press flex min-h-12 shrink-0 items-center border-b-[3px] px-3 text-base font-semibold ${
-                  isActive ? "border-coral-600 text-sea-950" : "border-transparent text-muted hover:text-ink"
+                  isActive ? "border-azure-600 text-navy-950" : "border-transparent text-muted hover:text-ink"
                 }`
               }
             >

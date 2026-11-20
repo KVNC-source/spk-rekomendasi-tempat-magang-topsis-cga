@@ -13,4 +13,4 @@ export { default as ScoreBar } from "./ScoreBar";
 export { default as SegmentedProgress } from "./SegmentedProgress";
 export { default as Skeleton } from "./Skeleton";
 export { default as StatCard } from "./StatCard";
-export { default as WaveLine } from "./WaveLine";
+export { default as Divider } from "./Divider";

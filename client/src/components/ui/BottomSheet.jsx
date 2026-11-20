@@ -116,14 +116,14 @@ export default function BottomSheet({ open, onClose, title, children }) {
         >
           <div aria-hidden="true" className="mx-auto mb-2 h-1 w-10 rounded-full bg-line-strong/50 lg:hidden" />
           <div className="flex items-start justify-between gap-4">
-            <h2 id={titleId} className="pt-1.5 font-display text-xl font-bold text-ink">
+            <h2 id={titleId} className="pt-1.5 font-display text-xl font-semibold text-ink">
               {title}
             </h2>
             <button
               type="button"
               onClick={onClose}
               aria-label="Tutup"
-              className="press -mr-2 grid size-11 shrink-0 place-items-center rounded-ctl text-ink hover:bg-sand-200 active:bg-sand-300"
+              className="press -mr-2 grid size-11 shrink-0 place-items-center rounded-ctl text-ink hover:bg-mist-200 active:bg-mist-300"
             >
               <X aria-hidden="true" size={22} />
             </button>

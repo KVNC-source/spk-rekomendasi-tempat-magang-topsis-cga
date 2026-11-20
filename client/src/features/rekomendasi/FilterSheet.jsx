@@ -21,7 +21,7 @@ export default function FilterSheet({ open, onClose, options, selected, onChange
                   type="checkbox"
                   checked={selected.includes(bidang)}
                   onChange={() => toggle(bidang)}
-                  className="size-5 shrink-0 accent-sea-700"
+                  className="size-5 shrink-0 accent-navy-700"
                 />
                 <span className="min-w-0 flex-1 font-medium text-ink">{bidang}</span>
                 <span className="font-mono text-sm text-muted">{jumlah}</span>

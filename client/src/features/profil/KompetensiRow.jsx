@@ -12,7 +12,7 @@ export default function KompetensiRow({ item, value, onChange, highlighted }) {
     <li
       id={`kompetensi-${id}`}
       className={`py-4 md:grid md:grid-cols-[minmax(0,1fr)_22rem] md:items-end md:gap-6 ${
-        highlighted ? "-mx-2 rounded-ctl bg-coral-50 px-2 ring-2 ring-coral-300" : ""
+        highlighted ? "-mx-2 rounded-ctl bg-azure-50 px-2 ring-2 ring-azure-300" : ""
       }`}
     >
       <div className="mb-3 min-w-0 md:mb-0">
@@ -24,7 +24,7 @@ export default function KompetensiRow({ item, value, onChange, highlighted }) {
         )}
         <p className="mt-1.5 text-sm">
           {answered ? (
-            <span className="font-medium text-sea-800">
+            <span className="font-medium text-navy-800">
               <span className="font-mono">Level {value}</span> · {levelLabel(value)}
             </span>
           ) : highlighted ? (

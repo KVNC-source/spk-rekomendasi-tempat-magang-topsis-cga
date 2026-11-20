@@ -1,40 +1,51 @@
-@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 /*
  * SPK Magang — design tokens.
  *
- * Identity: deep sea teal (Bunaken) as primary, warm coral used sparingly for
- * the main action and highlights, warm "sand" ground, near-black ink.
- * Contrast (WCAG): ink/muted on sand >= 6:1, white on sea-700 9:1, white on
- * coral-600 4.9:1, coral-700 on coral-50 6:1.
+ * Identity: deep navy as the primary, a clear azure blue for the main action and
+ * highlights, cool blue-grey ground, near-black navy ink. Coral is kept only for
+ * errors, warnings and the "wajib" marker so they stay recognisable against the blues.
+ * Contrast (WCAG): ink/muted on canvas >= 7:1, white on navy-700 10:1, white on
+ * azure-600 5.8:1, coral-700 on coral-50 6:1.
  *
- * Type scale (Tailwind defaults, nothing off-scale): xs 12 · sm 14 · base 16 ·
+ * Type: IBM Plex Sans (text and headings, headings at semibold) and IBM Plex Mono
+ * (numbers). Scale (Tailwind defaults, nothing off-scale): xs 12 · sm 14 · base 16 ·
  * lg 18 · xl 20 · 2xl 24 · 3xl 30 · 4xl 36.
- * Spacing: multiples of 4px. Radii: three sizes only — tile 8, ctl 12, card 20.
+ * Spacing: multiples of 4px. Radii: three sizes only — tile 6, ctl 8, card 12.
  */
 @theme {
-  /* Sea (primary) */
-  --color-sea-50: #eaf4f2;
-  --color-sea-100: #d3e8e5;
-  --color-sea-200: #a9d2ce;
-  --color-sea-300: #78b5b0;
-  --color-sea-400: #3f9690;
-  --color-sea-500: #1f7a77;
-  --color-sea-600: #0f6468;
-  --color-sea-700: #0b5057;
-  --color-sea-800: #083e45;
-  --color-sea-900: #062f35;
-  --color-sea-950: #041f24;
+  /* Navy (primary) */
+  --color-navy-50: #eef2f9;
+  --color-navy-100: #dce5f3;
+  --color-navy-200: #b9cbe6;
+  --color-navy-300: #8aa8d2;
+  --color-navy-400: #5a82b8;
+  --color-navy-500: #3b66a0;
+  --color-navy-600: #264f87;
+  --color-navy-700: #1b3c6c;
+  --color-navy-800: #142e55;
+  --color-navy-900: #0e2142;
+  --color-navy-950: #091630;
 
-  /* Sand (ground) */
-  --color-sand-50: #fffdf9;
-  --color-sand-100: #f6f0e4;
-  --color-sand-200: #ebe2d0;
-  --color-sand-300: #ddd3bd;
-  --color-sand-400: #b8a98a;
+  /* Mist (cool blue-grey ground) */
+  --color-mist-50: #fafbfd;
+  --color-mist-100: #eef2f8;
+  --color-mist-200: #e1e7f0;
+  --color-mist-300: #d0d8e5;
+  --color-mist-400: #9aa6bb;
 
-  /* Coral (accent — main action + highlights only) */
+  /* Azure (accent — main action + highlights) */
+  --color-azure-50: #eaf1ff;
+  --color-azure-100: #d4e3ff;
+  --color-azure-300: #8db6ff;
+  --color-azure-400: #5f97f5;
+  --color-azure-500: #2f6fe0;
+  --color-azure-600: #1f5fd1;
+  --color-azure-700: #184db0;
+
+  /* Coral (errors, warnings, "wajib" marker) */
   --color-coral-50: #fef0ea;
   --color-coral-100: #fcdccf;
   --color-coral-300: #f6a284;
@@ -44,25 +55,25 @@
   --color-coral-700: #a33518;
 
   /* Semantic */
-  --color-ink: #0f1f21;
-  --color-muted: #4a5857;
-  --color-canvas: #f6f0e4;
-  --color-surface: #fffdf9;
-  --color-line: #ddd3bd;
-  --color-line-strong: #7c7664;
-  --color-primary: #0b5057;
-  --color-accent: #c8431f;
-  /* Kept for the existing Landing page (previously an amber highlight). */
-  --color-signal: #f2814f;
+  --color-ink: #0d1b2e;
+  --color-muted: #475569;
+  --color-canvas: #f3f6fb;
+  --color-surface: #ffffff;
+  --color-line: #d0d8e5;
+  --color-line-strong: #6f7b91;
+  --color-primary: #1b3c6c;
+  --color-accent: #1f5fd1;
+  /* Highlight colour on the dark Landing page. */
+  --color-signal: #5f97f5;
 
-  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-display: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 
   /* Radii: small tiles, controls, cards. Nothing else. */
-  --radius-tile: 0.5rem;
-  --radius-ctl: 0.75rem;
-  --radius-card: 1.25rem;
+  --radius-tile: 0.375rem;
+  --radius-ctl: 0.5rem;
+  --radius-card: 0.75rem;
 
   /* Easing: ease-out for things entering, ease-in for things leaving. */
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
@@ -200,6 +211,7 @@
   h2,
   h3 {
     text-wrap: balance;
+    letter-spacing: -0.015em;
   }
 
   p {
@@ -219,14 +231,14 @@
     touch-action: manipulation;
   }
 
-  /* Focus ring: teal, offset so it never hugs the element, follows its shape. */
+  /* Focus ring: navy, offset so it never hugs the element, follows its shape. */
   :focus-visible {
-    outline: 3px solid var(--color-sea-700);
+    outline: 3px solid var(--color-navy-700);
     outline-offset: 3px;
   }
 
   .on-dark :focus-visible {
-    outline-color: var(--color-sand-100);
+    outline-color: var(--color-mist-100);
   }
 }
 

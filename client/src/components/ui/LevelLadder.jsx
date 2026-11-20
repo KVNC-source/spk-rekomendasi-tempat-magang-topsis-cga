@@ -48,14 +48,14 @@ function Step({ level, label, index, value, required, interactive }) {
 
   return (
     <span
-      className={`relative isolate flex ${heights[index]} flex-col items-center justify-center overflow-hidden rounded-tile border-2 bg-sand-50 px-1 text-center transition-[transform,background-color,border-color] duration-fast ease-out-soft ${
-        selected ? "border-sea-950" : climbed ? "border-sea-300" : "border-line-strong"
-      } ${interactive ? "group-hover:bg-sea-50 group-active:scale-[0.96]" : ""} ${
+      className={`relative isolate flex ${heights[index]} flex-col items-center justify-center overflow-hidden rounded-tile border-2 bg-mist-50 px-1 text-center transition-[transform,background-color,border-color] duration-fast ease-out-soft ${
+        selected ? "border-navy-950" : climbed ? "border-navy-300" : "border-line-strong"
+      } ${interactive ? "group-hover:bg-navy-50 group-active:scale-[0.96]" : ""} ${
         required === level ? requiredRing : ""
       }`}
     >
-      <span aria-hidden="true" className="ladder-fill absolute inset-0 -z-10 bg-sea-200" data-on={climbed || selected} style={{ transitionDelay: `${tintDelay}ms` }} />
-      <span aria-hidden="true" className="ladder-fill absolute inset-0 -z-10 bg-sea-800" data-on={selected} style={{ transitionDelay: `${solidDelay}ms` }} />
+      <span aria-hidden="true" className="ladder-fill absolute inset-0 -z-10 bg-navy-200" data-on={climbed || selected} style={{ transitionDelay: `${tintDelay}ms` }} />
+      <span aria-hidden="true" className="ladder-fill absolute inset-0 -z-10 bg-navy-800" data-on={selected} style={{ transitionDelay: `${solidDelay}ms` }} />
       <span
         className="ladder-check absolute right-1 top-1 text-white"
         data-on={selected}
@@ -85,11 +85,11 @@ function Ground({ value, interactive }) {
   const selected = value === 0;
   return (
     <span
-      className={`relative isolate flex min-h-11 items-center justify-center gap-2 overflow-hidden rounded-tile border-2 bg-sand-50 px-3 text-sm font-semibold transition-[transform,background-color,border-color] duration-fast ease-out-soft ${
-        selected ? "border-sea-950 text-white" : "border-dashed border-line-strong text-ink"
-      } ${interactive ? "group-hover:bg-sea-50 group-active:scale-[0.98]" : ""}`}
+      className={`relative isolate flex min-h-11 items-center justify-center gap-2 overflow-hidden rounded-tile border-2 bg-mist-50 px-3 text-sm font-semibold transition-[transform,background-color,border-color] duration-fast ease-out-soft ${
+        selected ? "border-navy-950 text-white" : "border-dashed border-line-strong text-ink"
+      } ${interactive ? "group-hover:bg-navy-50 group-active:scale-[0.98]" : ""}`}
     >
-      <span aria-hidden="true" className="ladder-fill absolute inset-0 -z-10 bg-sea-800" data-on={selected} />
+      <span aria-hidden="true" className="ladder-fill absolute inset-0 -z-10 bg-navy-800" data-on={selected} />
       {selected && <Check aria-hidden="true" size={15} strokeWidth={3} />}
       <span className="font-mono">0</span>
       <span>{LEVEL_NOL.label}</span>
@@ -152,7 +152,7 @@ export default function LevelLadder({
               onChange={() => onChange(0)}
               className="peer sr-only"
             />
-            <span className="block rounded-tile peer-focus-visible:outline-3 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-sea-700">
+            <span className="block rounded-tile peer-focus-visible:outline-3 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-navy-700">
               <Ground value={value} interactive />
             </span>
           </label>
@@ -170,7 +170,7 @@ export default function LevelLadder({
                   onChange={() => onChange(level)}
                   className="peer sr-only"
                 />
-                <span className="block rounded-tile peer-focus-visible:outline-3 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-sea-700">
+                <span className="block rounded-tile peer-focus-visible:outline-3 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-navy-700">
                   <Step level={level} label={stepLabel} index={i} value={value} required={required} interactive />
                 </span>
               </label>
@@ -183,8 +183,8 @@ export default function LevelLadder({
 }
 
 const gapIcons = {
-  exceeded: { icon: ChevronsUp, tone: "sea" },
-  met: { icon: Check, tone: "sea" },
+  exceeded: { icon: ChevronsUp, tone: "navy" },
+  met: { icon: Check, tone: "navy" },
   short: { icon: ArrowDown, tone: "coral" },
   none: { icon: Minus, tone: "neutral" },
 };
@@ -214,7 +214,7 @@ export function LadderGlyph({ level, className = "" }) {
           width="6"
           height={8 + i * 5}
           rx="1.5"
-          className={i < level ? "fill-sea-700" : "fill-sea-200"}
+          className={i < level ? "fill-navy-700" : "fill-navy-200"}
         />
       ))}
     </svg>

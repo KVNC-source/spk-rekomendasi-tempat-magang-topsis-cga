@@ -19,7 +19,7 @@ function LevelText({ level }) {
 function Status({ student, required }) {
   const status = gapStatus(student, required);
   const Icon = icons[status.kind];
-  const tone = status.kind === "short" ? "coral" : "sea";
+  const tone = status.kind === "short" ? "coral" : "navy";
   const gapText = student === 0 || status.gap === 0 ? "" : `${status.gap > 0 ? "+" : "−"}${Math.abs(status.gap)}`;
   return (
     <Chip tone={tone} icon={Icon} className="whitespace-nowrap">
@@ -64,7 +64,7 @@ export default function ElementTable({ elements }) {
           >
             <td role="cell" className={`${cell} col-span-3 md:col-span-1`}>
               <span className="block font-semibold leading-snug text-ink">{element.nama}</span>
-              <Chip tone={element.isMandatory ? "sea" : "neutral"} className="mt-1.5">
+              <Chip tone={element.isMandatory ? "navy" : "neutral"} className="mt-1.5">
                 {element.isMandatory ? "Wajib" : "Opsional"}
               </Chip>
             </td>

@@ -13,14 +13,14 @@ import {
   SegmentedProgress,
   Skeleton,
   StatCard,
-  WaveLine,
+  Divider,
 } from "../../components/ui";
 import LevelGuide from "../../features/profil/LevelGuide";
 
 function Section({ title, children }) {
   return (
     <section className="space-y-3">
-      <h2 className="font-display text-xl font-bold text-sea-900">{title}</h2>
+      <h2 className="font-display text-xl font-semibold text-navy-900">{title}</h2>
       {children}
     </section>
   );
@@ -33,7 +33,7 @@ export default function ComponentGallery() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-8 px-4 py-6 md:px-8">
-      <h1 className="font-display text-3xl font-extrabold text-ink">Komponen SPK Magang</h1>
+      <h1 className="font-display text-3xl font-semibold text-ink">Komponen SPK Magang</h1>
 
       <Section title="Button">
         <div className="flex flex-wrap gap-2">
@@ -72,7 +72,7 @@ export default function ComponentGallery() {
       <Section title="Chip">
         <div className="flex flex-wrap gap-2">
           <Chip>Netral</Chip>
-          <Chip tone="sea" icon={Layers}>
+          <Chip tone="navy" icon={Layers}>
             Web Development
           </Chip>
           <Chip tone="coral">Perlu perhatian</Chip>
@@ -87,7 +87,7 @@ export default function ComponentGallery() {
         </div>
         <Card className="space-y-4">
           <ScoreBar label="Skor Kesesuaian Kompetensi (C1)" value={86} />
-          <ScoreBar label="Peringkat 1" value={92.5} tone="coral" />
+          <ScoreBar label="Peringkat 1" value={92.5} tone="azure" />
           <SegmentedProgress done={5} total={8} label="Contoh progres" />
         </Card>
       </Section>
@@ -99,8 +99,8 @@ export default function ComponentGallery() {
         </Card>
       </Section>
 
-      <Section title="WaveLine — satu per layar">
-        <WaveLine className="text-sea-600" />
+      <Section title="Divider — satu per layar">
+        <Divider className="text-navy-600" />
       </Section>
 
       <Section title="Skeleton · EmptyState">

@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { ClipboardList, Landmark, RefreshCw, Scale, TriangleAlert } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getKompetensiAdmin, getKriteria, getTempatList } from "../../api/admin";
-import { Button, Card, EmptyState, Skeleton, StatCard, WaveLine } from "../../components/ui";
+import { Button, Card, EmptyState, Skeleton, StatCard, Divider } from "../../components/ui";
 import { useLoad } from "../../features/admin/useLoad";
 import { formatNumber } from "../../lib/format";
 
@@ -21,11 +21,11 @@ export default function AdminHome() {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 pb-16 pt-6 md:px-8 lg:pt-8">
       <header>
-        <h1 className="font-display text-3xl font-extrabold leading-[1.05] text-ink md:text-4xl">Data referensi</h1>
+        <h1 className="font-display text-3xl font-semibold leading-[1.05] text-ink md:text-4xl">Data referensi</h1>
         <p className="mt-2 max-w-prose text-base text-muted">
           Yang kamu ubah di sini dipakai perhitungan rekomendasi berikutnya.
         </p>
-        <WaveLine className="mt-4 text-sea-400" />
+        <Divider className="mt-4 text-navy-400" />
       </header>
 
       {status === "loading" && (
@@ -92,7 +92,7 @@ export default function AdminHome() {
                   to={item.to}
                   className="press block h-full rounded-card border border-line bg-surface p-4 hover:border-line-strong md:p-5"
                 >
-                  <span className="font-display text-xl font-bold text-ink">{item.title}</span>
+                  <span className="font-display text-xl font-semibold text-ink">{item.title}</span>
                   <span className="mt-1 block text-sm text-muted">{item.text}</span>
                 </Link>
               </li>

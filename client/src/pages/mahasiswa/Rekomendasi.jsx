@@ -9,7 +9,7 @@ import {
   EmptyState,
   RelativeTime,
   Skeleton,
-  WaveLine,
+  Divider,
 } from "../../components/ui";
 import FilterSheet from "../../features/rekomendasi/FilterSheet";
 import RankingCard from "../../features/rekomendasi/RankingCard";
@@ -107,7 +107,7 @@ export default function Rekomendasi() {
     <div className="mx-auto w-full max-w-3xl px-4 pb-48 pt-6 md:px-8 lg:max-w-4xl lg:pb-10 lg:pt-8">
       <header>
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">Langkah 2 dari 3</p>
-        <h1 className="mt-2 font-display text-3xl font-extrabold leading-[1.05] text-ink md:text-4xl">
+        <h1 className="mt-2 font-display text-3xl font-semibold leading-[1.05] text-ink md:text-4xl">
           Rekomendasi Tempat Magang
         </h1>
         <div className="mt-2 text-base text-muted">
@@ -121,11 +121,11 @@ export default function Rekomendasi() {
           )}
           {loaded && !hasil && "Urutan tempat magang yang paling cocok dengan profilmu."}
         </div>
-        <WaveLine className="mt-4 text-sea-400" />
+        <Divider className="mt-4 text-navy-400" />
       </header>
 
       <Card tone="quiet" className="mt-5 flex gap-3">
-        <Info aria-hidden="true" size={20} className="mt-0.5 shrink-0 text-sea-700" />
+        <Info aria-hidden="true" size={20} className="mt-0.5 shrink-0 text-navy-700" />
         <p className="max-w-prose text-sm leading-relaxed text-ink">
           Rekomendasi ini membantumu menimbang pilihan, bukan menggantikan keputusanmu. Kamu yang memutuskan, dan
           tempat magang di luar urutan teratas tetap boleh kamu pilih.
@@ -199,7 +199,7 @@ export default function Rekomendasi() {
                   <p className="font-semibold">{lengkapiJudul}</p>
                   <p className="mt-1">
                     {lengkapiRinci} Hasil di bawah masih dari perhitungan sebelumnya.{" "}
-                    <Link to={lengkapiTujuan} className="font-semibold text-sea-800 underline underline-offset-4">
+                    <Link to={lengkapiTujuan} className="font-semibold text-navy-800 underline underline-offset-4">
                       Lengkapi profil
                     </Link>
                   </p>
@@ -226,7 +226,7 @@ export default function Rekomendasi() {
               <Button variant="outline" icon={ListFilter} onClick={() => setFilterOpen(true)}>
                 Filter
                 {activeFilter.length > 0 && (
-                  <Chip tone="sea" className="ml-0.5">
+                  <Chip tone="navy" className="ml-0.5">
                     <span className="font-mono">{activeFilter.length}</span>
                   </Chip>
                 )}

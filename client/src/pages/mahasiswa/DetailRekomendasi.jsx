@@ -9,7 +9,7 @@ import {
   EmptyState,
   ScoreBar,
   Skeleton,
-  WaveLine,
+  Divider,
 } from "../../components/ui";
 import ElementTable from "../../features/rekomendasi/ElementTable";
 import { useDetailRekomendasi } from "../../features/rekomendasi/useDetailRekomendasi";
@@ -50,7 +50,7 @@ function CgaSummary({ cga }) {
           ? "Lowongan ini hanya mencantumkan kompetensi wajib, jadi skornya dihitung dari rata-rata skor kompetensi wajib saja."
           : `Skornya gabungan: kompetensi wajib berbobot ${formatNumber(cga.ncf * 100, 0)}% dan kompetensi opsional ${formatNumber(cga.nsf * 100, 0)}%.`}
       </p>
-      <dl className="mt-3 divide-y divide-line rounded-ctl bg-sand-100 px-3 text-sm">
+      <dl className="mt-3 divide-y divide-line rounded-ctl bg-mist-100 px-3 text-sm">
         {rows.map((row) => (
           <div key={row.label} className="flex items-baseline justify-between gap-3 py-2">
             <dt className="text-muted">{row.label}</dt>
@@ -155,18 +155,18 @@ export default function DetailRekomendasi() {
         <>
           <header className="mt-3">
             <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">Langkah 3 dari 3</p>
-            <h1 className="mt-2 font-display text-3xl font-extrabold leading-[1.05] text-ink md:text-4xl">
+            <h1 className="mt-2 font-display text-3xl font-semibold leading-[1.05] text-ink md:text-4xl">
               {item.namaPerusahaan}
             </h1>
             <p className="mt-1.5 text-base text-muted">{item.posisi}</p>
             <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Ringkasan tempat magang">
               <li>
-                <Chip tone="coral">
+                <Chip tone="azure">
                   Peringkat <span className="font-mono">{item.rank}</span> dari <span className="font-mono">{jumlah}</span>
                 </Chip>
               </li>
               <li>
-                <Chip tone="sea" icon={Briefcase}>
+                <Chip tone="navy" icon={Briefcase}>
                   {item.bidang}
                 </Chip>
               </li>
@@ -176,12 +176,12 @@ export default function DetailRekomendasi() {
                 </Chip>
               </li>
             </ul>
-            <WaveLine className="mt-4 text-sea-400" />
+            <Divider className="mt-4 text-navy-400" />
           </header>
 
           <div className="mt-5 space-y-4">
             <Card as="section" aria-labelledby="sec-cga" className="motion-rise" style={{ "--i": 0 }}>
-              <h2 id="sec-cga" className="font-display text-xl font-bold leading-tight">
+              <h2 id="sec-cga" className="font-display text-xl font-semibold leading-tight">
                 Kecocokan kompetensi
               </h2>
               <ScoreBar label="Compatibility Score" value={item.cga.compatibilityScore} countUp className="mt-3" />
@@ -189,7 +189,7 @@ export default function DetailRekomendasi() {
             </Card>
 
             <Card as="section" aria-labelledby="sec-elemen" className="motion-rise" style={{ "--i": 1 }}>
-              <h2 id="sec-elemen" className="font-display text-xl font-bold leading-tight">
+              <h2 id="sec-elemen" className="font-display text-xl font-semibold leading-tight">
                 Rincian per kompetensi
               </h2>
               <p className="mt-1 max-w-prose text-sm text-muted">
@@ -201,11 +201,11 @@ export default function DetailRekomendasi() {
             </Card>
 
             <Card as="section" aria-labelledby="sec-akhir" className="motion-rise" style={{ "--i": 2 }}>
-              <h2 id="sec-akhir" className="font-display text-xl font-bold leading-tight">
+              <h2 id="sec-akhir" className="font-display text-xl font-semibold leading-tight">
                 Nilai akhir perbandingan
               </h2>
               <div className="mt-3 flex items-end gap-3">
-                <p className="font-display text-5xl font-extrabold leading-none text-sea-800">
+                <p className="font-display text-5xl font-semibold leading-none text-navy-800">
                   <CountUp value={item.ci} digits={3} />
                 </p>
                 <p className="pb-1 text-sm text-muted">Ci, skala 0 sampai 1</p>
@@ -214,7 +214,7 @@ export default function DetailRekomendasi() {
                 Ini nilai relatif terhadap lowongan lain dalam daftar. Kalau daftarnya berubah, angkanya ikut berubah,
                 jadi bukan persentase kecocokan.
               </p>
-              <dl className="mt-3 divide-y divide-line rounded-ctl bg-sand-100 px-3 text-sm">
+              <dl className="mt-3 divide-y divide-line rounded-ctl bg-mist-100 px-3 text-sm">
                 <div className="flex items-baseline justify-between gap-3 py-2">
                   <dt className="text-muted">Jarak ke solusi ideal (D⁺)</dt>
                   <dd className="font-mono font-semibold">{formatNumber(item.dPlus, 4)}</dd>
@@ -246,7 +246,7 @@ export default function DetailRekomendasi() {
             </Card>
 
             <Card tone="quiet" className="motion-rise flex gap-3" style={{ "--i": 3 }}>
-              <Info aria-hidden="true" size={20} className="mt-0.5 shrink-0 text-sea-700" />
+              <Info aria-hidden="true" size={20} className="mt-0.5 shrink-0 text-navy-700" />
               <p className="max-w-prose text-sm leading-relaxed text-ink">
                 Rekomendasi ini membantumu menimbang, bukan menggantikan keputusanmu. “Simpan sebagai pilihan” hanya
                 mencatat pilihanmu di sini. Persetujuan dari koordinator tetap kamu urus di luar sistem ini.

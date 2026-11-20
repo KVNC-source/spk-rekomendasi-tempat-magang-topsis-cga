@@ -15,7 +15,7 @@ const shortLokasi = (lokasi) => lokasi.split("(")[0].trim();
 export default function RankingCard({ item, kotaAsal, motion }) {
   const top = item.rank === 1;
   const { values, flags } = item;
-  const tone = top ? "ondark" : "sea";
+  const tone = top ? "ondark" : "navy";
   const gaps = item.kesenjangan;
   const shownGaps = gaps.slice(0, MAX_GAPS_SHOWN);
 
@@ -26,7 +26,7 @@ export default function RankingCard({ item, kotaAsal, motion }) {
     <article
       aria-labelledby={`rek-${item.id}`}
       className={`${motion.className} rounded-card p-4 md:p-5 ${
-        top ? "on-dark bg-sea-900 text-sand-100" : "border border-line bg-surface"
+        top ? "on-dark bg-navy-900 text-mist-100" : "border border-line bg-surface"
       }`}
       style={motion.style}
     >
@@ -34,21 +34,21 @@ export default function RankingCard({ item, kotaAsal, motion }) {
         <div className="w-14 shrink-0">
           <p
             aria-label={`Peringkat ${item.rank}`}
-            className={`font-mono font-semibold leading-none ${top ? "text-5xl text-coral-400" : "text-4xl text-sea-700"}`}
+            className={`font-mono font-semibold leading-none ${top ? "text-5xl text-azure-400" : "text-4xl text-navy-700"}`}
           >
             {item.rank}
           </p>
         </div>
         <div className="min-w-0 flex-1">
           {top && (
-            <Chip tone="coral" icon={Medal} className="mb-2">
+            <Chip tone="azure" icon={Medal} className="mb-2">
               Peringkat teratas
             </Chip>
           )}
-          <h2 id={`rek-${item.id}`} className="font-display text-xl font-bold leading-snug">
+          <h2 id={`rek-${item.id}`} className="font-display text-xl font-semibold leading-snug">
             {item.namaPerusahaan}
           </h2>
-          <p className={`mt-0.5 text-sm ${top ? "text-sea-100" : "text-muted"}`}>{item.posisi}</p>
+          <p className={`mt-0.5 text-sm ${top ? "text-navy-100" : "text-muted"}`}>{item.posisi}</p>
         </div>
       </div>
 
@@ -88,13 +88,13 @@ export default function RankingCard({ item, kotaAsal, motion }) {
 
       <div className="mt-3">
         {gaps.length === 0 ? (
-          <p className={`flex items-center gap-1.5 text-sm font-medium ${top ? "text-sea-100" : "text-sea-800"}`}>
+          <p className={`flex items-center gap-1.5 text-sm font-medium ${top ? "text-navy-100" : "text-navy-800"}`}>
             <Check aria-hidden="true" size={16} strokeWidth={3} />
             Semua syarat kompetensinya sudah terpenuhi
           </p>
         ) : (
           <>
-            <p className={`mb-1.5 text-sm ${top ? "text-sea-200" : "text-muted"}`}>Perlu ditingkatkan</p>
+            <p className={`mb-1.5 text-sm ${top ? "text-navy-200" : "text-muted"}`}>Perlu ditingkatkan</p>
             <ul className="flex flex-wrap gap-1.5">
               {shownGaps.map((gap) => (
                 <li key={gap.id}>

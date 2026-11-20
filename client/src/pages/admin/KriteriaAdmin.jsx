@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Check, CircleAlert, Info, RefreshCw, Save } from "lucide-react";
 import { getKriteria, simpanBobot } from "../../api/admin";
-import { ActionBar, Button, Card, Chip, EmptyState, Skeleton, TextField, WaveLine } from "../../components/ui";
+import { ActionBar, Button, Card, Chip, EmptyState, Skeleton, TextField, Divider } from "../../components/ui";
 import { useLoad } from "../../features/admin/useLoad";
 import { formatNumber, formatTrim } from "../../lib/format";
 
@@ -56,15 +56,15 @@ export default function KriteriaAdmin() {
   return (
     <div className="mx-auto w-full max-w-3xl px-4 pb-48 pt-6 md:px-8 lg:max-w-4xl lg:pb-10 lg:pt-8">
       <header>
-        <h1 className="font-display text-3xl font-extrabold leading-[1.05] text-ink md:text-4xl">Kriteria TOPSIS</h1>
+        <h1 className="font-display text-3xl font-semibold leading-[1.05] text-ink md:text-4xl">Kriteria TOPSIS</h1>
         <p className="mt-2 max-w-prose text-base text-muted">
           Bobot C1 sampai C7 untuk membandingkan tempat magang. Totalnya harus tepat 1,00.
         </p>
-        <WaveLine className="mt-4 text-sea-400" />
+        <Divider className="mt-4 text-navy-400" />
       </header>
 
       <Card tone="quiet" className="mt-5 flex gap-3" role="note">
-        <Info aria-hidden="true" size={20} className="mt-0.5 shrink-0 text-sea-700" />
+        <Info aria-hidden="true" size={20} className="mt-0.5 shrink-0 text-navy-700" />
         <div className="max-w-prose text-sm leading-relaxed text-ink">
           <p>
             <Chip tone="coral">Sementara, menunggu validasi pakar</Chip>
@@ -109,8 +109,8 @@ export default function KriteriaAdmin() {
                     <li key={k.kode_kriteria} className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_9rem] sm:items-start md:p-5">
                       <div className="min-w-0">
                         <p className="flex flex-wrap items-center gap-2">
-                          <span className="font-mono text-sm font-semibold text-sea-800">{k.kode_kriteria}</span>
-                          <Chip tone={k.tipe === "cost" ? "coral" : "sea"}>{k.tipe === "cost" ? "Cost (makin kecil makin baik)" : "Benefit"}</Chip>
+                          <span className="font-mono text-sm font-semibold text-navy-800">{k.kode_kriteria}</span>
+                          <Chip tone={k.tipe === "cost" ? "coral" : "navy"}>{k.tipe === "cost" ? "Cost (makin kecil makin baik)" : "Benefit"}</Chip>
                         </p>
                         <p className="mt-1 font-semibold text-ink">{k.nama_kriteria}</p>
                         {SAMA_UNTUK_SEMUA.has(k.kode_kriteria) && (
@@ -145,7 +145,7 @@ export default function KriteriaAdmin() {
               <p aria-live="polite" className="flex items-center gap-2 font-mono text-2xl font-semibold text-ink">
                 {totalTeks}
                 {totalTepat ? (
-                  <Chip tone="sea" icon={Check}>
+                  <Chip tone="navy" icon={Check}>
                     Tepat 1,00
                   </Chip>
                 ) : (

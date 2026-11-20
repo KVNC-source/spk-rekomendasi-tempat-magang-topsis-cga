@@ -64,12 +64,12 @@ export default function Landing() {
       className="flex min-h-dvh flex-col bg-ink font-sans lg:h-dvh lg:overflow-hidden"
       style={{
         backgroundImage:
-          "radial-gradient(at 8% 8%, rgba(79,61,245,0.35) 0, transparent 40%), radial-gradient(at 90% 92%, rgba(124,92,255,0.2) 0, transparent 42%)",
+          "radial-gradient(at 8% 8%, rgba(47,111,224,0.30) 0, transparent 40%), radial-gradient(at 90% 92%, rgba(95,151,245,0.16) 0, transparent 42%)",
       }}
     >
       <header className="mx-auto flex w-full max-w-6xl xl:max-w-7xl shrink-0 items-center justify-between gap-4 px-6 py-[clamp(1rem,2.8vh,1.875rem)] md:px-10 lg:px-8">
         <div className="flex flex-col gap-1">
-          <span className="font-display text-[clamp(1rem,2.3vh,1.25rem)] font-extrabold tracking-tight text-white">
+          <span className="font-display text-[clamp(1rem,2.3vh,1.25rem)] font-semibold tracking-tight text-white">
             SPK Magang
           </span>
           <span className="text-[clamp(0.6875rem,1.5vh,0.8125rem)] text-white/50">
@@ -94,7 +94,7 @@ export default function Landing() {
 
       <main className="mx-auto flex w-full max-w-6xl xl:max-w-7xl flex-1 flex-col justify-center gap-14 px-6 py-12 md:px-10 lg:min-h-0 lg:flex-row lg:items-center lg:gap-20 lg:px-8 lg:py-[clamp(0.5rem,3vh,4rem)]">
         <section className="flex max-w-xl flex-1 flex-col lg:max-w-none gap-[clamp(1rem,3.2vh,2.5rem)]">
-          <h1 className="font-display text-[2rem] font-extrabold leading-[1.06] tracking-[-0.03em] text-white sm:text-[2.5rem] lg:text-[clamp(2.125rem,7vh,4.5rem)]">
+          <h1 className="font-display text-[2rem] font-semibold leading-[1.06] tracking-[-0.03em] text-white sm:text-[2.5rem] lg:text-[clamp(2.125rem,7vh,4.5rem)]">
             Pemilihan tempat magang dengan dasar yang terukur.
           </h1>
 

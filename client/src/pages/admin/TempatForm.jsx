@@ -12,7 +12,7 @@ import {
   Skeleton,
   TextAreaField,
   TextField,
-  WaveLine,
+  Divider,
 } from "../../components/ui";
 import { useLoad } from "../../features/admin/useLoad";
 import { LEVELS } from "../../lib/levels";
@@ -122,7 +122,7 @@ function Isi({ referensi, tempat }) {
       )}
 
       <Card as="section" aria-labelledby="sec-data" className="space-y-4">
-        <h2 id="sec-data" className="font-display text-xl font-bold leading-tight">Data lowongan</h2>
+        <h2 id="sec-data" className="font-display text-xl font-semibold leading-tight">Data lowongan</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {baru ? (
             <TextField id="kode_tempat" label="Kode tempat" mono hint="Dibuat otomatis. Tidak bisa diubah setelah disimpan." value={form.kode_tempat} error={errors.kode_tempat} onChange={isi("kode_tempat")} autoComplete="off" />
@@ -144,7 +144,7 @@ function Isi({ referensi, tempat }) {
 
       <Card as="section" aria-labelledby="sec-lokasi" className="space-y-4">
         <div>
-          <h2 id="sec-lokasi" className="font-display text-xl font-bold leading-tight">Lokasi dan cara kerja</h2>
+          <h2 id="sec-lokasi" className="font-display text-xl font-semibold leading-tight">Lokasi dan cara kerja</h2>
           <p className="mt-1 max-w-prose text-sm text-muted">
             Koordinat dipakai untuk menghitung jarak dan harus berada di wilayah Indonesia (lintang {koma(latMin)} sampai {koma(latMax)}, bujur {koma(lonMin)} sampai {koma(lonMax)}).
           </p>
@@ -165,7 +165,7 @@ function Isi({ referensi, tempat }) {
       </Card>
 
       <Card as="section" aria-labelledby="sec-benefit" className="space-y-4">
-        <h2 id="sec-benefit" className="font-display text-xl font-bold leading-tight">Benefit dan reputasi</h2>
+        <h2 id="sec-benefit" className="font-display text-xl font-semibold leading-tight">Benefit dan reputasi</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField id="benefit_finansial" label="Benefit finansial (boleh kosong)" mono inputMode="decimal" hint="Juta rupiah per bulan. Kosong dihitung dengan nilai tengah dan ditandai “perkiraan”." value={form.benefit_finansial} error={errors.benefit_finansial} onChange={isi("benefit_finansial")} autoComplete="off" />
           <TextField id="reputasi" label="Reputasi 1 sampai 5 (boleh kosong)" mono inputMode="numeric" hint="Kosong dianggap perkiraan." value={form.reputasi} error={errors.reputasi} onChange={isi("reputasi")} autoComplete="off" />
@@ -173,7 +173,7 @@ function Isi({ referensi, tempat }) {
       </Card>
 
       <Card as="section" aria-labelledby="sec-status" className="space-y-4">
-        <h2 id="sec-status" className="font-display text-xl font-bold leading-tight">Status</h2>
+        <h2 id="sec-status" className="font-display text-xl font-semibold leading-tight">Status</h2>
         <SelectField id="status_alternatif" label="Status di perhitungan" value={form.status_alternatif} error={errors.status_alternatif} onChange={isi("status_alternatif")}>
           <option value="Dipakai">Dipakai (ikut dihitung)</option>
           <option value="Dikeluarkan">Dikeluarkan (tidak ikut dihitung)</option>
@@ -190,10 +190,10 @@ function Isi({ referensi, tempat }) {
       <Card as="section" aria-labelledby="sec-kebutuhan" className="space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
-            <h2 id="sec-kebutuhan" className="font-display text-xl font-bold leading-tight">Kebutuhan kompetensi</h2>
+            <h2 id="sec-kebutuhan" className="font-display text-xl font-semibold leading-tight">Kebutuhan kompetensi</h2>
             <p className="mt-1 max-w-prose text-sm text-muted">Level minimum 1 sampai 4. Wajib dihitung 60%, opsional 40% (kalau ada).</p>
           </div>
-          <Chip tone={dikeluarkan || jumlahWajib > 0 ? "sea" : "coral"}>
+          <Chip tone={dikeluarkan || jumlahWajib > 0 ? "navy" : "coral"}>
             <span className="font-mono">{jumlahWajib}</span> wajib · <span className="font-mono">{jumlahOpsional}</span> opsional
           </Chip>
         </div>
@@ -209,7 +209,7 @@ function Isi({ referensi, tempat }) {
           {kebutuhan.map((r, i) => {
             const dipakai = sudahDipilih(r.uid);
             return (
-              <li key={r.uid} className="grid gap-3 rounded-tile border border-line bg-sand-50 p-3 sm:grid-cols-[minmax(0,1fr)_11.5rem_9rem_auto] sm:items-start">
+              <li key={r.uid} className="grid gap-3 rounded-tile border border-line bg-mist-50 p-3 sm:grid-cols-[minmax(0,1fr)_11.5rem_9rem_auto] sm:items-start">
                 <SelectField id={`kebutuhan-${i}-kompetensi`} label="Kompetensi" value={r.kompetensi} error={errors[`kebutuhan[${i}].kompetensi`]} onChange={ubahBaris(r.uid, "kompetensi")}>
                   <option value="">Pilih kompetensi</option>
                   {referensi.kompetensi.map((k) => (
@@ -266,10 +266,10 @@ export default function TempatForm() {
         Kembali ke daftar
       </Button>
       <header className="mt-2">
-        <h1 className="font-display text-3xl font-extrabold leading-[1.05] text-ink md:text-4xl">
+        <h1 className="font-display text-3xl font-semibold leading-[1.05] text-ink md:text-4xl">
           {kode ? "Ubah tempat magang" : "Tambah tempat magang"}
         </h1>
-        <WaveLine className="mt-4 text-sea-400" />
+        <Divider className="mt-4 text-navy-400" />
       </header>
 
       {status === "loading" && (

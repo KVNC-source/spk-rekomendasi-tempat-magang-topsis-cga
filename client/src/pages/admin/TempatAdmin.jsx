@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Check, MapPin, Plus, RefreshCw, SearchX } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { getTempatList, hapusTempat } from "../../api/admin";
-import { BottomSheet, Button, Card, Chip, EmptyState, SelectField, Skeleton, TextField, WaveLine } from "../../components/ui";
+import { BottomSheet, Button, Card, Chip, EmptyState, SelectField, Skeleton, TextField, Divider } from "../../components/ui";
 import { useLoad } from "../../features/admin/useLoad";
 
 const cocok = (t, kata) =>
@@ -46,7 +46,7 @@ export default function TempatAdmin() {
     <div className="mx-auto w-full max-w-5xl px-4 pb-16 pt-6 md:px-8 lg:pt-8">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl font-extrabold leading-[1.05] text-ink md:text-4xl">Tempat magang</h1>
+          <h1 className="font-display text-3xl font-semibold leading-[1.05] text-ink md:text-4xl">Tempat magang</h1>
           <p className="mt-2 max-w-prose text-base text-muted">
             Lowongan yang dibandingkan untuk mahasiswa, lengkap dengan kompetensi yang dibutuhkannya.
           </p>
@@ -55,10 +55,10 @@ export default function TempatAdmin() {
           Tambah tempat
         </Button>
       </header>
-      <WaveLine className="mt-4 text-sea-400" />
+      <Divider className="mt-4 text-navy-400" />
 
       {pesan && (
-        <p role="status" className="motion-pop mt-4 flex items-center gap-2 rounded-ctl bg-sea-100 px-4 py-3 text-sm font-semibold text-sea-900">
+        <p role="status" className="motion-pop mt-4 flex items-center gap-2 rounded-ctl bg-navy-100 px-4 py-3 text-sm font-semibold text-navy-900">
           <Check aria-hidden="true" size={16} strokeWidth={3} />
           {pesan}
         </p>
@@ -152,10 +152,10 @@ export default function TempatAdmin() {
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="flex flex-wrap items-center gap-2">
-                          <span className="font-mono text-sm font-semibold text-sea-800">{t.kode_tempat}</span>
-                          <Chip tone={t.status_alternatif === "Dipakai" ? "sea" : "neutral"}>{t.status_alternatif}</Chip>
+                          <span className="font-mono text-sm font-semibold text-navy-800">{t.kode_tempat}</span>
+                          <Chip tone={t.status_alternatif === "Dipakai" ? "navy" : "neutral"}>{t.status_alternatif}</Chip>
                         </p>
-                        <h2 id={`tempat-${t.kode_tempat}`} className="mt-1 font-display text-xl font-bold leading-snug">
+                        <h2 id={`tempat-${t.kode_tempat}`} className="mt-1 font-display text-xl font-semibold leading-snug">
                           {t.nama_perusahaan}
                         </h2>
                         <p className="text-sm text-muted">{t.posisi}</p>
@@ -178,7 +178,7 @@ export default function TempatAdmin() {
                     </div>
                     <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Ringkasan">
                       <li>
-                        <Chip tone="sea">{t.bidang_industri}</Chip>
+                        <Chip tone="navy">{t.bidang_industri}</Chip>
                       </li>
                       <li>
                         <Chip tone="outline" icon={MapPin}>
@@ -214,11 +214,11 @@ export default function TempatAdmin() {
               Hapus <strong>{hapus.kode_tempat} · {hapus.nama_perusahaan}</strong> ({hapus.posisi}) beserta kebutuhan kompetensinya? Ini tidak bisa dibatalkan.
             </p>
             {!hapus.bisa_dihapus && (
-              <p role="note" className="rounded-ctl bg-sand-200/60 p-3 text-sm text-ink">
+              <p role="note" className="rounded-ctl bg-mist-200/60 p-3 text-sm text-ink">
                 Tempat ini sudah ada di <span className="font-mono">{hapus.terpakai.hasil}</span> hasil perhitungan dan{" "}
                 <span className="font-mono">{hapus.terpakai.pilihan}</span> pilihan mahasiswa, jadi tidak bisa dihapus. Ubah statusnya menjadi
                 Dikeluarkan supaya tidak ikut dihitung.{" "}
-                <Link to={`/admin/tempat/${hapus.kode_tempat}`} className="font-semibold text-sea-800 underline underline-offset-4">
+                <Link to={`/admin/tempat/${hapus.kode_tempat}`} className="font-semibold text-navy-800 underline underline-offset-4">
                   Ubah status
                 </Link>
               </p>

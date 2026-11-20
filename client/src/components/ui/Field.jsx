@@ -2,7 +2,7 @@ import { ChevronDown, CircleAlert } from "lucide-react";
 
 // default · hover · focus · error · disabled
 const control =
-  "block min-h-12 w-full rounded-ctl border-2 bg-sand-50 px-4 text-base text-ink transition-colors duration-fast placeholder:text-muted hover:border-ink focus:border-sea-700 disabled:cursor-not-allowed disabled:bg-sand-200 disabled:text-muted disabled:hover:border-line-strong";
+  "block min-h-12 w-full rounded-ctl border-2 bg-mist-50 px-4 text-base text-ink transition-colors duration-fast placeholder:text-muted hover:border-ink focus:border-navy-700 disabled:cursor-not-allowed disabled:bg-mist-200 disabled:text-muted disabled:hover:border-line-strong";
 
 function Message({ id, error, hint }) {
   if (error) {
