@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ambilPengguna, keluar as apiKeluar, masuk as apiMasuk } from "../../api/auth";
+import { ambilPengguna, daftar as apiDaftar, keluar as apiKeluar, masuk as apiMasuk } from "../../api/auth";
 import { setUnauthorizedHandler } from "../../api/http";
 import { AuthContext } from "./useAuth";
 
@@ -37,6 +37,18 @@ export default function AuthProvider({ children }) {
     return user;
   }, []);
 
+  /** Self-registration: the server signs the new mahasiswa in at once (session cookie). */
+  const daftar = useCallback(async (payload) => {
+    const user = await apiDaftar(payload);
+    setState({ status: "ready", user, error: null });
+    return user;
+  }, []);
+
+  /** Patches the signed-in user in place (for example a changed name), without reloading the session. */
+  const perbaruiPengguna = useCallback((sebagian) => {
+    setState((s) => (s.user ? { ...s, user: { ...s.user, ...sebagian } } : s));
+  }, []);
+
   const keluar = useCallback(async () => {
     try {
       await apiKeluar();
@@ -51,6 +63,9 @@ export default function AuthProvider({ children }) {
     setReloadKey((key) => key + 1);
   }, []);
 
-  const value = useMemo(() => ({ ...state, masuk, keluar, reload }), [state, masuk, keluar, reload]);
+  const value = useMemo(
+    () => ({ ...state, masuk, daftar, keluar, reload, perbaruiPengguna }),
+    [state, masuk, daftar, keluar, reload, perbaruiPengguna],
+  );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

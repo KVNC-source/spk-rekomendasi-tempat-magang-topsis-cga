@@ -84,6 +84,12 @@ export default function Landing() {
             Panduan
           </Link>
           <Link
+            to="/daftar"
+            className="hidden text-sm font-medium text-white/60 transition-colors hover:text-white sm:block"
+          >
+            Daftar
+          </Link>
+          <Link
             to="/masuk"
             className="rounded-full bg-white px-6 py-[clamp(0.5rem,1.3vh,0.625rem)] text-sm font-bold text-ink transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           >
@@ -107,10 +113,16 @@ export default function Landing() {
 
           <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
             <Link
-              to="/masuk"
+              to="/daftar"
               className="rounded-full bg-white px-8 py-[clamp(0.75rem,2.1vh,1.125rem)] text-[clamp(0.875rem,1.85vh,1.0625rem)] font-bold text-ink transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
-              Masuk ke sistem
+              Daftar sebagai mahasiswa
+            </Link>
+            <Link
+              to="/masuk"
+              className="text-[clamp(0.875rem,1.85vh,1.0625rem)] font-semibold text-white underline decoration-white/40 underline-offset-4 transition-colors hover:decoration-white"
+            >
+              Sudah punya akun? Masuk
             </Link>
             <Link
               to="/panduan"
@@ -123,8 +135,8 @@ export default function Landing() {
           <div className="flex items-start gap-3 text-white/45">
             <IconInfo className="mt-0.5 h-4 w-4 shrink-0" />
             <span className="text-[clamp(0.75rem,1.7vh,0.9375rem)] leading-relaxed">
-              Akun dibuatkan oleh administrator. Belum punya akses? Hubungi
-              koordinator magang.
+              Mahasiswa mendaftar sendiri dengan NIM dan email. Pendaftaran hanya
+              untuk mahasiswa; akun administrator dibuat oleh peneliti.
             </span>
           </div>
         </section>

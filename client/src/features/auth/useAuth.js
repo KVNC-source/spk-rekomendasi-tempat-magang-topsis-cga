@@ -21,7 +21,10 @@ export const insideArea = (pathname, role) => {
 
 export const AuthContext = createContext(null);
 
-/** { status: "loading" | "ready" | "error", user, error, masuk(email, password), keluar(), reload() } */
+/**
+ * { status: "loading" | "ready" | "error", user, error, masuk(email, password), daftar(payload),
+ *   keluar(), reload(), perbaruiPengguna(sebagian) }
+ */
 export function useAuth() {
   const value = useContext(AuthContext);
   if (!value) throw new Error("useAuth must be used inside <AuthProvider>");

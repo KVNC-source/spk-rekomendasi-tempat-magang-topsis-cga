@@ -4,6 +4,7 @@ import AuthProvider from "./features/auth/AuthProvider";
 import RequireRole from "./features/auth/RequireRole";
 import AdminLayout from "./layouts/AdminLayout";
 import MahasiswaLayout from "./layouts/MahasiswaLayout";
+import Daftar from "./pages/Daftar";
 import Landing from "./pages/Landing";
 import Masuk from "./pages/Masuk";
 import RequireServer from "./features/admin/RequireServer";
@@ -26,9 +27,10 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* Public: anyone can open the landing page and the login page. */}
+          {/* Public: anyone can open the landing page, the login page and the sign-up page. */}
           <Route path="/" element={<Landing />} />
           <Route path="/masuk" element={<Masuk />} />
+          <Route path="/daftar" element={<Daftar />} />
 
           <Route element={<RequireRole role="mahasiswa" />}>
             <Route path="/mahasiswa" element={<MahasiswaLayout />}>

@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { ArrowLeft, CircleAlert } from "lucide-react";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { BrandMark, Button, Card, TextField, Divider } from "../components/ui";
 import { homeFor, insideArea, useAuth } from "../features/auth/useAuth";
 
@@ -130,7 +130,14 @@ export default function Masuk() {
           </form>
         </Card>
 
-        <Button to="/" variant="ghost" icon={ArrowLeft} className="-ml-3 mt-3">
+        <p className="mt-4 text-base text-ink">
+          Belum punya akun?{" "}
+          <Link to="/daftar" className="font-semibold text-navy-800 underline underline-offset-4">
+            Daftar
+          </Link>
+        </p>
+
+        <Button to="/" variant="ghost" icon={ArrowLeft} className="-ml-3 mt-2">
           Kembali ke halaman awal
         </Button>
       </div>

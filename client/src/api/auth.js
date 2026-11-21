@@ -12,6 +12,14 @@
  *           password, an unknown email and an inactive account
  *        -> 429 { error: "Terlalu banyak percobaan masuk. Coba lagi dalam 15 menit." }
  *           after 5 failed tries per IP + email (also for an unregistered email)
+ *   POST   /api/auth/daftar  (public; self-registration, mahasiswa only; REAL SERVER ONLY, the mock does not register)
+ *        body { nama, nim, angkatan, email, password, konfirmasi, setuju: true }
+ *        -> 201 { user } + Set-Cookie: the new mahasiswa is signed in at once
+ *        -> 422 { error, kesalahan: { field: message } } for any invalid field (nama, nim, angkatan,
+ *           email, password, konfirmasi, setuju)
+ *        -> 409 { error, kesalahan: { email?, nim? } } when the email or the NIM is already registered
+ *        -> 429 { error } after DAFTAR_MAKS_PER_JAM (5) successful sign-ups from one IP in an hour
+ *        The role is always "mahasiswa": a role in the body is ignored.
  *   GET    /api/auth/me    -> 200 { user } | 401 when there is no valid session
  *   POST   /api/auth/logout -> 204, the cookie is cleared and the session deleted
  *
@@ -28,6 +36,9 @@ export const masuk = (email, password) =>
   useMock
     ? loadMock().then((m) => m.login(email, password))
     : apiFetch("/api/auth/login", { method: "POST", body: { email, password } }).then((data) => data.user);
+
+/** Registers a new mahasiswa (real server only) and resolves to the signed-in user. */
+export const daftar = (payload) => apiFetch("/api/auth/daftar", { method: "POST", body: payload }).then((data) => data.user);
 
 export const keluar = () =>
   useMock ? loadMock().then((m) => m.logout()) : apiFetch("/api/auth/logout", { method: "POST" });
