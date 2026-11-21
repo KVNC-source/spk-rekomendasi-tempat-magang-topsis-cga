@@ -11,6 +11,7 @@
 import { recommend } from '../engine/src/matrix.js';
 import { REQUIRED_CRITERIA_CODES } from '../config/scoring.js';
 import { HttpError } from '../lib/httpError.js';
+import { ringkasKesenjangan } from '../lib/ringkasanKesenjangan.js';
 import { hitungSkorPengalaman } from '../lib/skorPengalaman.js';
 import { ambilKonfigEngine, sidikData, sidikProfil } from '../lib/sidikJari.js';
 import { bacaDataset } from './dataset.js';
@@ -147,7 +148,9 @@ export function createRekomendasiService({ repository, now = () => new Date(), g
       }
     );
 
-    return { ...hasilAkhir, basi: false, penyebabBasi: [] };
+    // ringkasanKesenjangan is computed from the ranking in every response, never stored (it is only a
+    // description of the result), so POST and GET /terakhir always have the same shape.
+    return { ...hasilAkhir, ringkasanKesenjangan: ringkasKesenjangan(hasilAkhir.ranking), basi: false, penyebabBasi: [] };
   }
 
   /**
@@ -175,7 +178,12 @@ export function createRekomendasiService({ repository, now = () => new Date(), g
     if (tersimpan.sidik_data !== sidikData({ tempatRows, kompetensiRows, kriteriaRows }, getKonfigEngine())) {
       penyebabBasi.push('data');
     }
-    return { ...tersimpan.hasil, basi: penyebabBasi.length > 0, penyebabBasi };
+    return {
+      ...tersimpan.hasil,
+      ringkasanKesenjangan: ringkasKesenjangan(tersimpan.hasil.ranking),
+      basi: penyebabBasi.length > 0,
+      penyebabBasi,
+    };
   }
 
   return { hitungRekomendasi, ambilTerakhir };

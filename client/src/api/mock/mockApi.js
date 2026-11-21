@@ -12,6 +12,8 @@ import { recommend } from "./engine/matrix.js";
 import { BIDANG, KOMPETENSI, KOTA } from "./masterData";
 // The C7 formula lives in ONE file, the server's; the mock runs the very same code.
 import { hitungSkorPengalaman } from "../../../../server/src/lib/skorPengalaman.js";
+// Same for the kompetensi-prioritas summary: the server's pure function, not a copy.
+import { ringkasKesenjangan } from "../../../../server/src/lib/ringkasanKesenjangan.js";
 
 // v3: the saved pilihan joined the store. Bump again when the stored shape changes.
 const KEY = "spk-magang:mock-v3";
@@ -175,7 +177,12 @@ export async function postRekomendasi() {
     profilDiperbaruiPada: profil.diperbarui_pada,
   };
   writeStore(store);
-  return { ...store.rekomendasi, basi: false, penyebabBasi: [] };
+  return {
+    ...store.rekomendasi,
+    ringkasanKesenjangan: ringkasKesenjangan(store.rekomendasi.ranking),
+    basi: false,
+    penyebabBasi: [],
+  };
 }
 
 export async function getRekomendasiTerakhir() {
@@ -184,7 +191,12 @@ export async function getRekomendasiTerakhir() {
   if (!rekomendasi) throw new ApiError(404, "Belum ada rekomendasi.");
   // The real server compares fingerprints; the mock only knows when the profile last changed.
   const profilBerubah = new Date(profil.diperbarui_pada).getTime() > new Date(rekomendasi.profilDiperbaruiPada).getTime();
-  return { ...rekomendasi, basi: profilBerubah, penyebabBasi: profilBerubah ? ["profil"] : [] };
+  return {
+    ...rekomendasi,
+    ringkasanKesenjangan: ringkasKesenjangan(rekomendasi.ranking),
+    basi: profilBerubah,
+    penyebabBasi: profilBerubah ? ["profil"] : [],
+  };
 }
 
 // --- Pilihan: the lowongan the mahasiswa saved as their choice (one at a time).

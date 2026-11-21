@@ -25,7 +25,13 @@
  *             excluded: [{ tempatId, alasan, namaPerusahaan?, posisi? }],
  *             imputasi, warnings: [string], steps,
  *             dihitungPada: ISO date, profilDiperbaruiPada: ISO date,
- *             basi: boolean, penyebabBasi: ["profil"|"data"] }   (POST: always false / [])
+ *             basi: boolean, penyebabBasi: ["profil"|"data"],   (POST: always false / [])
+ *             ringkasanKesenjangan: { jumlahDiperiksa,
+ *               kompetensiPrioritas: [{ id, nama, levelMahasiswa, levelDibutuhkan,
+ *                 jumlahKurang, jumlahWajib, kesenjanganTerbesar, keterangan }] } }
+ *   ringkasanKesenjangan is descriptive only: the kompetensi that fall short most often in the
+ *   top 5 lowongan (server/src/lib/ringkasanKesenjangan.js, also used by the mock). It is built
+ *   from `ranking` in every response and never changes C1, Ci or the order.
  *        -> 422 { error, belum_diisi: [], data_kurang: [field] }
  *           when a data field of the profile is empty (ipk, minat_bidang, domisili).
  *           An unanswered kompetensi does NOT block: it counts as level 0 (Belum punya),
