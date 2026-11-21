@@ -26,7 +26,7 @@ function Avatar({ nama, className = "" }) {
 function Sidebar() {
   const { user } = useAuth();
   return (
-    <aside className="on-dark sticky top-0 hidden h-dvh flex-col bg-navy-900 p-5 text-mist-100 lg:flex">
+    <aside className="on-dark sticky top-0 hidden h-dvh flex-col bg-navy-900 p-5 text-mist-100 lg:flex print:hidden">
       <div className="flex items-center gap-3 px-1 pb-8 pt-1">
         <BrandMark className="size-10" />
         <div className="leading-tight">
@@ -72,7 +72,7 @@ function Sidebar() {
 function TopBar() {
   const { user } = useAuth();
   return (
-    <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-canvas px-4 pb-2.5 pt-[calc(0.625rem+env(safe-area-inset-top))] lg:hidden">
+    <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-canvas px-4 pb-2.5 pt-[calc(0.625rem+env(safe-area-inset-top))] lg:hidden print:hidden">
       <div className="flex items-center gap-2.5">
         <BrandMark className="size-9" />
         <span className="font-display text-lg font-semibold text-navy-900">SPK Magang</span>
@@ -93,7 +93,7 @@ function TabBar() {
   return (
     <nav
       aria-label="Menu mahasiswa"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-mist-50 pb-[env(safe-area-inset-bottom)] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-mist-50 pb-[env(safe-area-inset-bottom)] lg:hidden print:hidden"
     >
       <ul className="flex">
         {NAV.map(({ to, label, icon: Icon, end }) => (
@@ -130,10 +130,10 @@ function TabBar() {
 /** Shell for every mahasiswa screen: sidebar on desktop, top bar + bottom tabs on mobile. */
 export default function MahasiswaLayout() {
   return (
-    <div className="min-h-dvh lg:grid lg:grid-cols-[17rem_minmax(0,1fr)]">
+    <div className="layout-shell min-h-dvh lg:grid lg:grid-cols-[17rem_minmax(0,1fr)]">
       <a
         href="#konten"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-ctl focus:bg-navy-900 focus:px-4 focus:py-3 focus:text-mist-100"
+        className="sr-only print:hidden focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-ctl focus:bg-navy-900 focus:px-4 focus:py-3 focus:text-mist-100"
       >
         Lewati ke konten
       </a>

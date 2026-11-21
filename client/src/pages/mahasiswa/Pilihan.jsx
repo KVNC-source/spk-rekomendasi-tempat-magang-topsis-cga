@@ -1,5 +1,7 @@
-import { BookmarkCheck, Check, ExternalLink, Info, RefreshCw, X } from "lucide-react";
+import { BookmarkCheck, Check, ExternalLink, Info, Printer, RefreshCw, X } from "lucide-react";
 import { Button, Card, Chip, EmptyState, RelativeTime, ScoreBar, Skeleton, Divider } from "../../components/ui";
+import { alasanCetakNonaktif } from "../../features/rekomendasi/alasanCetak";
+import RingkasanCetak from "../../features/rekomendasi/RingkasanCetak";
 import { usePilihan } from "../../features/rekomendasi/usePilihan";
 import { formatDate } from "../../lib/format";
 
@@ -21,14 +23,17 @@ function PilihanSkeleton() {
 }
 
 export default function Pilihan() {
-  const { load, pilihan, item, jumlah, aksi, batalkan, reload } = usePilihan();
+  const { load, pilihan, item, jumlah, hasil, profil, aksi, batalkan, reload } = usePilihan();
   const loaded = load.status === "ready";
   const saving = aksi.status === "saving";
   const url = safeUrl(pilihan?.sumberUrl);
   const gaps = item?.kesenjangan ?? [];
+  // The summary can only be printed while the result is fresh (its weights are then the ones used).
+  const alasanCetak = alasanCetakNonaktif({ pilihan, hasil, item, profil });
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 pb-32 pt-6 md:px-8 lg:max-w-4xl lg:pb-10 lg:pt-8">
+    <>
+    <div className="mx-auto w-full max-w-3xl px-4 pb-32 pt-6 md:px-8 lg:max-w-4xl lg:pb-10 lg:pt-8 print:hidden">
       <header>
         <h1 className="font-display text-3xl font-semibold leading-[1.05] text-ink md:text-4xl">Pilihanmu</h1>
         <div className="mt-2 text-base text-muted">
@@ -167,7 +172,21 @@ export default function Pilihan() {
                 >
                   Batalkan pilihan
                 </Button>
+                <Button
+                  variant="outline"
+                  icon={Printer}
+                  disabled={alasanCetak !== null}
+                  aria-describedby={alasanCetak ? "alasan-cetak" : undefined}
+                  onClick={() => window.print()}
+                >
+                  Cetak / Simpan PDF
+                </Button>
               </div>
+              {alasanCetak && (
+                <p id="alasan-cetak" className="mt-2 text-sm text-muted">
+                  {alasanCetak}
+                </p>
+              )}
               {aksi.status === "error" && (
                 <p role="alert" className="mt-3 text-sm font-medium text-coral-700">
                   {aksi.error}
@@ -186,5 +205,17 @@ export default function Pilihan() {
         )}
       </div>
     </div>
+
+    {/* Print-only: nothing here shows on screen. Without a fresh result it prints just the reason. */}
+    {loaded && pilihan && (
+      <div className="hidden print:block">
+        {alasanCetak ? (
+          <p className="text-[11pt] text-black">{alasanCetak}</p>
+        ) : (
+          <RingkasanCetak mahasiswa={profil.mahasiswa} pilihan={pilihan} item={item} jumlah={jumlah} hasil={hasil} />
+        )}
+      </div>
+    )}
+    </>
   );
 }

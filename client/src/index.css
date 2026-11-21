@@ -299,6 +299,48 @@
   }
 }
 
+/*
+ * Printing (the summary on the Pilihan page, window.print()): A4, white paper, black text. The
+ * page itself marks what prints (`print:hidden` / `hidden print:block`); this only sets the paper.
+ */
+@page {
+  size: A4;
+  margin: 12mm;
+}
+
+@media print {
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* The two-column shell (sidebar + content) would leave a blank 17rem column on paper. */
+  .layout-shell {
+    display: block !important;
+    min-height: 0 !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  table {
+    page-break-inside: auto;
+  }
+
+  tr {
+    break-inside: avoid;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+}
+
 /* Reduced motion: swap movement for simple opacity changes. */
 @media (prefers-reduced-motion: reduce) {
   .motion-rise,
