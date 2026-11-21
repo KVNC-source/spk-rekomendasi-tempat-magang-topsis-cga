@@ -12,6 +12,7 @@ import {
   Divider,
 } from "../../components/ui";
 import FilterSheet from "../../features/rekomendasi/FilterSheet";
+import KompetensiPrioritas from "../../features/rekomendasi/KompetensiPrioritas";
 import RankingCard from "../../features/rekomendasi/RankingCard";
 import RankingSkeleton from "../../features/rekomendasi/RankingSkeleton";
 import TidakIkutDihitung from "../../features/rekomendasi/TidakIkutDihitung";
@@ -216,6 +217,9 @@ export default function Rekomendasi() {
                 </p>
               </Card>
             )}
+
+            {/* From the whole result (top 5), so the filter below does not change it. */}
+            <KompetensiPrioritas ringkasan={hasil.ringkasanKesenjangan} stale={rek.stale} />
 
             <div className="flex items-center justify-between gap-3">
               <p className="text-sm text-muted">
