@@ -11,6 +11,30 @@ export function createAuthRepository(prisma) {
       return prisma.user.findUnique({ where: { email }, include: sertakanPengguna });
     },
 
+    findMahasiswaByNim(nim) {
+      return prisma.mahasiswa.findUnique({ where: { nim }, select: { mahasiswa_id: true } });
+    },
+
+    /**
+     * The users row and its mahasiswa row in ONE nested create, so both exist or neither does.
+     * Returns the user in the shape findUserByEmail does (role + mahasiswa).
+     */
+    async buatAkunMahasiswa({ namaRole, email, username, passwordHash, nama, nim, angkatan, persetujuanPada }) {
+      const role = await prisma.role.findFirst({ where: { nama_role: namaRole } });
+      if (!role) throw new Error(`Role "${namaRole}" tidak ada di tabel role. Jalankan seed.`);
+      return prisma.user.create({
+        data: {
+          role_id: role.role_id,
+          email,
+          username,
+          password: passwordHash,
+          status: 'aktif',
+          mahasiswa: { create: { nim, nama, angkatan, persetujuan_pada: persetujuanPada } },
+        },
+        include: sertakanPengguna,
+      });
+    },
+
     buatSesi({ userId, tokenHash, kedaluwarsaPada }) {
       return prisma.sesi.create({
         data: { user_id: userId, token_hash: tokenHash, kedaluwarsa_pada: kedaluwarsaPada },

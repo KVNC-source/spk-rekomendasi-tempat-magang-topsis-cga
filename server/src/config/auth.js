@@ -13,6 +13,13 @@ export function getAuthConfig(env = process.env) {
     throw new Error(`SESSION_HOURS harus berupa angka lebih dari 0, ditemukan "${env.SESSION_HOURS}"`);
   }
 
+  // Successful self-registrations allowed per IP per hour. Students sitting on one network share
+  // an IP, so raise it (DAFTAR_MAKS_PER_JAM in .env) before a group session.
+  const daftarMaksPerJam = env.DAFTAR_MAKS_PER_JAM === undefined || env.DAFTAR_MAKS_PER_JAM === '' ? 5 : Number(env.DAFTAR_MAKS_PER_JAM);
+  if (!Number.isInteger(daftarMaksPerJam) || daftarMaksPerJam <= 0) {
+    throw new Error(`DAFTAR_MAKS_PER_JAM harus berupa bilangan bulat lebih dari 0, ditemukan "${env.DAFTAR_MAKS_PER_JAM}"`);
+  }
+
   return {
     clientOrigin,
     sessionHours,
@@ -20,6 +27,7 @@ export function getAuthConfig(env = process.env) {
     secureCookie: env.NODE_ENV === 'production',
     maxAttempts: 5,
     lockMinutes: 15,
+    daftarMaksPerJam,
   };
 }
 

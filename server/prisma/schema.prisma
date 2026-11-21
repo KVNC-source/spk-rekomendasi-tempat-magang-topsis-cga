@@ -58,15 +58,19 @@ model Sesi {
 }
 
 model Mahasiswa {
-  mahasiswa_id Int      @id @default(autoincrement())
-  user_id      Int      @unique
-  nim          String   @db.VarChar(50)
-  nama         String   @db.VarChar(255)
-  angkatan     Int
+  mahasiswa_id     Int       @id @default(autoincrement())
+  user_id          Int       @unique
+  // [Tahap 7] unique: a NIM belongs to one account only (self-registration checks it).
+  nim              String    @unique @db.VarChar(50)
+  nama             String    @db.VarChar(255)
+  angkatan         Int
+  // [ADDED, Tahap 7] when the student ticked the research-consent box at self-registration;
+  // null for accounts that were not self-registered (the CONTOH sample).
+  persetujuan_pada DateTime?
   // [Tahap 5] nullable: a draft profile may leave the data fields empty. A profile is
   // "Lengkap" only when all of them and every kompetensi are filled (computed, not stored).
-  ipk          Decimal? @db.Decimal(3, 2) // [C3]
-  minat_bidang String?  @db.VarChar(100) // [C2, student side]
+  ipk              Decimal?  @db.Decimal(3, 2) // [C3]
+  minat_bidang     String?   @db.VarChar(100) // [C2, student side]
 
   // [ADDED, gap 2] domisili coordinates for C4 (Haversine). Nullable: a
   // mahasiswa without coordinates cannot be ranked (rekomendasi returns 422).

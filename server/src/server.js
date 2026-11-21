@@ -20,6 +20,8 @@ const authConfig = getAuthConfig();
 const authService = createAuthService({
   repository: createAuthRepository(prisma),
   limiter: createLoginLimiter({ maxAttempts: authConfig.maxAttempts, windowMs: authConfig.lockMinutes * 60 * 1000 }),
+  // One counted attempt per successful registration, per IP, per hour (DAFTAR_MAKS_PER_JAM).
+  pendaftaranLimiter: createLoginLimiter({ maxAttempts: authConfig.daftarMaksPerJam, windowMs: 60 * 60 * 1000 }),
   config: authConfig,
 });
 const rekomendasiService = createRekomendasiService({ repository: createRekomendasiRepository(prisma) });
