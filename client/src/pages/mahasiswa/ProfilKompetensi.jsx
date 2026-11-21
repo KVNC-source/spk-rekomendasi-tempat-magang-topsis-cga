@@ -14,6 +14,8 @@ import {
   TextField,
   Divider,
 } from "../../components/ui";
+import { useAuth } from "../../features/auth/useAuth";
+import { pilihanAngkatan } from "../../features/auth/validasiDaftar";
 import KompetensiGroup from "../../features/profil/KompetensiGroup";
 import LevelGuide from "../../features/profil/LevelGuide";
 import ProfilSkeleton from "../../features/profil/ProfilSkeleton";
@@ -85,6 +87,9 @@ export default function ProfilKompetensi() {
   const groups = groupByKategori(kompetensi);
   const ready = load.status === "ready" && total > 0;
   const firstName = profil.mahasiswa?.nama?.split(" ")[0];
+  const { perbaruiPengguna } = useAuth();
+  // The years to choose from; a saved angkatan outside them (an older account) stays selectable.
+  const opsiAngkatan = [...new Set([...pilihanAngkatan(), Number(form.angkatan) || null].filter(Boolean))].sort((a, b) => b - a);
   const fokusKategori = (() => {
     const target = kompetensi.find((k) => k.kompetensi_id === fokusId);
     return target ? kategoriOf(target) : null;
@@ -107,6 +112,8 @@ export default function ProfilKompetensi() {
     const result = await profil.submit();
     if (!result.ok && result.field) document.getElementById(result.field)?.focus();
     if (result.ok) {
+      // the name in the sidebar and top bar follows a changed name without reloading the session
+      perbaruiPengguna({ nama: profil.form.nama.trim().replace(/\s+/g, " ") });
       setConfirmed(true);
       clearTimeout(confirmTimer.current);
       confirmTimer.current = setTimeout(() => setConfirmed(false), CONFIRMED_MS);
@@ -238,6 +245,58 @@ export default function ProfilKompetensi() {
                   highlightId={highlightId}
                 />
               ))}
+
+              <Card
+                as="section"
+                tone="quiet"
+                aria-labelledby="grup-diri"
+                className="motion-rise"
+                style={{ "--i": groups.length }}
+              >
+                <h2 id="grup-diri" className="font-display text-xl font-semibold leading-tight">
+                  Data diri
+                </h2>
+                <p className="mt-1 max-w-prose text-sm text-muted">
+                  Nama dan angkatan boleh kamu perbaiki. NIM tidak bisa diubah.
+                </p>
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <TextField
+                    id="nama"
+                    label="Nama lengkap"
+                    autoComplete="name"
+                    className="sm:col-span-2"
+                    value={form.nama}
+                    error={errors.nama}
+                    onChange={(event) => profil.setField("nama")(event.target.value)}
+                    onBlur={profil.touch("nama")}
+                  />
+                  <TextField
+                    id="nim"
+                    label="NIM"
+                    mono
+                    readOnly
+                    aria-readonly="true"
+                    hint="NIM tidak bisa diubah."
+                    value={profil.mahasiswa?.nim ?? ""}
+                    onChange={() => {}}
+                    className="[&_input]:cursor-not-allowed [&_input]:bg-mist-200 [&_input]:text-muted"
+                  />
+                  <SelectField
+                    id="angkatan"
+                    label="Angkatan"
+                    value={form.angkatan}
+                    error={errors.angkatan}
+                    onChange={(event) => profil.setField("angkatan")(event.target.value)}
+                    onBlur={profil.touch("angkatan")}
+                  >
+                    {opsiAngkatan.map((tahun) => (
+                      <option key={tahun} value={String(tahun)}>
+                        {tahun}
+                      </option>
+                    ))}
+                  </SelectField>
+                </div>
+              </Card>
 
               <Card
                 as="section"

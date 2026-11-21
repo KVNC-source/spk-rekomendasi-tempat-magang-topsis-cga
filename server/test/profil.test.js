@@ -239,3 +239,46 @@ test('the administrator is not a mahasiswa: both profile methods answer 403 befo
     assert.equal(ADMIN.mahasiswa_id, null);
   });
 });
+
+// --- Tahap 7: nama and angkatan can be changed on the profile page, the NIM cannot
+
+const SEKARANG_UJI = new Date('2026-11-21T03:00:00.000Z');
+const layananUji = (repository) => createProfilService({ repository, now: () => SEKARANG_UJI });
+
+test('PUT profile: nama and angkatan can be changed, and the answer shows the new values', async () => {
+  const repository = fakeRepository();
+  const profil = await layananUji(repository).simpan(1, { ...isianLengkap(), nama: '  Nama   Baru  ', angkatan: 2024 });
+  assert.equal(profil.mahasiswa.nama, 'Nama Baru');
+  assert.equal(profil.mahasiswa.angkatan, 2024);
+  assert.equal(repository.state.simpan[0].kolom.nama, 'Nama Baru');
+  assert.equal(repository.state.simpan[0].kolom.angkatan, 2024);
+  assert.equal(profil.status, 'Lengkap'); // identity fields do not decide the status
+});
+
+test('PUT profile: the NIM can never be changed, even when it is sent', async () => {
+  const repository = fakeRepository();
+  const profil = await layananUji(repository).simpan(1, { ...isianLengkap(), nim: '99999999', nama: 'Nama Baru' });
+  assert.equal(profil.mahasiswa.nim, mahasiswa.nim);
+  assert.ok(!('nim' in repository.state.simpan[0].kolom), 'nim must never reach the repository');
+});
+
+test('PUT profile: when nama and angkatan are not sent they stay as they are', async () => {
+  const repository = fakeRepository();
+  const profil = await layananUji(repository).simpan(1, isianLengkap());
+  assert.equal(profil.mahasiswa.nama, mahasiswa.nama);
+  assert.equal(profil.mahasiswa.angkatan, mahasiswa.angkatan);
+  assert.ok(!('nama' in repository.state.simpan[0].kolom));
+  assert.ok(!('angkatan' in repository.state.simpan[0].kolom));
+});
+
+test('PUT profile: an empty or too long nama, and an angkatan in the future or older than 10 years, give 422', async () => {
+  const repository = fakeRepository();
+  const layanan = layananUji(repository);
+  for (const nama of ['', '   ', 'a'.repeat(256), null, 42]) {
+    await assert.rejects(() => layanan.simpan(1, { ...isianLengkap(), nama }), (e) => e.status === 422 && typeof e.details.kesalahan.nama === 'string', JSON.stringify(nama));
+  }
+  for (const angkatan of [2027, 2015, 20, 'abcd', null, 2023.5]) {
+    await assert.rejects(() => layanan.simpan(1, { ...isianLengkap(), angkatan }), (e) => e.status === 422 && typeof e.details.kesalahan.angkatan === 'string', JSON.stringify(angkatan));
+  }
+  assert.equal(repository.state.simpan.length, 0); // nothing was saved
+});

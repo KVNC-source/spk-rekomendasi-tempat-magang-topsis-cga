@@ -25,7 +25,10 @@
  *             diperbarui_pada: ISO date }
  *   PUT  /api/mahasiswa/me/profil
  *        body { ipk, minat_bidang, domisili, jumlah_proyek, jumlah_sertifikasi,
- *               kompetensi: [{ kompetensi_id, level_penguasaan }] }
+ *               kompetensi: [{ kompetensi_id, level_penguasaan }],
+ *               nama?, angkatan? }       nama and angkatan are optional: when they are not sent the
+ *                                        saved values stay. The NIM is never changed (a nim in the
+ *                                        body is ignored). Same rules as registration.
  *        -> 200, same shape as GET. Errors: { error: string } with 400 / 422.
  *        A draft is accepted: kompetensi may be partial and ipk / minat_bidang /
  *        domisili / jumlah_* may be null. Completeness is enforced when

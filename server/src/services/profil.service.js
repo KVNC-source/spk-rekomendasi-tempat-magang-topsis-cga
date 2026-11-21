@@ -49,7 +49,7 @@ export function bentukProfil(m, kompetensiRows) {
   };
 }
 
-export function createProfilService({ repository }) {
+export function createProfilService({ repository, now = () => new Date() }) {
   async function baca(mahasiswaId) {
     const [mahasiswa, kompetensiRows] = await Promise.all([repository.findMahasiswa(mahasiswaId), repository.findKompetensi()]);
     if (!mahasiswa) throw new HttpError(404, `Mahasiswa ${mahasiswaId} tidak ditemukan`);
@@ -60,12 +60,15 @@ export function createProfilService({ repository }) {
   async function simpan(mahasiswaId, body) {
     const kompetensiRows = await repository.findKompetensi();
     const skala = new Map(kompetensiRows.map((k) => [k.kode_kompetensi, k.skala_maksimum]));
-    const { data, kesalahan } = validasiProfil(body, skala);
+    const { data, kesalahan } = validasiProfil(body, skala, { sekarang: now() });
     if (Object.keys(kesalahan).length > 0) {
       throw new HttpError(422, 'Profil belum bisa disimpan. Periksa isian yang bertanda salah.', { kesalahan });
     }
     const kompetensiIdByKode = new Map(kompetensiRows.map((k) => [k.kode_kompetensi, k.kompetensi_id]));
     const tersimpan = await repository.simpanProfil(mahasiswaId, {
+      // nama and angkatan only when they were sent; the NIM is never part of this
+      ...(data.nama !== undefined && { nama: data.nama }),
+      ...(data.angkatan !== undefined && { angkatan: data.angkatan }),
       ipk: data.ipk,
       minat_bidang: data.minat_bidang,
       kota_domisili: data.domisili?.kota ?? null,

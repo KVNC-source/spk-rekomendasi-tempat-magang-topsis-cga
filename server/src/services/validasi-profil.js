@@ -5,12 +5,16 @@
  * list may be partial. A value that IS given must be valid. Completeness
  * ("Lengkap") is decided separately, when the profile is read.
  *
+ * `nama` and `angkatan` are optional: when they are not sent the saved values stay as
+ * they are. The NIM is never read, so it cannot be changed here.
+ *
  * Returns { data, kesalahan }; `kesalahan` maps a field name to a plain-Indonesian
  * message and is empty when the input is fine (the service turns it into
  * 422 { error, kesalahan }, the same shape as the administrator forms).
  */
 import { BIDANG } from '../engine/src/config.js';
 import { cariKota } from '../lib/kotaDomisili.js';
+import { periksaAngkatan, periksaNama } from './validasi-daftar.js';
 
 export const IPK_MIN = 0;
 export const IPK_MAX = 4;
@@ -33,13 +37,28 @@ const bulat = (value) => {
 /**
  * @param {object} input
  * @param {Map<string, number>} kompetensi  kode_kompetensi -> skala_maksimum, from the kompetensi table
+ * @param {{ sekarang?: Date }} [opsi]
  */
-export function validasiProfil(input, kompetensi) {
+export function validasiProfil(input, kompetensi, { sekarang = new Date() } = {}) {
   const kesalahan = {};
   const salah = (field, pesan) => {
     if (!kesalahan[field]) kesalahan[field] = pesan;
   };
   const body = input && typeof input === 'object' && !Array.isArray(input) ? input : {};
+
+  // identity fields the mahasiswa may change: only when they are sent
+  let nama;
+  if (body.nama !== undefined) {
+    const hasil = periksaNama(body.nama);
+    if (hasil.pesan) salah('nama', hasil.pesan);
+    else nama = hasil.nilai;
+  }
+  let angkatan;
+  if (body.angkatan !== undefined) {
+    const hasil = periksaAngkatan(body.angkatan, sekarang);
+    if (hasil.pesan) salah('angkatan', hasil.pesan);
+    else angkatan = hasil.nilai;
+  }
 
   // IPK: 0-4, at most two decimals
   let ipk = null;
@@ -112,7 +131,7 @@ export function validasiProfil(input, kompetensi) {
   }
 
   return {
-    data: { ipk, minat_bidang: minat, domisili, jumlah_proyek: jumlahProyek, jumlah_sertifikasi: jumlahSertifikasi, kompetensi: jawaban },
+    data: { ...(nama !== undefined && { nama }), ...(angkatan !== undefined && { angkatan }), ipk, minat_bidang: minat, domisili, jumlah_proyek: jumlahProyek, jumlah_sertifikasi: jumlahSertifikasi, kompetensi: jawaban },
     kesalahan,
   };
 }

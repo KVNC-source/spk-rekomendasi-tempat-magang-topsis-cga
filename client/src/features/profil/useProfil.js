@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { getBidangMinat, getKompetensi, getKotaDomisili, getProfil, saveProfil } from "../../api/profil";
 import { formatNumber, parseDecimal } from "../../lib/format";
+import { pesanAngkatan, pesanNama } from "../auth/validasiDaftar";
 
 export function validateIpk(text) {
   if (String(text).trim() === "") return "IPK wajib diisi.";
@@ -22,6 +23,8 @@ export function validateCount(text, noun) {
 const isAnswered = (level) => Number.isInteger(level);
 
 const sameForm = (a, b) =>
+  a.nama.trim() === b.nama.trim() &&
+  a.angkatan === b.angkatan &&
   a.ipk.trim() === b.ipk.trim() &&
   a.minat === b.minat &&
   a.kota === b.kota &&
@@ -29,7 +32,7 @@ const sameForm = (a, b) =>
   a.sertifikasi.trim() === b.sertifikasi.trim() &&
   Object.keys({ ...a.levels, ...b.levels }).every((id) => a.levels[id] === b.levels[id]);
 
-const EMPTY_FORM = { levels: {}, ipk: "", minat: "", kota: "", proyek: "", sertifikasi: "" };
+const EMPTY_FORM = { levels: {}, nama: "", angkatan: "", ipk: "", minat: "", kota: "", proyek: "", sertifikasi: "" };
 
 /** Loads the profil form data and owns its edit / validate / save state. */
 export function useProfil() {
@@ -55,6 +58,8 @@ export function useProfil() {
         if (cancelled) return;
         const snapshot = {
           levels: Object.fromEntries(profil.kompetensi.map((k) => [k.kompetensi_id, k.level_penguasaan])),
+          nama: profil.mahasiswa?.nama ?? "",
+          angkatan: profil.mahasiswa?.angkatan == null ? "" : String(profil.mahasiswa.angkatan),
           ipk: profil.ipk == null ? "" : formatNumber(profil.ipk, 2),
           minat: profil.minat_bidang ?? "",
           kota: profil.domisili?.kota ?? "",
@@ -95,6 +100,10 @@ export function useProfil() {
   // A draft may leave fields blank, so only a value that was typed and is wrong is an error.
   const filled = (text) => String(text).trim() !== "";
   const errors = {
+    // identity: the name may not be emptied, the angkatan is a list of valid years
+    nama: show("nama") ? pesanNama(form.nama) : null,
+    // an angkatan that was not touched is never an error: an older account keeps its saved year
+    angkatan: show("angkatan") && form.angkatan !== saved?.angkatan ? pesanAngkatan(form.angkatan) : null,
     ipk: show("ipk") && filled(form.ipk) ? validateIpk(form.ipk) : null,
     minat: null,
     kota: null,
@@ -129,6 +138,12 @@ export function useProfil() {
   /** Resolves to { ok } or { ok: false, field } so the page can focus the first invalid field. */
   const submit = async () => {
     setSubmitted(true);
+    // The name and angkatan are not part of "Lengkap". The name may not be blank; the angkatan is checked
+    // (and sent) only when it was changed, so an account whose saved year is now outside the choices can still save.
+    const namaBaru = form.nama.trim().replace(/\s+/g, " ");
+    const angkatanBerubah = form.angkatan !== saved?.angkatan;
+    if (pesanNama(form.nama)) return { ok: false, field: "nama" };
+    if (angkatanBerubah && pesanAngkatan(form.angkatan)) return { ok: false, field: "angkatan" };
     // Blank fields are fine (it is saved as a draft); a filled-in invalid value is not.
     if (filled(form.ipk) && validateIpk(form.ipk)) return { ok: false, field: "ipk" };
     if (filled(form.proyek) && validateCount(form.proyek, "proyek")) return { ok: false, field: "proyek" };
@@ -140,6 +155,8 @@ export function useProfil() {
     setSave((s) => ({ ...s, status: "saving", error: null }));
     try {
       const result = await saveProfil({
+        nama: namaBaru,
+        ...(angkatanBerubah && { angkatan: Number(form.angkatan) }),
         ipk: filled(form.ipk) ? Number(parseDecimal(form.ipk).toFixed(2)) : null,
         minat_bidang: form.minat || null,
         domisili: kota ? { kota: kota.kota, lat: kota.lat, lon: kota.lon } : null,
@@ -153,6 +170,7 @@ export function useProfil() {
           .map(([kompetensi_id, level_penguasaan]) => ({ kompetensi_id, level_penguasaan })),
       });
       setSaved(form);
+      setMahasiswa(result.mahasiswa ?? mahasiswa);
       setSavedStatus(result.status ?? "Draf");
       setSave({ status: "saved", error: null, savedAt: new Date() });
       return { ok: true };

@@ -126,7 +126,18 @@ export async function putProfil(payload) {
   await wait(700);
   if (mode() === "saveerror") throw new ApiError(500, "Profil belum bisa disimpan.");
   const store = readStore();
-  store.profil = { ...store.profil, ...payload, diperbarui_pada: now() };
+  // nama and angkatan belong to the mahasiswa block; the NIM is never changed
+  const { nama, angkatan, ...profilDiubah } = payload;
+  store.profil = {
+    ...store.profil,
+    ...profilDiubah,
+    mahasiswa: {
+      ...store.profil.mahasiswa,
+      ...(nama !== undefined && { nama }),
+      ...(angkatan !== undefined && { angkatan }),
+    },
+    diperbarui_pada: now(),
+  };
   writeStore(store);
   return withStatus(store.profil);
 }
