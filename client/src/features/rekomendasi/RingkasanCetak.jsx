@@ -10,9 +10,9 @@ const gapText = (gap) => (gap === null || gap === undefined ? "–" : gap > 0 ? 
 const bobotText = (bobot) => (typeof bobot === "number" ? `${formatNumber(bobot, 2)} (${formatNumber(bobot * 100, 0)}%)` : "–");
 const tipeText = (tipe) => (tipe === "cost" ? "Cost" : tipe === "benefit" ? "Benefit" : "–");
 
-const th = "border border-black/60 bg-neutral-100 px-2 py-1 text-left text-[9pt] font-semibold";
-const td = "border border-black/60 px-2 py-1 align-top";
-const h2 = "mb-1.5 mt-4 break-after-avoid border-b border-black/50 pb-0.5 text-[11pt] font-semibold";
+const th = "border border-black/60 bg-neutral-100 px-2 py-[3px] text-left text-[9pt] font-semibold";
+const td = "border border-black/60 px-2 py-[3px] align-top";
+const h2 = "mb-1.5 mt-3 break-after-avoid border-b border-black/50 pb-0.5 text-[11pt] font-semibold";
 
 function Baris({ label, children }) {
   return (
