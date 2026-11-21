@@ -10,6 +10,9 @@
  * is a form field name, or kebutuhan[i].kompetensi / .level_minimum / .wajib.
  * 409 means a duplicate code, or data that is still used and cannot be deleted.
  *
+ *   GET  /api/admin/ringkasan
+ *        -> { mahasiswa_terdaftar, mahasiswa_mandiri, mandiri_dengan_rekomendasi, mandiri_dengan_pilihan }
+ *        "mandiri" = registered through /daftar (has a research-consent time); the CONTOH sample is not.
  *   GET  /api/admin/referensi
  *        -> { bidang: [string], status_alternatif, mode_kerja_saran, batas_koordinat,
  *             kategori: [string], kompetensi: [{ kode_kompetensi, nama_kompetensi, kategori }],
@@ -48,6 +51,7 @@ import { useMock } from "./profil";
 export const adminButuhServer = useMock;
 
 export const getReferensi = () => apiFetch("/api/admin/referensi");
+export const getRingkasan = () => apiFetch("/api/admin/ringkasan");
 
 export const getKriteria = () => apiFetch("/api/admin/kriteria");
 export const simpanBobot = (bobot) => apiFetch("/api/admin/kriteria", { method: "PUT", body: { bobot } });

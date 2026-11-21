@@ -8,6 +8,7 @@ export function createAdminRouter({ adminController: c, auth }) {
   // Express 5 forwards rejected promises from async handlers to the error middleware.
 
   router.get('/referensi', c.referensi);
+  router.get('/ringkasan', c.ringkasan);
 
   router.get('/kriteria', c.kriteria);
   router.put('/kriteria', c.ubahKriteria);

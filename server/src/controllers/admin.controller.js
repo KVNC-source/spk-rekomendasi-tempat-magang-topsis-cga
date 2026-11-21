@@ -8,6 +8,11 @@ export function createAdminController({ adminService }) {
       res.json(await adminService.ubahBobot(req.body));
     },
 
+    // --- ringkasan (numbers for the home page)
+    async ringkasan(req, res) {
+      res.json(await adminService.ringkasan());
+    },
+
     // --- referensi (lists for the forms)
     async referensi(req, res) {
       res.json(await adminService.referensi());

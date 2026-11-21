@@ -86,6 +86,22 @@ export function createAdminRepository(prisma) {
     },
 
     // --- tempat_magang + kebutuhan_kompetensi
+    /**
+     * Counts of mahasiswa for the admin summary. "Mandiri" = registered through /daftar (the row has a
+     * persetujuan_pada); the CONTOH sample account is not. "Dengan hasil" / "dengan pilihan" count the
+     * mandiri ones that have a stored recommendation / a saved pilihan.
+     */
+    async hitungMahasiswa() {
+      const mandiri = { persetujuan_pada: { not: null } };
+      const [terdaftar, mandiriJumlah, denganHasil, denganPilihan] = await Promise.all([
+        prisma.mahasiswa.count(),
+        prisma.mahasiswa.count({ where: mandiri }),
+        prisma.mahasiswa.count({ where: { ...mandiri, hasil_rekomendasi: { isNot: null } } }),
+        prisma.mahasiswa.count({ where: { ...mandiri, pilihan: { isNot: null } } }),
+      ]);
+      return { terdaftar, mandiri: mandiriJumlah, mandiriDenganHasil: denganHasil, mandiriDenganPilihan: denganPilihan };
+    },
+
     findTempatList() {
       return prisma.tempatMagang.findMany({ include: sertakanTempat });
     },

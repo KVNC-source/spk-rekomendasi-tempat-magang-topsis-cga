@@ -198,6 +198,18 @@ export function createAdminService({ repository, now = () => new Date() }) {
     await repository.deleteTempat(row.tempat_id);
   }
 
+  // ------------------------------------------------------------------ ringkasan
+  /** Numbers for the admin home page: who has registered and how far the self-registered ones got. */
+  async function ringkasan() {
+    const h = await repository.hitungMahasiswa();
+    return {
+      mahasiswa_terdaftar: h.terdaftar,
+      mahasiswa_mandiri: h.mandiri,
+      mandiri_dengan_rekomendasi: h.mandiriDenganHasil,
+      mandiri_dengan_pilihan: h.mandiriDenganPilihan,
+    };
+  }
+
   // ------------------------------------------------------------------ referensi
   /** Lists the forms need: bidang, kategori, kompetensi, suggested codes. */
   async function referensi() {
@@ -228,5 +240,6 @@ export function createAdminService({ repository, now = () => new Date() }) {
     ubahTempat,
     hapusTempat,
     referensi,
+    ringkasan,
   };
 }

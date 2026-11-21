@@ -1,14 +1,17 @@
 import { useCallback } from "react";
-import { ClipboardList, Landmark, RefreshCw, Scale, TriangleAlert } from "lucide-react";
+import { BookmarkCheck, ClipboardList, Landmark, RefreshCw, Scale, Sparkles, TriangleAlert, Users } from "lucide-react";
 import { Link } from "react-router-dom";
-import { getKompetensiAdmin, getKriteria, getTempatList } from "../../api/admin";
+import { getKompetensiAdmin, getKriteria, getRingkasan, getTempatList } from "../../api/admin";
 import { Button, Card, EmptyState, Skeleton, StatCard, Divider } from "../../components/ui";
 import { useLoad } from "../../features/admin/useLoad";
 import { formatNumber } from "../../lib/format";
 
 export default function AdminHome() {
   const load = useCallback(
-    () => Promise.all([getTempatList(), getKompetensiAdmin(), getKriteria()]).then(([tempat, kompetensi, kriteria]) => ({ tempat, kompetensi, kriteria })),
+    () =>
+      Promise.all([getTempatList(), getKompetensiAdmin(), getKriteria(), getRingkasan()]).then(
+        ([tempat, kompetensi, kriteria, ringkasan]) => ({ tempat, kompetensi, kriteria, ringkasan }),
+      ),
     [],
   );
   const { status, data, error, reload } = useLoad(load);
@@ -80,6 +83,32 @@ export default function AdminHome() {
               icon={Scale}
             />
           </div>
+
+          <section aria-labelledby="sec-responden">
+            <h2 id="sec-responden" className="mb-2 font-display text-xl font-semibold text-ink">
+              Responden
+            </h2>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <StatCard
+                label="Mahasiswa terdaftar"
+                value={data.ringkasan.mahasiswa_terdaftar}
+                hint={`${data.ringkasan.mahasiswa_mandiri} mendaftar sendiri`}
+                icon={Users}
+              />
+              <StatCard
+                label="Sudah punya rekomendasi"
+                value={data.ringkasan.mandiri_dengan_rekomendasi}
+                hint="Dari yang mendaftar sendiri"
+                icon={Sparkles}
+              />
+              <StatCard
+                label="Sudah menyimpan pilihan"
+                value={data.ringkasan.mandiri_dengan_pilihan}
+                hint="Dari yang mendaftar sendiri"
+                icon={BookmarkCheck}
+              />
+            </div>
+          </section>
 
           <ul className="grid gap-4 md:grid-cols-3">
             {[
