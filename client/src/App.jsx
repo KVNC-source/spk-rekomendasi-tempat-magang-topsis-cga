@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import AuthProvider from "./features/auth/AuthProvider";
 import RequireRole from "./features/auth/RequireRole";
 import AdminLayout from "./layouts/AdminLayout";
@@ -13,7 +13,7 @@ import KompetensiAdmin from "./pages/admin/KompetensiAdmin";
 import KriteriaAdmin from "./pages/admin/KriteriaAdmin";
 import TempatAdmin from "./pages/admin/TempatAdmin";
 import TempatForm from "./pages/admin/TempatForm";
-import ComingSoon from "./pages/mahasiswa/ComingSoon";
+import Beranda from "./pages/mahasiswa/Beranda";
 import DetailRekomendasi from "./pages/mahasiswa/DetailRekomendasi";
 import Pilihan from "./pages/mahasiswa/Pilihan";
 import ProfilKompetensi from "./pages/mahasiswa/ProfilKompetensi";
@@ -34,7 +34,8 @@ export default function App() {
 
           <Route element={<RequireRole role="mahasiswa" />}>
             <Route path="/mahasiswa" element={<MahasiswaLayout />}>
-              <Route index element={<ComingSoon title="Beranda" />} />
+              <Route index element={<Navigate to="beranda" replace />} />
+              <Route path="beranda" element={<Beranda />} />
               <Route path="profil" element={<ProfilKompetensi />} />
               <Route path="rekomendasi" element={<Rekomendasi />} />
               <Route path="rekomendasi/:tempatId" element={<DetailRekomendasi />} />

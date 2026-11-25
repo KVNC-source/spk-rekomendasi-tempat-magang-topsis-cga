@@ -6,7 +6,7 @@ import { useAuth } from "../features/auth/useAuth";
 import { inisial } from "../lib/format";
 
 const NAV = [
-  { to: "/mahasiswa", label: "Beranda", icon: House, end: true },
+  { to: "/mahasiswa/beranda", label: "Beranda", icon: House },
   { to: "/mahasiswa/profil", label: "Profil", icon: ClipboardPenLine },
   { to: "/mahasiswa/rekomendasi", label: "Rekomendasi", icon: Compass },
   { to: "/mahasiswa/pilihan", label: "Pilihan", icon: BookmarkCheck },

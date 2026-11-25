@@ -2,9 +2,12 @@ import { createContext, useContext } from "react";
 
 /** Where each role lands after login, and the area it may use. */
 export const ROLE_HOME = {
-  mahasiswa: "/mahasiswa/profil",
+  mahasiswa: "/mahasiswa/beranda",
   administrator: "/admin",
 };
+
+/** A new account has nothing to summarise yet, so registering goes straight to the profile. */
+export const TUJUAN_SETELAH_DAFTAR = "/mahasiswa/profil";
 
 export const ROLE_AREA = {
   mahasiswa: "/mahasiswa",

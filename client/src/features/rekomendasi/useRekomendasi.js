@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ApiError } from "../../api/http";
 import { getKompetensi, getProfil } from "../../api/profil";
 import { getRekomendasiTerakhir, requestRekomendasi } from "../../api/rekomendasi";
+import { hasilBasi } from "../beranda/langkahBerikutnya";
 
 /**
  * Loads what the Rekomendasi screen needs (profil, kompetensi names, the last
@@ -56,11 +57,7 @@ export function useRekomendasi() {
   const profilLengkap = profil !== null && profil.status === "Lengkap";
   // The server says whether the result is stale (profile or reference data changed since it was
   // calculated); fall back to comparing the profile's timestamp if a result has no flag.
-  const stale =
-    hasil !== null &&
-    (typeof hasil.basi === "boolean"
-      ? hasil.basi
-      : profil !== null && new Date(profil.diperbarui_pada).getTime() > new Date(hasil.profilDiperbaruiPada).getTime());
+  const stale = hasilBasi(hasil, profil);
 
   const reload = () => {
     setLoad({ status: "loading", error: null });

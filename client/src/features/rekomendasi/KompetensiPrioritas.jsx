@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ChevronDown, Target } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button, Card } from "../../components/ui";
 import { levelLabel } from "../../lib/levels";
 
@@ -15,13 +16,14 @@ const levelText = (level) => (level === 0 ? "Belum punya" : `${level} · ${level
  * top recommendations. Purely descriptive (it comes from `hasil.ringkasanKesenjangan`, which the
  * API builds from the ranking) and not affected by the filter of the list below.
  * From 768px up all rows show at once; on a phone the rows after the third wait for "Tampilkan semua".
+ * `maks` lowers the number of rows (the Beranda shows 3) and `tautan` ({ ke, label }) adds a link under the list.
  */
-export default function KompetensiPrioritas({ ringkasan, stale = false }) {
+export default function KompetensiPrioritas({ ringkasan, stale = false, maks = MAKS_KOMPETENSI_PRIORITAS, tautan = null }) {
   const [semua, setSemua] = useState(false);
   if (!ringkasan) return null;
 
   const { jumlahDiperiksa, kompetensiPrioritas } = ringkasan;
-  const daftar = kompetensiPrioritas.slice(0, MAKS_KOMPETENSI_PRIORITAS);
+  const daftar = kompetensiPrioritas.slice(0, maks);
   const adaTersembunyi = daftar.length > BARIS_AWAL_MOBILE;
 
   return (
@@ -86,6 +88,12 @@ export default function KompetensiPrioritas({ ringkasan, stale = false }) {
         <Button variant="ghost" icon={ChevronDown} className="-mx-3 mt-2 md:hidden" onClick={() => setSemua(true)}>
           Tampilkan semua ({daftar.length})
         </Button>
+      )}
+
+      {tautan && (
+        <Link to={tautan.ke} className="mt-3 inline-flex min-h-11 items-center font-semibold text-navy-800 underline underline-offset-4">
+          {tautan.label}
+        </Link>
       )}
     </Card>
   );

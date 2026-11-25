@@ -4,7 +4,7 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useMock } from "../api/profil";
 import { ApiError } from "../api/http";
 import { BrandMark, Button, Card, Divider, EmptyState, SelectField, TextField } from "../components/ui";
-import { homeFor, useAuth } from "../features/auth/useAuth";
+import { homeFor, TUJUAN_SETELAH_DAFTAR, useAuth } from "../features/auth/useAuth";
 import { TEKS_PERSETUJUAN, URUTAN_FIELD, pilihanAngkatan, validasiFormDaftar } from "../features/auth/validasiDaftar";
 
 const FORM_KOSONG = { nama: "", nim: "", angkatan: "", email: "", password: "", konfirmasi: "", setuju: false };
@@ -24,8 +24,9 @@ export default function Daftar() {
   const [error, setError] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
 
-  // Already signed in: go to the right home, as /masuk does.
-  if (status === "ready" && user) return <Navigate to={homeFor(user.role)} replace />;
+  // Already signed in: go to the right home, as /masuk does. Not while this form is registering: the new
+  // account becomes the signed-in user a moment before navigate() below runs, and it must win (to the profile).
+  if (status === "ready" && user && !submitting) return <Navigate to={homeFor(user.role)} replace />;
 
   const set = (field) => (event) => {
     const nilai = event.target.type === "checkbox" ? event.target.checked : event.target.value;
@@ -55,7 +56,7 @@ export default function Daftar() {
         setuju: form.setuju,
       });
       // Signed in already (session cookie): straight to the profile.
-      navigate(homeFor(baru.role), { replace: true });
+      navigate(baru.role === "mahasiswa" ? TUJUAN_SETELAH_DAFTAR : homeFor(baru.role), { replace: true });
     } catch (err) {
       const dariServer = err instanceof ApiError ? err.details?.kesalahan : null;
       if (dariServer && Object.keys(dariServer).length > 0) {
