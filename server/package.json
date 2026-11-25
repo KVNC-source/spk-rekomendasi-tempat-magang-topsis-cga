@@ -4,10 +4,12 @@
   "type": "module",
   "main": "src/server.js",
   "engines": {
-    "node": ">=22.18.0"
+    "node": ">=22.18.0 <25"
   },
   "scripts": {
     "start": "node src/server.js",
+    "build": "prisma generate",
+    "migrate:deploy": "prisma migrate deploy",
     "dev": "nodemon src/server.js",
     "test": "node --test \"test/**/*.test.js\" \"src/engine/test/**/*.test.js\"",
     "seed": "node prisma/seed.js",
