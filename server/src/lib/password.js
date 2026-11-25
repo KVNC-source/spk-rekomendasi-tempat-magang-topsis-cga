@@ -5,8 +5,12 @@
  * The cost parameters travel with the hash, so they can be raised later and
  * old hashes keep verifying.
  *
- * Memory: scrypt needs about 128 * N * r bytes, i.e. 64 MiB for N=2^16, r=8.
- * Node's default limit is 32 MiB and would throw "memory limit exceeded", so
+ * Memory: scrypt needs about 128 * N * r bytes. New hashes use N=2^14, r=8, p=5: 16 MiB, one of
+ * the equal-strength settings OWASP lists for scrypt (N=2^17/p=1, 2^16/p=2, 2^15/p=3, 2^14/p=5,
+ * 2^13/p=10). A small instance (512 MiB) hashes up to 4 passwords at once (Node's thread pool),
+ * so 16 MiB each keeps the peak low. The first accounts were hashed with N=2^16, r=8, p=1 (64 MiB);
+ * those hashes still verify, because their parameters are read from the stored hash.
+ * Node's default limit is 32 MiB and would throw "memory limit exceeded" for the old ones, so
  * maxmem is set explicitly to 128 MiB.
  */
 import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
@@ -14,7 +18,7 @@ import { promisify } from 'node:util';
 
 const scryptAsync = promisify(scrypt);
 
-const COST = { N: 2 ** 16, r: 8, p: 1 };
+export const COST = Object.freeze({ N: 2 ** 14, r: 8, p: 5 });
 const KEY_BYTES = 64;
 const SALT_BYTES = 16;
 const MAX_MEMORY = 128 * 1024 * 1024;
