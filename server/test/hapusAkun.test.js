@@ -172,8 +172,11 @@ test('an unknown email, an empty email and an account without mahasiswa data are
 });
 
 test('the seed still creates exactly the accounts the script protects', () => {
-  const seed = readFileSync(new URL('../prisma/seed.js', import.meta.url), 'utf8');
-  for (const email of EMAIL_AKUN_CONTOH) assert.ok(seed.includes(`'${email}'`), `${email} must be in prisma/seed.js`);
+  // the sample mahasiswa is written in the seed; the default administrator email in the seed rules it uses
+  const seed =
+    readFileSync(new URL('../prisma/seed.js', import.meta.url), 'utf8') +
+    readFileSync(new URL('../src/lib/aturanSeed.js', import.meta.url), 'utf8');
+  for (const email of EMAIL_AKUN_CONTOH) assert.ok(seed.includes(`'${email}'`), `${email} must be in prisma/seed.js or src/lib/aturanSeed.js`);
   assert.ok(seed.includes(`nim: '${AWALAN_NIM_CONTOH}`), 'the seed NIM must start with the protected prefix');
 });
 

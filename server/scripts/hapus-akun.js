@@ -9,6 +9,7 @@
  * of the seed are refused. This cannot be undone.
  */
 import 'dotenv/config';
+import { teksTarget } from '../src/lib/dbTarget.js';
 import { prisma } from '../src/lib/prisma.js';
 import { createAuthRepository } from '../src/repositories/auth.repository.js';
 import { createHapusAkunRepository, URUTAN_TABEL } from '../src/repositories/hapusAkun.repository.js';
@@ -20,6 +21,7 @@ const tabel = (judul, baris) =>
 let kodeKeluar = 0;
 try {
   const { email, ya } = bacaArgumen(process.argv.slice(2));
+  process.stdout.write(`Database tujuan: ${teksTarget()}\n`);
   const repository = { ...createAuthRepository(prisma), ...createHapusAkunRepository(prisma) };
   const { akun, rencana, dihapus } = await hapusAkunMahasiswa({ email, ya, repository });
 

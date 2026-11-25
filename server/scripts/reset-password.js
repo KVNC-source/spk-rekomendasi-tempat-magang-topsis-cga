@@ -8,6 +8,7 @@
  * account is deleted. Administrator accounts are refused.
  */
 import 'dotenv/config';
+import { teksTarget } from '../src/lib/dbTarget.js';
 import { prisma } from '../src/lib/prisma.js';
 import { createAkunRepository } from '../src/repositories/akun.repository.js';
 import { createAuthRepository } from '../src/repositories/auth.repository.js';
@@ -15,6 +16,7 @@ import { ResetPasswordError, resetPasswordMahasiswa } from '../src/services/rese
 
 let kodeKeluar = 0;
 try {
+  process.stdout.write(`Database tujuan: ${teksTarget()}\n`);
   const repository = { ...createAuthRepository(prisma), ...createAkunRepository(prisma) };
   const hasil = await resetPasswordMahasiswa({ email: process.argv[2], repository });
   process.stdout.write(

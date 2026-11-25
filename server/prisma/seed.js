@@ -12,23 +12,28 @@
  *     table is empty.
  *  4. tempat_magang + kebutuhan_kompetensi: from the engine's dataset.json,
  *     ONLY when the tempat_magang table is empty.
- *  5. TWO login accounts, both CONTOH (log in with the EMAIL): the sample
- *     mahasiswa and one administrator. They are created when missing. The one
- *     thing re-applied on every run is the PASSWORD, read from server/.env
- *     (SEED_PASSWORD_MAHASISWA, SEED_PASSWORD_ADMIN), because there is no
- *     change-password feature yet. The seed stops if one is empty. Passwords
- *     are never written in code or printed; they are stored as scrypt hashes.
+ *  5. Login accounts (log in with the EMAIL): the administrator (SEED_ADMIN_EMAIL, or the CONTOH
+ *     one) and the sample mahasiswa. They are created when missing. The one thing re-applied on
+ *     every run is the PASSWORD, read from server/.env (SEED_PASSWORD_MAHASISWA,
+ *     SEED_PASSWORD_ADMIN), because there is no change-password feature yet. The seed stops if one
+ *     is empty. Passwords are never written in code or printed; they are stored as scrypt hashes.
  *  6. ONE sample mahasiswa profile (CONTOH-WEB-MANADO from profil_contoh.json),
  *     ONLY when that mahasiswa row does not exist yet. Not respondent data.
  *     For a row that already exists, only the columns added in Tahap 5 are filled
  *     when they are still empty (kota_domisili, jumlah_proyek, jumlah_sertifikasi),
  *     so the sample account is "Lengkap"; nothing else in the profile is touched.
  *
+ * In production (NODE_ENV=production) the rules in src/lib/aturanSeed.js apply: the administrator
+ * password needs 12 characters or more, and steps 5 (mahasiswa) and 6 are skipped unless
+ * SEED_AKUN_CONTOH=ya.
+ *
  * Run: npm run seed
  */
 import 'dotenv/config';
 import { readFileSync } from 'node:fs';
 import { criteriaC1C7 } from '../src/engine/src/topsis.js';
+import { teksTarget } from '../src/lib/dbTarget.js';
+import { rencanaSeed } from '../src/lib/aturanSeed.js';
 import { hashPassword } from '../src/lib/password.js';
 import { prisma } from '../src/lib/prisma.js';
 
@@ -41,19 +46,15 @@ const profilContoh = readJson('../src/engine/data/profil_contoh.json').profil.fi
 );
 if (!profilContoh) throw new Error('profil CONTOH-WEB-MANADO tidak ditemukan di profil_contoh.json');
 
-// --- 0. passwords for the sample accounts come from .env only
+// --- 0. which database, and what this run may do. Passwords come from the environment only.
+console.log(`Database tujuan: ${teksTarget()}`);
+const rencana = rencanaSeed();
+for (const peringatan of rencana.peringatan) console.warn(`Peringatan: ${peringatan}`);
+if (rencana.kesalahan.length > 0) {
+  throw new Error(`Seed berhenti: ${rencana.kesalahan.join(' ')}`);
+}
 const passwordMahasiswa = process.env.SEED_PASSWORD_MAHASISWA ?? '';
 const passwordAdmin = process.env.SEED_PASSWORD_ADMIN ?? '';
-const kosong = [
-  passwordMahasiswa === '' && 'SEED_PASSWORD_MAHASISWA',
-  passwordAdmin === '' && 'SEED_PASSWORD_ADMIN',
-].filter(Boolean);
-if (kosong.length > 0) {
-  throw new Error(`Seed berhenti: ${kosong.join(' dan ')} belum diisi di server/.env. Isi dulu, lalu jalankan lagi.`);
-}
-for (const [nama, nilai] of [['SEED_PASSWORD_MAHASISWA', passwordMahasiswa], ['SEED_PASSWORD_ADMIN', passwordAdmin]]) {
-  if (nilai.length < 8) console.warn(`Peringatan: ${nama} kurang dari 8 karakter. Cukup untuk pengembangan, jangan dipakai di tempat lain.`);
-}
 
 const ringkasan = [];
 
@@ -157,24 +158,34 @@ async function pastikanAkun({ email, username, role_id, password }) {
   return prisma.user.create({ data: { email, username, role_id, password: hash, status: 'aktif' } });
 }
 
-const user = await pastikanAkun({
-  email: 'contoh-web-manado@example.invalid',
-  username: 'contoh-web-manado',
-  role_id: roleByName.get('mahasiswa').role_id,
-  password: passwordMahasiswa,
-});
+// The sample mahasiswa only on a laptop, or in production when SEED_AKUN_CONTOH=ya (see src/lib/aturanSeed.js).
+const user = rencana.buatAkunContoh
+  ? await pastikanAkun({
+      email: 'contoh-web-manado@example.invalid',
+      username: 'contoh-web-manado',
+      role_id: roleByName.get('mahasiswa').role_id,
+      password: passwordMahasiswa,
+    })
+  : null;
+// The administrator: SEED_ADMIN_EMAIL, or the CONTOH email when it is not set.
 const admin = await pastikanAkun({
-  email: 'contoh-admin@example.invalid',
-  username: 'contoh-admin',
+  email: rencana.emailAdmin,
+  username: rencana.usernameAdmin,
   role_id: roleByName.get('administrator').role_id,
   password: passwordAdmin,
 });
-ringkasan.push('akun CONTOH: password disetel ulang dari .env');
+ringkasan.push(
+  rencana.buatAkunContoh
+    ? 'akun administrator dan akun CONTOH mahasiswa: password disetel ulang dari env'
+    : 'akun administrator: password disetel ulang dari env; akun CONTOH mahasiswa tidak dibuat'
+);
 
 // --- 6. sample mahasiswa profile (CONTOH): only when this mahasiswa does not exist yet
 // Kota from profil_contoh.json; 2 proyek + 2 sertifikasi are sample numbers (score 4, as in that file).
 const ISIAN_TAHAP_5 = { kota_domisili: profilContoh.domisili.kota, jumlah_proyek: 2, jumlah_sertifikasi: 2 };
-if (!(await prisma.mahasiswa.findUnique({ where: { user_id: user.user_id } }))) {
+if (!user) {
+  ringkasan.push('mahasiswa CONTOH: tidak dibuat (produksi tanpa SEED_AKUN_CONTOH=ya)');
+} else if (!(await prisma.mahasiswa.findUnique({ where: { user_id: user.user_id } }))) {
   const mahasiswa = await prisma.mahasiswa.create({
     data: {
       user_id: user.user_id,
@@ -208,5 +219,7 @@ if (!(await prisma.mahasiswa.findUnique({ where: { user_id: user.user_id } }))) 
 }
 
 console.log(`Seed selesai. ${ringkasan.join('; ')}.`);
-console.log(`Akun masuk: ${user.email} (mahasiswa), ${admin.email} (administrator); password dari .env.`);
+console.log(
+  `Akun masuk: ${user ? `${user.email} (mahasiswa), ` : ''}${admin.email} (administrator); password dari environment.`
+);
 await prisma.$disconnect();
