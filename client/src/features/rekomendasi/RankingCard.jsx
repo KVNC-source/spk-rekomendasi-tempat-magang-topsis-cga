@@ -53,7 +53,7 @@ export default function RankingCard({ item, kotaAsal, motion }) {
       </div>
 
       <ScoreBar
-        label="Kecocokan kompetensi"
+        label="Kesesuaian kompetensi"
         value={values.C1}
         countUp
         onDark={top}

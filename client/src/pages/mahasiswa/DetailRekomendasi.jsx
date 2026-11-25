@@ -168,9 +168,9 @@ export default function DetailRekomendasi() {
           <div className="mt-5 space-y-4">
             <Card as="section" aria-labelledby="sec-cga" className="motion-rise" style={{ "--i": 0 }}>
               <h2 id="sec-cga" className="font-display text-xl font-semibold leading-tight">
-                Kecocokan kompetensi
+                Kesesuaian kompetensi
               </h2>
-              <ScoreBar label="Compatibility Score" value={item.cga.compatibilityScore} countUp className="mt-3" />
+              <ScoreBar label="Kesesuaian kompetensi" value={item.cga.compatibilityScore} countUp className="mt-3" />
               <CgaSummary cga={item.cga} />
             </Card>
 
@@ -198,7 +198,7 @@ export default function DetailRekomendasi() {
               </div>
               <p className="mt-2 max-w-prose text-sm leading-relaxed text-ink">
                 Ini nilai relatif terhadap lowongan lain dalam daftar. Kalau daftarnya berubah, angkanya ikut berubah,
-                jadi bukan persentase kecocokan.
+                jadi bukan persentase kesesuaian.
               </p>
               <dl className="mt-3 divide-y divide-line rounded-ctl bg-mist-100 px-3 text-sm">
                 <div className="flex items-baseline justify-between gap-3 py-2">

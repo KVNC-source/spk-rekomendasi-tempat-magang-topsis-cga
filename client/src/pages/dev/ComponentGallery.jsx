@@ -92,7 +92,7 @@ export default function ComponentGallery() {
         </Card>
       </Section>
 
-      <Section title="Compatibility Score — hitung naik sekali">
+      <Section title="Kesesuaian kompetensi — hitung naik sekali">
         <Card className="flex items-baseline gap-2">
           <CountUp value={86.0} digits={1} className="text-4xl font-semibold" />
           <span className="font-mono text-muted">%</span>

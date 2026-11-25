@@ -90,7 +90,7 @@ export default function Pilihan() {
 
               {item ? (
                 <>
-                  <ScoreBar label="Kecocokan kompetensi" value={item.values.C1} countUp className="mt-4" />
+                  <ScoreBar label="Kesesuaian kompetensi" value={item.values.C1} countUp className="mt-4" />
                   <p className="mt-2 text-sm text-muted">
                     Peringkat <span className="font-mono">{item.rank}</span> dari{" "}
                     <span className="font-mono">{jumlah}</span> di rekomendasi terakhirmu
@@ -130,7 +130,7 @@ export default function Pilihan() {
                 </>
               ) : (
                 <p className="mt-4 max-w-prose rounded-ctl bg-mist-100 p-3 text-sm leading-relaxed text-ink">
-                  Skor kecocokannya belum bisa ditampilkan karena rekomendasimu belum dihitung, atau hasil barunya sudah
+                  Skor kesesuaiannya belum bisa ditampilkan karena rekomendasimu belum dihitung, atau hasil barunya sudah
                   tidak memuat tempat magang ini.
                 </p>
               )}
@@ -160,7 +160,7 @@ export default function Pilihan() {
               <div className="mt-4 flex flex-col gap-2 sm:flex-row">
                 {item && (
                   <Button to={`${REKOMENDASI}/${item.id}`} variant="secondary">
-                    Lihat detail kecocokan
+                    Lihat detail kesesuaian
                   </Button>
                 )}
                 <Button

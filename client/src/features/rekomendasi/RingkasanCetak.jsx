@@ -77,7 +77,7 @@ export default function RingkasanCetak({ mahasiswa, pilihan, item, jumlah, hasil
           {[
             ["Peringkat", `${item.rank} dari ${jumlah}`],
             ["Nilai akhir (Ci)", formatNumber(item.ci, 3)],
-            ["Compatibility Score (C1)", `${formatNumber(item.values.C1, 1)}%`],
+            ["Kesesuaian kompetensi (C1)", `${formatNumber(item.values.C1, 1)}%`],
           ].map(([label, nilai]) => (
             <div key={label} className="break-inside-avoid border border-black/60 px-3 py-2">
               <p className="text-[8.5pt] text-black/70">{label}</p>
@@ -86,7 +86,7 @@ export default function RingkasanCetak({ mahasiswa, pilihan, item, jumlah, hasil
           ))}
         </div>
         <p className="mt-1.5 text-[8.5pt] text-black/70">
-          Ci adalah nilai relatif terhadap tempat magang lain di daftar rekomendasi. C1 adalah tingkat kecocokan
+          Ci adalah nilai relatif terhadap tempat magang lain di daftar rekomendasi. C1 adalah tingkat kesesuaian
           kompetensi (0–100%).
         </p>
       </section>

@@ -7,7 +7,7 @@ import { formatNumber, formatTrim } from "../../lib/format";
  * names the `item.flags` entry that marks the value as an estimate.
  */
 export const KRITERIA = [
-  { code: "C1", nama: "Kecocokan kompetensi", show: (v) => `${formatNumber(v, 1)}%` },
+  { code: "C1", nama: "Kesesuaian kompetensi", show: (v) => `${formatNumber(v, 1)}%` },
   {
     code: "C2",
     nama: "Kesesuaian bidang",
