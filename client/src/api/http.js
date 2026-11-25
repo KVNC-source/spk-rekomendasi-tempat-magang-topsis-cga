@@ -1,4 +1,6 @@
-const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:5000";
+// In development the API runs on its own port. In the production build the server also serves the
+// website, so the API is at the same address and the paths below are relative (VITE_API_URL stays empty).
+const BASE_URL = import.meta.env.VITE_API_URL ?? (import.meta.env.PROD ? "" : "http://localhost:5000");
 
 export class ApiError extends Error {
   constructor(status, message, details) {

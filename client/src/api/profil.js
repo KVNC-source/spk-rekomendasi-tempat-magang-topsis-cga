@@ -46,7 +46,11 @@
  */
 import { apiFetch } from "./http";
 
-export const useMock = import.meta.env.VITE_USE_MOCK !== "false";
+// Development: the mock is on unless VITE_USE_MOCK=false. Production build: the mock is off unless
+// VITE_USE_MOCK=true, so a deployed site can never answer from the in-browser mock by accident.
+export const useMock = import.meta.env.PROD
+  ? import.meta.env.VITE_USE_MOCK === "true"
+  : import.meta.env.VITE_USE_MOCK !== "false";
 export const loadMock = () => import("./mock/mockApi");
 
 export const getKompetensi = () => (useMock ? loadMock().then((m) => m.getKompetensi()) : apiFetch("/api/kompetensi"));
