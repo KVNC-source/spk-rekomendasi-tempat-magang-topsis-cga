@@ -1,185 +1,205 @@
+import { ListChecks, Printer, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
+import { BrandMark, Button, Card, Chip, Divider, ScoreBar } from "../components/ui";
 
-const LANGKAH = [
+const MANFAAT = [
   {
-    nomor: 1,
-    judul: "Mahasiswa mengisi profil kompetensi",
-    detail: "Skala 1–4 dengan indikator perilaku per level",
-    olehSistem: true,
+    icon: ListChecks,
+    judul: "Dicocokkan dengan kompetensimu",
+    isi: "Setiap lowongan dibandingkan dengan kompetensi yang kamu isi, lalu diberi skor kesesuaian.",
   },
   {
-    nomor: 2,
-    judul: "Sistem menjalankan CGA",
-    detail: "Menghasilkan skor kesesuaian kompetensi",
-    olehSistem: true,
+    icon: TrendingUp,
+    judul: "Tahu apa yang perlu ditingkatkan",
+    isi: "Lihat kompetensi yang paling sering kurang di rekomendasi teratasmu, lengkap dengan level yang dibutuhkan.",
   },
   {
-    nomor: 3,
-    judul: "Sistem menjalankan TOPSIS",
-    detail: "Menyusun peringkat dari tujuh kriteria",
-    olehSistem: true,
-  },
-  {
-    nomor: 4,
-    judul: "Mahasiswa memilih dan mengajukan",
-    detail: "Bebas memilih, termasuk di luar urutan teratas",
-    olehSistem: false,
-  },
-  {
-    nomor: 5,
-    judul: "Koordinator mengevaluasi usulan",
-    detail: "Skor sebagai bahan pertimbangan, bukan perintah",
-    olehSistem: false,
-  },
-  {
-    nomor: 6,
-    judul: "Keputusan akhir oleh Program Studi",
-    detail: "Usulan disetujui atau ditolak koordinator",
-    olehSistem: false,
+    icon: Printer,
+    judul: "Ringkasan siap dibawa",
+    isi: "Simpan pilihanmu dan cetak ringkasannya sebagai bahan diskusi dengan koordinator magang.",
   },
 ];
 
-function IconInfo({ className }) {
+const LANGKAH = [
+  { judul: "Isi profil", isi: "Kompetensi, IPK, minat bidang, dan domisili." },
+  { judul: "Lihat rekomendasi", isi: "Urutan tempat magang beserta alasannya." },
+  { judul: "Simpan dan cetak", isi: "Pilih satu tempat dan bawa ringkasannya." },
+];
+
+// Small section label, the same one the other pages use above their groups.
+const label = "font-mono text-xs uppercase tracking-[0.18em] text-muted";
+
+// Inline link on the navy hero, like the sidebar links: light text, underlined, 44px tap height.
+const tautanGelap = "inline-flex min-h-11 items-center font-semibold text-mist-100 underline underline-offset-4";
+
+/** A static sample of one result card. It is a picture of the product, not data: the company is made up. */
+function ContohHasil() {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 8v5" />
-      <path d="M12 16h.01" />
-    </svg>
+    <Card as="article" aria-label="Contoh tampilan hasil rekomendasi" className="motion-rise" style={{ "--i": 3 }}>
+      <div className="flex items-center justify-between gap-3">
+        <Chip tone="navy">Contoh tampilan</Chip>
+        <Chip tone="azure">Peringkat teratas</Chip>
+      </div>
+
+      <div className="mt-4 flex gap-4">
+        <p aria-label="Peringkat 1" className="w-10 shrink-0 font-mono text-5xl font-semibold leading-none text-navy-700">
+          1
+        </p>
+        <div className="min-w-0">
+          <p className="font-display text-xl font-semibold leading-snug text-ink">PT Contoh Teknologi</p>
+          <p className="mt-0.5 text-sm text-muted">Web Developer Intern · Jakarta</p>
+        </div>
+      </div>
+
+      <ScoreBar label="Kesesuaian kompetensi" value={94} digits={0} className="mt-5" />
+
+      <div className="mt-4">
+        <p className="mb-1.5 text-sm text-muted">Perlu ditingkatkan</p>
+        <Chip tone="coral">Pengujian perangkat lunak: level 1 → 2</Chip>
+      </div>
+    </Card>
   );
 }
 
 export default function Landing() {
   return (
-    <div
-      className="flex min-h-dvh flex-col bg-ink font-sans lg:h-dvh lg:overflow-hidden"
-      style={{
-        backgroundImage:
-          "radial-gradient(at 8% 8%, rgba(47,111,224,0.30) 0, transparent 40%), radial-gradient(at 90% 92%, rgba(95,151,245,0.16) 0, transparent 42%)",
-      }}
-    >
-      <header className="mx-auto flex w-full max-w-6xl xl:max-w-7xl shrink-0 items-center justify-between gap-4 px-6 py-[clamp(1rem,2.8vh,1.875rem)] md:px-10 lg:px-8">
-        <div className="flex flex-col gap-1">
-          <span className="font-display text-[clamp(1rem,2.3vh,1.25rem)] font-semibold tracking-tight text-white">
-            SPK Magang
-          </span>
-          <span className="text-[clamp(0.6875rem,1.5vh,0.8125rem)] text-white/50">
-            Program Studi Teknik Informatika · Universitas Sam Ratulangi
-          </span>
-        </div>
-        <nav className="flex items-center gap-8">
-          <Link
-            to="/panduan"
-            className="hidden text-sm font-medium text-white/60 transition-colors hover:text-white sm:block"
-          >
-            Panduan
-          </Link>
-          <Link
-            to="/daftar"
-            className="hidden text-sm font-medium text-white/60 transition-colors hover:text-white sm:block"
-          >
-            Daftar
-          </Link>
-          <Link
-            to="/masuk"
-            className="rounded-full bg-white px-6 py-[clamp(0.5rem,1.3vh,0.625rem)] text-sm font-bold text-ink transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-          >
-            Masuk
-          </Link>
-        </nav>
-      </header>
+    <div className="flex min-h-dvh flex-col bg-canvas">
+      <div className="on-dark bg-navy-900 text-mist-100">
+        <header className="border-b border-navy-800">
+          <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 py-3 md:px-8">
+            <div className="flex min-w-0 items-center gap-3">
+              <BrandMark className="size-10 shrink-0" />
+              <div className="min-w-0 leading-tight">
+                <p className="font-display text-lg font-semibold">SPK Magang</p>
+                <p className="text-xs text-navy-200">Program Studi Teknik Informatika · Universitas Sam Ratulangi</p>
+              </div>
+            </div>
+            <nav aria-label="Menu utama" className="flex shrink-0 items-center gap-1">
+              <div className="hidden sm:block">
+                <Link
+                  to="/daftar"
+                  className="press inline-flex min-h-11 items-center rounded-ctl px-4 text-base font-semibold text-navy-100 hover:bg-navy-800"
+                >
+                  Daftar
+                </Link>
+              </div>
+              <Button to="/masuk" variant="light">
+                Masuk
+              </Button>
+            </nav>
+          </div>
+        </header>
 
-      <main className="mx-auto flex w-full max-w-6xl xl:max-w-7xl flex-1 flex-col justify-center gap-14 px-6 py-12 md:px-10 lg:min-h-0 lg:flex-row lg:items-center lg:gap-20 lg:px-8 lg:py-[clamp(0.5rem,3vh,4rem)]">
-        <section className="flex max-w-xl flex-1 flex-col lg:max-w-none gap-[clamp(1rem,3.2vh,2.5rem)]">
-          <h1 className="font-display text-[2rem] font-semibold leading-[1.06] tracking-[-0.03em] text-white sm:text-[2.5rem] lg:text-[clamp(2.125rem,7vh,4.5rem)]">
-            Pemilihan tempat magang dengan dasar yang terukur.
-          </h1>
+        <section className="mx-auto grid w-full max-w-5xl gap-10 px-4 py-10 md:px-8 lg:grid-cols-2 lg:items-center lg:gap-14 lg:py-14">
+          <div>
+            <p className="motion-rise font-mono text-xs uppercase tracking-[0.18em] text-navy-200" style={{ "--i": 0 }}>
+              SPK Magang · Teknik Informatika Unsrat
+            </p>
+            <h1
+              className="motion-rise mt-3 font-display text-3xl font-semibold leading-[1.05] md:text-4xl"
+              style={{ "--i": 1 }}
+            >
+              Temukan tempat magang yang cocok dengan kompetensimu.
+            </h1>
+            <div className="motion-rise mt-4" style={{ "--i": 2 }}>
+              <Divider className="text-navy-300/60" />
+            </div>
+            <p className="motion-rise mt-4 max-w-prose text-base leading-relaxed text-navy-100" style={{ "--i": 2 }}>
+              Isi profil kompetensimu sekali. Sistem mencocokkannya dengan kebutuhan setiap lowongan, menyusun
+              rekomendasi, dan menunjukkan apa yang masih perlu kamu tingkatkan.
+            </p>
 
-          <p className="max-w-lg text-[clamp(0.9375rem,2.1vh,1.1875rem)] leading-relaxed text-white/60">
-            Sistem ini membandingkan profil kompetensi mahasiswa dengan
-            kebutuhan tiap tempat magang, lalu menyusun urutan alternatif
-            sebagai bahan pertimbangan. Keputusan akhir tetap pada mahasiswa dan
-            koordinator magang.
-          </p>
+            <div className="motion-rise mt-6 flex flex-wrap items-center gap-x-6 gap-y-1" style={{ "--i": 3 }}>
+              <Button to="/daftar" size="lg">
+                Daftar sebagai mahasiswa
+              </Button>
+              <Link to="/masuk" className={tautanGelap}>
+                Sudah punya akun? Masuk
+              </Link>
+            </div>
 
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-            <Link
-              to="/daftar"
-              className="rounded-full bg-white px-8 py-[clamp(0.75rem,2.1vh,1.125rem)] text-[clamp(0.875rem,1.85vh,1.0625rem)] font-bold text-ink transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-            >
-              Daftar sebagai mahasiswa
-            </Link>
-            <Link
-              to="/masuk"
-              className="text-[clamp(0.875rem,1.85vh,1.0625rem)] font-semibold text-white underline decoration-white/40 underline-offset-4 transition-colors hover:decoration-white"
-            >
-              Sudah punya akun? Masuk
-            </Link>
-            <Link
-              to="/panduan"
-              className="text-[clamp(0.875rem,1.85vh,1.0625rem)] font-semibold text-white/60 underline decoration-white/25 underline-offset-4 transition-colors hover:text-white hover:decoration-white/50"
-            >
-              Baca panduan penggunaan
-            </Link>
+            <p className="motion-rise mt-5 max-w-prose text-sm text-navy-200" style={{ "--i": 4 }}>
+              Rekomendasi adalah bahan pertimbangan. Keputusan akhir tetap di tanganmu dan koordinator magang.
+            </p>
           </div>
 
-          <div className="flex items-start gap-3 text-white/45">
-            <IconInfo className="mt-0.5 h-4 w-4 shrink-0" />
-            <span className="text-[clamp(0.75rem,1.7vh,0.9375rem)] leading-relaxed">
-              Mahasiswa mendaftar sendiri dengan NIM dan email. Pendaftaran hanya
-              untuk mahasiswa; akun administrator dibuat oleh peneliti.
-            </span>
+          <div className="mx-auto w-full max-w-md lg:mx-0 lg:ml-auto">
+            <ContohHasil />
           </div>
         </section>
+      </div>
 
-        <section className="flex w-full max-w-md shrink-0 flex-col lg:max-w-none gap-[clamp(0.625rem,1.7vh,1.125rem)] lg:w-[24rem] xl:w-[27.5rem] 2xl:w-[30rem]">
-          <span className="pl-1 text-[clamp(0.625rem,1.35vh,0.75rem)] font-semibold uppercase tracking-[0.18em] text-white/35">
-            Alur enam langkah
-          </span>
+      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-12 px-4 py-10 md:px-8 lg:py-14">
+        <section aria-labelledby="manfaat">
+          <h2 id="manfaat" className="sr-only">
+            Manfaat
+          </h2>
+          <ul className="grid gap-3 md:grid-cols-3 md:gap-4">
+            {MANFAAT.map(({ icon: Icon, judul, isi }, i) => (
+              <li key={judul} className="motion-rise" style={{ "--i": i }}>
+                <Card className="h-full">
+                  <span className="grid size-10 place-items-center rounded-ctl bg-azure-100 text-navy-900">
+                    <Icon aria-hidden="true" size={20} strokeWidth={1.9} />
+                  </span>
+                  <h3 className="mt-3 font-display text-lg font-semibold leading-snug text-ink">{judul}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-muted">{isi}</p>
+                </Card>
+              </li>
+            ))}
+          </ul>
+        </section>
 
-          <ol className="flex flex-col rounded-3xl border border-white/10 bg-white/[0.03] px-[clamp(1.25rem,3.2vh,2.125rem)]">
-            {LANGKAH.map((langkah, i) => (
-              <li
-                key={langkah.nomor}
-                className={`flex items-start gap-3.5 py-[clamp(0.625rem,2.4vh,1.5rem)] ${
-                  i > 0 ? "border-t border-white/[0.07]" : ""
-                }`}
-              >
-                <span
-                  className={`mt-px flex h-[clamp(1.125rem,2.8vh,1.75rem)] w-[clamp(1.125rem,2.8vh,1.75rem)] shrink-0 items-center justify-center rounded-full text-[clamp(0.5625rem,1.3vh,0.8125rem)] font-bold ${
-                    langkah.olehSistem
-                      ? "bg-signal/15 text-signal"
-                      : "bg-white/5 text-white/40"
-                  }`}
-                >
-                  {langkah.nomor}
+        <section aria-labelledby="cara-kerja">
+          <h2 id="cara-kerja" className={label}>
+            Cara kerja
+          </h2>
+          <ol className="mt-3 grid gap-4 md:grid-cols-3 md:gap-6">
+            {LANGKAH.map(({ judul, isi }, i) => (
+              <li key={judul} className="motion-rise flex items-start gap-3 border-t border-line pt-4" style={{ "--i": i }}>
+                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-azure-100 font-mono text-xs font-semibold text-navy-900">
+                  {i + 1}
                 </span>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-[clamp(0.8125rem,1.9vh,1.125rem)] font-semibold leading-snug text-white">
-                    {langkah.judul}
-                  </span>
-                  <span className="text-[clamp(0.6875rem,1.65vh,0.9375rem)] leading-relaxed text-white/45">
-                    {langkah.detail}
-                  </span>
+                <div className="min-w-0">
+                  <h3 className="text-base font-semibold leading-snug text-ink">{judul}</h3>
+                  <p className="mt-0.5 text-sm text-muted">{isi}</p>
                 </div>
               </li>
             ))}
           </ol>
         </section>
+
+        <section aria-labelledby="metode">
+          <Card tone="quiet">
+            <h2 id="metode" className={label}>
+              Metode
+            </h2>
+            <p className="mt-2 max-w-prose text-sm leading-relaxed text-ink">
+              Di balik layar, Analisis Kesenjangan Kompetensi (Competency Gap Analysis) mengukur kecocokan
+              kompetensimu dengan setiap lowongan, lalu TOPSIS menyusun peringkat dari tujuh kriteria: kesesuaian
+              kompetensi, minat bidang, IPK, jarak, benefit finansial, reputasi perusahaan, serta pengalaman dan
+              sertifikasi.
+            </p>
+          </Card>
+        </section>
+
+        <section
+          aria-labelledby="ajakan"
+          className="on-dark flex flex-col gap-5 rounded-card bg-navy-900 px-5 py-6 text-mist-100 md:flex-row md:items-center md:justify-between md:px-8 md:py-8"
+        >
+          <h2 id="ajakan" className="font-display text-2xl font-semibold leading-tight">
+            Siap mencari tempat magang yang cocok?
+          </h2>
+          <Button to="/daftar" size="lg" className="shrink-0">
+            Daftar sebagai mahasiswa
+          </Button>
+        </section>
       </main>
 
-      <footer className="mx-auto flex w-full max-w-6xl xl:max-w-7xl shrink-0 flex-col gap-1 border-t border-white/10 px-6 py-[clamp(0.75rem,2.2vh,1.5rem)] text-[clamp(0.625rem,1.45vh,0.8125rem)] text-white/40 sm:flex-row sm:items-center sm:justify-between md:px-10 lg:px-8">
-        <span>Fakultas Teknik · Universitas Sam Ratulangi Manado</span>
-        <span>Sistem pendukung keputusan — bukan pengambil keputusan</span>
+      <footer className="border-t border-line">
+        <div className="mx-auto flex w-full max-w-5xl flex-col gap-1 px-4 py-4 text-xs text-muted sm:flex-row sm:items-center sm:justify-between md:px-8">
+          <span>Fakultas Teknik · Universitas Sam Ratulangi Manado</span>
+          <span>Sistem pendukung keputusan — bukan pengambil keputusan</span>
+        </div>
       </footer>
     </div>
   );
